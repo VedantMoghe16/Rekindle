@@ -16,6 +16,10 @@ Other source conflicts/open decisions: §6.8's “31 deals” hero contradicts �
 
 Capture's review-before-save UI (§6.4) and immediate-save route description (§10) are reconciled by an extraction preview followed by explicit confirmation using the capture endpoint/service; no memory is finalized before “Looks right.” Generic unknown offline input retains editable input and a low-confidence OTHER fallback, while known sample hashes use precomputed memories. The audit scheduler can queue five rows (§6.8) but the shared LLM semaphore admits at most four provider calls (§13). Retention/deletion/India residency, OAuth, matcher learning and paid workspaces are roadmap copy, not new product features.
 
+## Current cycle environment blocker (2026-10-03)
+
+T001 remains unchecked. Node 22.23.3 and npm 10.9.9 are installed at `/home/24b4518/.local/node/bin` but are absent from the default PATH. Shell access to `nodejs.org` and `registry.npmjs.org` fails DNS resolution (curl exit 6). The existing npm cache contains only Next.js 16.3.0, Zod 4.4.3 and no `zod-to-json-schema` package; it cannot currently supply the verified patched framework and compatible schema-conversion pair required by T001. Restore registry access or provision those package artifacts and their transitive dependencies before resuming T001. No product scaffold or lockfile has been fabricated; dev/build/start acceptance is unverified. The protected gate passes only its existing planning/shell checks.
+
 ## M0 — Foundation (P0; §§6.0, 8–11, 14–15)
 
 - [ ] T001 — Scaffold Next.js App Router and TypeScript with a pinned supported runtime, lockfile, dev/build/start scripts and the §11 directory layout. Dependencies: none. Accept: minimal page runs in dev and production build; document chosen stable versions without assuming spec model/version examples are current. Bind dev/start to 127.0.0.1 by default; DB/native modules use Node runtime and DB-backed pages render dynamically; pin compatible zod/schema-conversion versions.
