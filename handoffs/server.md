@@ -6,15 +6,15 @@ T001 — foundation scaffold, selected as the first ready task. Blocked by unava
 
 ## Work completed
 
-Read PRODUCT_SPEC.md, AI_WORKFLOW.md, TASKS.md and the prior handoff; inspected git status, diff and the last ten commits. The only pre-existing untracked file, CODEX_WRITE_TEST.txt, contains a write-access probe and was preserved unchanged. No existing product code or manifest is present.
+Read PRODUCT_SPEC.md completely, AI_WORKFLOW.md, TASKS.md and the prior handoff; inspected git status, diff and the last ten commits. The working tree was clean on branch agent/server. CODEX_WRITE_TEST.txt is now tracked and contains the same write-access probe; preserved unchanged. No product code or manifest is present.
 
-Found Node 22.23.3 and npm 10.9.9 under /home/24b4518/.local/node/bin, outside default PATH. Checked the local npm cache read-only. It contains Next.js 16.3.0, React/react-dom 19.2.0, TypeScript 6.0.3 and Zod 4.4.3, but no zod-to-json-schema or alternative Next.js tarball. curl requests to nodejs.org and registry.npmjs.org both failed DNS resolution, preventing dependency provisioning.
+Rechecked the previous T001 blocker on 2026-10-03. Node 22.23.3 and npm 10.9.9 still execute from /home/24b4518/.local/node/bin. Read-only npm cache searches still show only the Next.js 16.3.0 tarball and Zod 4.4.3 tarball, with no zod-to-json-schema artifact. Both bounded HTTPS probes to registry.npmjs.org and nodejs.org still fail DNS resolution (curl exit 6). Dependency provisioning remains unavailable, so the scaffold cannot meet installation/build/start acceptance in this environment.
 
-Checked official framework release information through the web tool: https://nextjs.org/blog/upcoming-nextjs-security-release-september-2026 recommends the September patched release (expected 16.3.8/15.5.27), rather than the cached 16.3.0. Recheck published release metadata when registry access returns. The converter maintainer documents Zod v3 schema compatibility and deprecation at https://github.com/StefanTerdell/zod-to-json-schema; do not silently substitute Zod v4 schema conversion for the specified library.
+Prior handoff release observations were not revalidated online this cycle. Recheck supported framework/runtime versions and compatible Zod/converter metadata when registry access is restored; do not treat the prior expected patch version as a verified published release.
 
 ## Files changed
 
-- TASKS.md — added the concrete T001 environment blocker; all checkboxes remain unchecked.
+- TASKS.md — recorded the repeated T001 blocker checks; all checkboxes remain unchecked.
 - handoffs/server.md — recorded this bounded cycle and retained prior planning decisions below.
 
 No product or protected orchestration files were changed. No commits, pushes or branch changes.
