@@ -1,0 +1,4 @@
+.ai-state/
+.ai-logs/
+.env
+.env.*
