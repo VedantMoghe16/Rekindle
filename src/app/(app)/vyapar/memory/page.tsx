@@ -1,6 +1,6 @@
 import { Brain, Building2, MessageCircle, Phone, Send, ShoppingCart, Bot, StickyNote } from "lucide-react";
 import { AppBar, ProviderTag, dayLabel, timeLabel } from "@/components/paytm/ui";
-import { VyaparTabs } from "@/components/paytm/nav";
+import { HomeNav, VyaparTabs } from "@/components/paytm/nav";
 import { AskBox } from "@/components/vyapar/ask-box";
 import { db } from "@/lib/db";
 import { isCogneeConfigured } from "@/lib/providers/cognee";
@@ -15,7 +15,8 @@ export default async function MemoryPage() {
   const counts = await db.knowledgeEvent.groupBy({ by: ["kind"], _count: true });
   let lastDay = "";
   return <div className="page">
-    <AppBar title="Business memory" sub={isCogneeConfigured() ? "Everything your AI team learned · Cognee knowledge graph" : "Everything your AI team learned"} back="/vyapar" right={<ProviderTag provider={isCogneeConfigured() ? "cognee" : "local"} />} />
+    <AppBar title="Business memory" sub={isCogneeConfigured() ? "Everything your AI team learned · Cognee knowledge graph" : "Everything your AI team learned"} right={<ProviderTag provider={isCogneeConfigured() ? "cognee" : "local"} />} />
+    <VyaparTabs />
     <main className="scroll"><div className="pad">
       <div className="card stack">
         <div className="card-title"><span className="row"><Brain size={16} />Ask your business memory</span></div>
@@ -35,6 +36,6 @@ export default async function MemoryPage() {
         </div>];
       })}
     </div></main>
-    <VyaparTabs />
+    <HomeNav />
   </div>;
 }

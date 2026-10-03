@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Box, Brain, CalendarDays, Check, Clock, Heart, MessageCircle, TriangleAlert, Truck } from "lucide-react";
 import { AppBar, Avatar, ProviderTag, dayLabel, timeLabel } from "@/components/paytm/ui";
-import { VyaparTabs } from "@/components/paytm/nav";
+import { HomeNav, VyaparTabs } from "@/components/paytm/nav";
 import { AskBox } from "@/components/vyapar/ask-box";
 import { imageFor } from "@/lib/vyapar/images";
 import { isCogneeConfigured } from "@/lib/providers/cognee";
@@ -35,6 +35,7 @@ export default async function MerchantPage({ params }: { params: Promise<{ id: s
 
   return <div className="page">
     <AppBar title="Merchant memory" sub={isCogneeConfigured() ? "Cognee knowledge graph" : "Vyapar memory (Cognee when connected)"} back={deal ? `/vyapar/deals/${deal.id}` : "/vyapar/deals"} />
+    <VyaparTabs />
     <main className="scroll">
       {img && <div className="banner-photo" style={{ backgroundImage: `url(${img.src})` }}>
         <span className="credit">Representative photo · <a href={img.page} target="_blank" rel="noreferrer">{img.artist}</a>, {img.license}</span>
@@ -91,6 +92,6 @@ export default async function MerchantPage({ params }: { params: Promise<{ id: s
         </div>
       </div>
     </main>
-    <VyaparTabs />
+    <HomeNav />
   </div>;
 }

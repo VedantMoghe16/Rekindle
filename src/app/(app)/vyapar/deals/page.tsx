@@ -1,5 +1,5 @@
 import { AppBar, inr } from "@/components/paytm/ui";
-import { VyaparTabs } from "@/components/paytm/nav";
+import { HomeNav, VyaparTabs } from "@/components/paytm/nav";
 import { DealList, ReviveCards } from "@/components/vyapar/deals-board";
 import { AskBox } from "@/components/vyapar/ask-box";
 import { getDealsOverview } from "@/lib/vyapar/server/insights";
@@ -19,7 +19,8 @@ export default async function DealsPage() {
   const pending = requests.filter((r) => r.status === "REQUESTED");
   const max = Math.max(1, o.funnel[0].value);
   return <div className="page">
-    <AppBar title="My Deals" sub="Vyapar AI · your merchant pipeline" back="/vyapar" />
+    <AppBar title="My Deals" sub="Vyapar AI · your merchant pipeline" />
+    <VyaparTabs />
     <main className="scroll">
       <div className="pad">
         <div className="kpis">
@@ -54,6 +55,6 @@ export default async function DealsPage() {
         </div>
       </div>
     </main>
-    <VyaparTabs />
+    <HomeNav />
   </div>;
 }

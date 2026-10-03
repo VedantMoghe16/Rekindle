@@ -1,7 +1,8 @@
+import { VyaparIntro } from "@/components/vyapar/vyapar-intro";
 import Link from "next/link";
-import { BellRing, ChevronRight, Search, Sparkles } from "lucide-react";
+import { BellRing, ChevronRight, Search } from "lucide-react";
 import { AppBar, dayLabel } from "@/components/paytm/ui";
-import { VyaparTabs } from "@/components/paytm/nav";
+import { HomeNav, VyaparTabs } from "@/components/paytm/nav";
 import { PromptBox } from "@/components/vyapar/prompt-box";
 import { recentHunts } from "@/lib/vyapar/server/hunts";
 import { getDealsOverview, getHomeStats } from "@/lib/vyapar/server/insights";
@@ -12,13 +13,13 @@ export default async function VyaparHome() {
   const [stats, hunts, overview] = await Promise.all([getHomeStats(), recentHunts(), getDealsOverview()]);
   const top = overview.revivals[0];
   return <div className="page">
-    <AppBar title="Vyapar AI" sub="Your AI sales teammate" back="/" right={<span className="ai-chip"><Sparkles />Beta</span>} />
+    <AppBar title="Vyapar AI" sub="Your AI sales teammate" right={<VyaparIntro />} />
+    <VyaparTabs />
     <main className="scroll">
       <div className="hero-ai">
         <div className="greet">Namaste {stats.ownerFirstName} 👋</div>
         <h2>Kya bechna hai, aur <em>kisko?</em></h2>
         <PromptBox />
-        <ol className="flow-strip"><li><b>1</b>Ask who to find</li><li><b>2</b>Check the shops</li><li><b>3</b>Tap Start: AI team messages &amp; calls at their quietest hour</li></ol>
       </div>
       <div className="pad">
         {top && <Link href="/vyapar/deals" className="revive">
@@ -31,6 +32,6 @@ export default async function VyaparHome() {
         </div>}
       </div>
     </main>
-    <VyaparTabs />
+    <HomeNav />
   </div>;
 }

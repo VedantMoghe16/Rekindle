@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { Info, Sparkles } from "lucide-react";
 import { AppBar, ProviderTag } from "@/components/paytm/ui";
-import { VyaparTabs } from "@/components/paytm/nav";
+import { HomeNav, VyaparTabs } from "@/components/paytm/nav";
 import { PlanSteps, RevealAfterSteps } from "@/components/vyapar/plan-steps";
 import { RadarMap, type Pin } from "@/components/vyapar/radar-map";
 import { OpportunityCard, type CardLead } from "@/components/vyapar/opportunity-card";
@@ -44,6 +44,7 @@ export default async function HuntPage({ params, searchParams }: { params: Promi
 
   return <div className="page">
     <AppBar title={`${hunt.shortlist.length} opportunities near you`} sub={`${plan.product} · within ${plan.radiusKm} km · ${paytmCount} on Paytm`} back="/vyapar" />
+    <VyaparTabs />
     <main className="scroll">
       <div className="pad" style={{ paddingBottom: 0 }}>
         <div className="card">
@@ -88,6 +89,6 @@ export default async function HuntPage({ params, searchParams }: { params: Promi
       </RevealAfterSteps>
     </main>
     <OutreachBar huntId={hunt.id} candidates={hunt.shortlist.filter((l) => l.opp.action === "pitch" && !l.dealId).slice(0, 5).map((l) => ({ id: l.id, name: l.merchant.name, category: l.merchant.category, distanceKm: l.opp.distanceKm }))} />
-    <VyaparTabs />
+    <HomeNav />
   </div>;
 }

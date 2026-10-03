@@ -1,5 +1,5 @@
 import { AppBar, ProviderTag, dayLabel } from "@/components/paytm/ui";
-import { VyaparTabs } from "@/components/paytm/nav";
+import { HomeNav, VyaparTabs } from "@/components/paytm/nav";
 import { CampaignStudio } from "@/components/vyapar/campaign-studio";
 import { getCampaignState } from "@/lib/vyapar/server/insights";
 
@@ -10,6 +10,7 @@ export default async function CampaignsPage() {
   const max = Math.max(1, ...s.objections.map((o) => o.count));
   return <div className="page">
     <AppBar title="Campaigns" sub="Built from what buyers actually said" back="/vyapar" />
+    <VyaparTabs />
     <main className="scroll">
       <div className="pad">
         <div className="card">
@@ -28,6 +29,6 @@ export default async function CampaignsPage() {
         </div>
       </div>
     </main>
-    <VyaparTabs />
+    <HomeNav />
   </div>;
 }

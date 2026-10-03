@@ -7,12 +7,15 @@ import { toast } from "@/components/paytm/toast";
 
 const soon = (what: string) => () => toast(`${what} is part of the main Paytm app, not this prototype`);
 
+/** The app's own navigation: always at the bottom of every main screen, Vyapar AI included. */
 export function HomeNav() {
+  const pathname = usePathname();
+  const vyapar = pathname.startsWith("/vyapar");
   return <nav className="bottomnav">
-    <Link className="on" href="/"><House />Home</Link>
+    <Link className={vyapar ? "" : "on"} href="/"><House />Home</Link>
     <button onClick={soon("Payments")}><ReceiptText />Payments</button>
     <button onClick={soon("Scan & Pay")} aria-label="Scan"><span className="scan"><ScanLine /></span></button>
-    <Link href="/vyapar"><Sparkles />Vyapar AI</Link>
+    <Link className={vyapar ? "on" : ""} href="/vyapar"><Sparkles />Vyapar AI</Link>
     <button onClick={soon("Profile")}><User />Profile</button>
   </nav>;
 }
@@ -20,13 +23,14 @@ export function HomeNav() {
 const TABS = [
   { href: "/vyapar", label: "Find", Icon: Search, match: (p: string) => p === "/vyapar" || p.startsWith("/vyapar/hunts") || p.startsWith("/vyapar/leads") },
   { href: "/vyapar/fleet", label: "AI team", Icon: Bot, match: (p: string) => p.startsWith("/vyapar/fleet") || p.startsWith("/vyapar/onboarding") },
-  { href: "/vyapar/deals", label: "Deals", Icon: Handshake, match: (p: string) => p.startsWith("/vyapar/deals") || p.startsWith("/vyapar/merchants") || p.startsWith("/vyapar/requests") },
-  { href: "/vyapar/memory", label: "Memory", Icon: Brain, match: (p: string) => p.startsWith("/vyapar/memory") },
+  { href: "/vyapar/deals", label: "Deals", Icon: Handshake, match: (p: string) => p.startsWith("/vyapar/deals") || p.startsWith("/vyapar/merchants") || p.startsWith("/vyapar/requests") || p.startsWith("/vyapar/followups") },
+  { href: "/vyapar/memory", label: "Memory", Icon: Brain, match: (p: string) => p.startsWith("/vyapar/memory") || p.startsWith("/vyapar/business") || p.startsWith("/vyapar/campaigns") },
 ];
 
+/** Sections inside Vyapar AI: a tab strip under the title (the bottom bar stays the app's). */
 export function VyaparTabs() {
   const pathname = usePathname();
-  return <nav className="bottomnav four">{TABS.map(({ href, label, Icon, match }) => <Link key={href} href={href} className={match(pathname) ? "on" : ""}><Icon />{label}</Link>)}</nav>;
+  return <nav className="top-tabs" aria-label="Vyapar AI sections">{TABS.map(({ href, label, Icon, match }) => <Link key={href} href={href} className={match(pathname) ? "on" : ""} aria-current={match(pathname) ? "page" : undefined}><Icon />{label}</Link>)}</nav>;
 }
 
 export function SoonTile({ label, children, className = "tile" }: { label: string; children: React.ReactNode; className?: string }) {

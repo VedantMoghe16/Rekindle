@@ -1,6 +1,6 @@
 import { BadgeCheck, Clock, Gift, IndianRupee, Package, Truck, Wallet } from "lucide-react";
 import { AppBar, Avatar } from "@/components/paytm/ui";
-import { VyaparTabs } from "@/components/paytm/nav";
+import { HomeNav, VyaparTabs } from "@/components/paytm/nav";
 import { getSeller } from "@/lib/vyapar/server/context";
 import { learningReadiness, loadPreferenceRows } from "@/lib/vyapar/server/opportunities";
 import { rupees } from "@/lib/vyapar/taxonomy";
@@ -15,6 +15,7 @@ export default async function BusinessPage() {
   const activePrefs = prefRows.filter((p) => p.active && p.kind !== "CAPACITY_ANSWER");
   return <div className="page">
     <AppBar title="My offers" sub="What Vyapar AI is allowed to offer buyers" back="/vyapar" />
+    <VyaparTabs />
     <main className="scroll">
       <div className="pad">
         <div className="card row" style={{ gap: 12 }}>
@@ -57,6 +58,6 @@ export default async function BusinessPage() {
         </div>
       </div>
     </main>
-    <VyaparTabs />
+    <HomeNav />
   </div>;
 }

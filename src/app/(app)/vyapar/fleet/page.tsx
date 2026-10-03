@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ChevronRight, Settings2 } from "lucide-react";
 import { AppBar } from "@/components/paytm/ui";
-import { VyaparTabs } from "@/components/paytm/nav";
+import { HomeNav, VyaparTabs } from "@/components/paytm/nav";
 import { FleetConsole } from "@/components/vyapar/fleet-console";
 import { ensureWorker, getDemoContacts, getFleetRun, recentRuns } from "@/lib/vyapar/server/fleet";
 
@@ -16,7 +16,8 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
   if (run) ensureWorker(run);
   const past = runs.filter((r) => r.id !== run?.id);
   return <div className="page">
-    <AppBar title="AI sales team" sub="Messages and calls the shops you picked in Find" back="/vyapar" />
+    <AppBar title="AI sales team" sub="Messages and calls the shops you picked in Find" />
+    <VyaparTabs />
     <main className="scroll"><div className="pad">
       <FleetConsole key={run?.id ?? "none"} initialRun={run ? JSON.parse(JSON.stringify(run)) : null} contacts={contacts.map((c) => ({ priority: c.priority, phone: c.phone, telegramChatId: c.telegramChatId }))} />
       {past.length > 0 && <div className="card">
@@ -32,6 +33,6 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
         <ChevronRight size={18} />
       </Link>
     </div></main>
-    <VyaparTabs />
+    <HomeNav />
   </div>;
 }
