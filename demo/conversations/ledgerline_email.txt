@@ -1,0 +1,12 @@
+From: Priya Nair <priya@ledgerline.example>
+Date: 5 May 2026
+Subject: Re: Follow-up on CloudKavach evaluation
+
+Hi Ananya,
+
+We've completed the evaluation. The SOC 2 workflow is great, but our auditors require ISO 27001 Annex A control mapping, not just SOC 2. Without that, I can't justify a second tool to our CFO.
+
+If ISO 27001 support lands on your roadmap, please let me know. We'd move quickly.
+
+Best,
+Priya

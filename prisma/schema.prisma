@@ -1,0 +1,228 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model SellerProfile {
+  id                String   @id
+  name              String
+  oneLiner          String
+  product           String
+  icp               String
+  personasJson      String
+  proofPointsJson   String
+  roleKeywordsJson  String
+  changelogJson     String
+  repName           String
+  updatedAt         DateTime @updatedAt
+}
+
+model Account {
+  id              String   @id
+  name            String
+  domain          String?
+  industry        String?
+  sizeBand        String?
+  city            String?
+  careersProvider String   @default("none")
+  careersToken    String?
+  isDemo          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  contacts        Contact[]
+  deals           Deal[]
+  signals         Signal[]
+}
+
+model Contact {
+  id        String  @id
+  accountId String
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  name      String
+  title     String?
+  role      String  @default("unknown")
+}
+
+model Deal {
+  id              String   @id
+  accountId       String
+  account         Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  ownerName       String
+  valueInr        Int
+  stage           String   @default("stalled")
+  stalledAt       DateTime?
+  lastTouchAt     DateTime?
+  lane            String   @default("WATCH")
+  priorityScore   Int      @default(0)
+  matchScore      Int      @default(0)
+  interactions    Interaction[]
+  memory          Memory?
+  recommendations Recommendation[]
+  laneChanges     LaneChange[]
+}
+
+model Interaction {
+  id               String   @id
+  dealId           String
+  deal             Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  channel          String
+  occurredAt       DateTime
+  rawText          String
+  normalizedText   String
+  contentHash      String   @unique
+  audioFile        String?
+  transcriptCached Boolean  @default(false)
+  createdAt        DateTime @default(now())
+}
+
+model Memory {
+  id                    String   @id
+  dealId                String   @unique
+  deal                  Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  stallCategory         String
+  summary               String
+  evidenceQuote         String
+  evidenceSpeaker       String?
+  evidenceDate          DateTime?
+  evidenceInteractionId String?
+  evidenceVerified      Boolean  @default(true)
+  timingJson            String
+  competitorJson        String
+  missingFeatureJson    String
+  stakeholdersJson      String
+  commitmentsJson       String
+  sentiment             String
+  language              String
+  confidence            Float
+  editedByUser          Boolean  @default(false)
+  updatedAt             DateTime @updatedAt
+}
+
+model Signal {
+  id         String   @id
+  accountId  String
+  account    Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  dealId     String?
+  type       String
+  title      String
+  detail     String?
+  sourceName String
+  sourceUrl  String?
+  occurredAt DateTime
+  detectedAt DateTime @default(now())
+  provenance String
+  stale      Boolean  @default(false)
+  rawJson    String?
+  dedupeKey  String   @unique
+}
+
+model Recommendation {
+  id                 String   @id
+  dealId             String
+  deal               Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  signalIdsJson      String
+  effect             String
+  matchScore         Int
+  priorityScore      Int
+  lane               String
+  headline           String
+  explanation        String
+  scoreBreakdownJson String
+  status             String   @default("new")
+  snoozedUntil       DateTime?
+  isCurrent          Boolean  @default(true)
+  createdAt          DateTime @default(now())
+}
+
+model LaneChange {
+  id        String   @id @default(cuid())
+  dealId    String
+  deal      Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  fromLane  String
+  toLane    String
+  reason    String
+  createdAt DateTime @default(now())
+  seen      Boolean  @default(false)
+}
+
+model DiscoveryThread {
+  id                  String        @id
+  title               String
+  currentCriteriaJson String
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  messages            ChatMessage[]
+  icpVersions         IcpVersion[]
+  researchRuns        ResearchRun[]
+}
+
+model ChatMessage {
+  id         String          @id @default(cuid())
+  threadId   String
+  thread     DiscoveryThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  role       String
+  content    String
+  createdAt  DateTime        @default(now())
+}
+
+model IcpVersion {
+  id           String          @id @default(cuid())
+  threadId     String
+  thread       DiscoveryThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  version      Int
+  prompt       String
+  criteriaJson String
+  createdAt    DateTime        @default(now())
+
+  @@unique([threadId, version])
+}
+
+model ResearchRun {
+  id           String          @id @default(cuid())
+  threadId     String
+  thread       DiscoveryThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  criteriaJson String
+  status       String          @default("completed")
+  resultCount  Int
+  isDemo       Boolean         @default(true)
+  createdAt    DateTime        @default(now())
+}
+
+model LeadCandidate {
+  id                String         @id
+  name              String
+  domain            String         @unique
+  industry          String
+  city              String
+  sizeBand          String
+  fundingStage      String?
+  fitScore          Int
+  timingScore       Int
+  overallScore      Int
+  confidence        String
+  suggestedPersona  String
+  whyFitJson        String
+  tagsJson          String
+  status            String         @default("SUGGESTED")
+  promotedAccountId String?
+  isDemo            Boolean        @default(true)
+  createdAt         DateTime       @default(now())
+  evidence          LeadEvidence[]
+}
+
+model LeadEvidence {
+  id          String        @id
+  candidateId String
+  candidate   LeadCandidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  kind        String
+  title       String
+  excerpt     String
+  sourceName  String
+  sourceUrl   String?
+  observedAt  DateTime
+  confidence  String
+  isDemo      Boolean       @default(true)
+}

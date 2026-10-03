@@ -1,0 +1,1 @@
+export default function LoopPage() { return <div className="content"><div className="eyebrow">P1 · Upcoming</div><h1>Revenue Loop</h1><p className="subtitle">See which signals and messages bring stalled deals back.</p><div className="placeholder">Outcome learning begins after the P0 demo path is complete.</div></div>; }

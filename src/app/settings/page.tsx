@@ -1,0 +1,1 @@
+export default function SettingsPage() { return <div className="content"><div className="eyebrow">P1 · Upcoming</div><h1>Settings</h1><p className="subtitle">Seller profile, proof points, role keywords and changelog.</p><div className="placeholder">CloudKavach’s seeded profile is active.</div></div>; }

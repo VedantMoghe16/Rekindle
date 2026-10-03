@@ -1,0 +1,6 @@
+21/05/26, 4:10 pm - Ananya Rao: Hi Karan, following up on last week's demo. Any thoughts from the team?
+21/05/26, 4:32 pm - Karan Malhotra: Hey Ananya. Team liked it, but honestly we're scarred.
+21/05/26, 4:33 pm - Karan Malhotra: Last time we tried a compliance tool, onboarding took 4 months and pulled 2 engineers off the roadmap.
+21/05/26, 4:33 pm - Karan Malhotra: We can't afford that again this year. If it isn't plug and play, it's a no for now.
+21/05/26, 4:40 pm - Ananya Rao: Fair concern. Our onboarding is much lighter, happy to show you how.
+21/05/26, 4:41 pm - Karan Malhotra: Maybe later in the year. Let's park it for now.
