@@ -3,12 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Check, ChevronDown, Clock, LoaderCircle, PencilLine, RefreshCw, Send, ShieldCheck, ShieldOff, X } from "lucide-react";
+import { Check, ChevronDown, Clock, LoaderCircle, Mic, PencilLine, RefreshCw, Send, ShieldCheck, ShieldOff, Sparkles, TrendingUp, X } from "lucide-react";
 import { toast } from "@/components/paytm/toast";
 
 type CheckRow = { id: string; label: string; ok: boolean; detail: string };
-type Item = { id: string; dealId: string; cohortLabel: string; attempt: number; reason: string; text: string; status: string; risk: string; provider: string; timingNote: string | null; scheduledFor: string; autoApproved: boolean; note: string | null; repliedAt: string | null; sentAt: string | null; silentDays: number; checks: CheckRow[]; merchant: { id: string; name: string; category: string } | null };
-type Queue = { settings: { mode: string }; waiting: Item[]; scheduled: Item[]; history: Item[]; held: { dealId: string; name: string; why: string }[]; stats: { sent: number; replied: number } };
+type Item = { channel: string; why: { template: string; channel: string } | null; id: string; dealId: string; cohortLabel: string; attempt: number; reason: string; text: string; status: string; risk: string; provider: string; timingNote: string | null; scheduledFor: string; autoApproved: boolean; note: string | null; repliedAt: string | null; sentAt: string | null; silentDays: number; checks: CheckRow[]; merchant: { id: string; name: string; category: string } | null };
+type Queue = { settings: { mode: string }; waiting: Item[]; scheduled: Item[]; history: Item[]; held: { dealId: string; name: string; why: string }[]; stats: { sent: number; replied: number; templates: { id: string; label: string; rate: number; sent: number; replied: number }[] } };
 
 const MODES = [
   { id: "review", label: "I approve each", detail: "Every follow-up waits for your OK" },
@@ -36,8 +36,10 @@ function FollowupCard({ f, onDone }: { f: Item; onDone: () => void }) {
       <div className="grow" style={{ minWidth: 0 }}>{f.merchant ? <Link href={`/vyapar/deals/${f.dealId}`}><b>{f.merchant.name}</b></Link> : <b>Deal</b>}<div className="xs muted">{f.merchant?.category} · quiet {f.silentDays} days · follow-up {f.attempt} of 3</div></div>
       <span className={`badge ${f.risk === "review" ? "b-amber" : "b-cyan"}`}>{f.cohortLabel}</span>
     </div>
+    {f.channel === "voice" && <span className="badge b-navy" style={{ justifySelf: "start" }}><Mic />Sends as a voice note</span>}
     <div className="fu-why"><b>Why now:</b> {f.reason}</div>
     {editing ? <textarea className="draft-edit" value={text} onChange={(e) => setText(e.target.value)} aria-label="Follow-up message" /> : <div className="fu-msg">{text}</div>}
+    {f.why && <div className="fu-ai"><Sparkles size={12} /><span>{f.why.template}.{f.channel === "voice" ? ` ${f.why.channel}.` : ""}</span></div>}
     <div className="row xs muted" style={{ gap: 6, flexWrap: "wrap" }}>
       <span className="row" style={{ gap: 4 }}><Clock size={12} />{f.timingNote ?? when(f.scheduledFor)}</span>
       <span>· {f.provider === "template" ? "Template" : f.provider === "human" ? "Edited by you" : "Template, personalised by Gemini"}</span>
@@ -87,6 +89,7 @@ export function FollowupQueue({ initial }: { initial: Queue }) {
           <li>Never while the buyer is waiting on <i>your</i> reply</li>
           <li>Every message needs a new reason (no &ldquo;just checking in&rdquo;)</li>
           <li>Lost deals only after 14 days (30 if not interested), and only with something new</li>
+          <li>If they said &ldquo;after Diwali&rdquo; or &ldquo;next week&rdquo;, it waits for that date, then follows up on it</li>
           <li>Real prices from your offer sheet only; no private Paytm data; no pressure words</li>
           <li>Queued follow-ups are cancelled the moment the buyer replies</li>
         </ul>
@@ -111,6 +114,12 @@ export function FollowupQueue({ initial }: { initial: Queue }) {
       <div className="sec-title">Not messaging, on purpose ({q.held.length})</div>
       <div className="card">{q.held.map((h) => <Link key={h.dealId} href={`/vyapar/deals/${h.dealId}`} className="list-row"><ShieldOff size={16} color="var(--pt-muted)" /><div className="grow"><b style={{ fontSize: 13 }}>{h.name}</b><small>{h.why}</small></div></Link>)}</div>
     </>}
+
+    <details className="card">
+      <summary className="card-title" style={{ cursor: "pointer" }}><span className="row" style={{ gap: 6 }}><TrendingUp size={16} />What works</span><span className="xs muted">reply rate</span></summary>
+      <p className="xs muted" style={{ margin: "6px 0 8px" }}>The agent picks the message style with the best reply rate. It starts from a demo benchmark and learns from your own results.</p>
+      {q.stats.templates.map((t) => <div key={t.id} className="fu-rate"><span className="grow">{t.label}{t.sent ? <small> · yours {t.replied}/{t.sent}</small> : null}</span><i style={{ width: `${t.rate * 1.6}px` }} /><b>{t.rate}%</b></div>)}
+    </details>
 
     {q.history.length > 0 && <>
       <div className="sec-title">Recent</div>

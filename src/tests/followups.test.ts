@@ -79,3 +79,43 @@ describe("follow-up agent", () => {
     expect(contentChecks("1,000+ pcs pe sirf ₹4.20. Sample bhej doon?", offers).every((c) => c.ok)).toBe(true);
   });
 });
+
+describe("follow-up agent: promises, learning, voice", () => {
+  it("reads the buyer's own timing", async () => {
+    const { promiseDate } = await import("@/lib/vyapar/followups");
+    const said = new Date("2026-09-14T15:20:00+05:30");
+    const d = (t: string) => promiseDate(t, said)?.date.toISOString().slice(0, 10);
+    expect(d("Abhi zaroorat nahi bhai, ek mahine ka stock pada hai.")).toBe("2026-10-12");
+    expect(d("Diwali ke baad baat karte hain")).toBe("2026-11-10");
+    expect(d("agle hafte call karna")).toBe("2026-09-21");
+    expect(d("10 din baad aana")).toBe("2026-09-24");
+    expect(d("Monday ko aao")).toBe("2026-09-21");
+    expect(promiseDate("60 din ka credit chahiye", said)).toBeNull();
+    expect(promiseDate("Rate zyada hai", said)).toBeNull();
+  });
+
+  it("waits for the promised date, then follows up on it (even for a lost deal)", () => {
+    const deal = (nowIso: string) => evaluateFollowup(base({ stage: "LOST", objection: "NOT_NOW", lostAt: at("2026-09-14"), messages: [{ direction: "out", at: at("2026-09-10"), text: "pitch" }, { direction: "in", at: new Date("2026-09-14T15:20:00+05:30"), text: "Abhi zaroorat nahi, ek mahine ka stock pada hai." }] }), offers, new Date(nowIso));
+    const early = deal("2026-10-04T12:00:00+05:30");
+    expect(early.eligible).toBe(false);
+    if (!early.eligible) expect(early.blockedBy?.id).toBe("promise_wait");
+    const due = deal("2026-10-12T12:00:00+05:30");
+    expect(due.eligible).toBe(true);
+    if (due.eligible) { expect(due.reason.code).toBe("PROMISE"); expect(due.text).toContain("ek mahine"); }
+  });
+
+  it("uses the variant with the better reply rate, and learns from the seller's own results", () => {
+    const e = evaluateFollowup(base({ sent: [{ at: at("2026-09-28"), templateId: "new_tier" }] }), { ...offers, tiers: [] }, now);
+    expect(e.eligible && e.templateId).toBe("sample_open_b"); // 35% benchmark beats 22%
+    const own = { sample_open_b: { sent: 6, replied: 0 }, sample_open: { sent: 6, replied: 4 } };
+    const learned = evaluateFollowup(base({ sent: [{ at: at("2026-09-28"), templateId: "new_tier" }] }), { ...offers, tiers: [] }, now, undefined, own);
+    expect(learned.eligible && learned.templateId).toBe("sample_open");
+  });
+
+  it("switches to a voice note when texts go unanswered", () => {
+    const e = evaluateFollowup(base({ sent: [{ at: at("2026-09-28"), templateId: "new_tier" }] }), offers, now);
+    expect(e.eligible && e.channel).toBe("voice");
+    const first = evaluateFollowup(base({}), offers, now);
+    expect(first.eligible && first.channel).toBe("text");
+  });
+});

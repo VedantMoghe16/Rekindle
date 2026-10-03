@@ -22,7 +22,7 @@ export default async function VyaparHome() {
         <PromptBox />
       </div>
       <div className="pad">
-        {top && <Link href="/vyapar/deals" className="revive">
+        {top && <Link href="/vyapar/followups" className="revive">
           <div className="h"><span className="badge b-green"><BellRing />Revive</span><b className="grow">{top.merchantName} is worth another try</b><ChevronRight size={18} /></div>
           <span className="small muted">{top.changes[0]}</span>
         </Link>}

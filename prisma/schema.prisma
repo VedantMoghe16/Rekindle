@@ -678,6 +678,10 @@ model VyaparFollowup {
   scheduledFor DateTime
   timingNote   String?
   autoApproved Boolean   @default(false)
+  /// text | voice (Sarvam voice note, used when texts went unanswered)
+  channel      String    @default("text")
+  /// Why this template and channel were chosen (learning + channel rule), for the seller
+  whyJson      String?
   note         String?
   createdAt    DateTime
   decidedAt    DateTime?

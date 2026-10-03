@@ -5,10 +5,11 @@ import { haversineKm } from "@/lib/vyapar/geo";
 import { firstName } from "@/lib/vyapar/pitch";
 import { OBJECTION_LABELS, type Objection } from "@/lib/vyapar/taxonomy";
 import { nextSlot, paymentProfile } from "@/lib/vyapar/contact-timing";
-import { COHORT_LABELS, contentChecks, evaluateFollowup, POLICY, type Check, type Cohort, type Evaluation, type FollowupInput } from "@/lib/vyapar/followups";
+import { BENCHMARK, COHORT_LABELS, contentChecks, evaluateFollowup, POLICY, TEMPLATE_LABELS, templateScore, type Check, type Cohort, type Evaluation, type FollowupInput, type TemplateStats } from "@/lib/vyapar/followups";
 import { getSeller, liveNow, remember, viewMerchant } from "@/lib/vyapar/server/context";
 import { logEvent } from "@/lib/vyapar/server/opportunities";
-import { sendMessage } from "@/lib/vyapar/server/conversation";
+import { deliverToTelegram, sendMessage } from "@/lib/vyapar/server/conversation";
+import { isSarvamTtsConfigured, sarvamTts } from "@/lib/providers/sarvam";
 
 /**
  * Follow-up agent service: plans follow-ups for silent deals (rules in lib/vyapar/followups.ts), personalises the
@@ -17,7 +18,7 @@ import { sendMessage } from "@/lib/vyapar/server/conversation";
  */
 
 const OPEN = ["PROPOSED", "APPROVED"];
-const HELD: Record<string, string> = { opt_out: "Asked us to stop", our_turn: "Waiting on your reply", gap: "Followed up recently", cap: "3 follow-ups unanswered", cooldown: "Too soon after losing it", reason: "Nothing new to say", fresh: "Already tried every angle" };
+const HELD: Record<string, string> = { promise_wait: "Waiting for the date they gave", opt_out: "Asked us to stop", our_turn: "Waiting on your reply", gap: "Followed up recently", cap: "3 follow-ups unanswered", cooldown: "Too soon after losing it", reason: "Nothing new to say", fresh: "Already tried every angle" };
 const DAY = 86_400_000;
 
 export async function getFollowupSettings() {
@@ -29,6 +30,13 @@ export async function saveFollowupSettings(mode: "review" | "auto" | "off") {
   if (mode === "auto") await db.vyaparFollowup.updateMany({ where: { status: "PROPOSED", risk: "low" }, data: { status: "APPROVED", autoApproved: true, decidedAt: liveNow() } });
   if (mode === "off") await db.vyaparFollowup.updateMany({ where: { status: "APPROVED", autoApproved: true }, data: { status: "PROPOSED", autoApproved: false } });
   return getFollowupSettings();
+}
+
+/** The seller's own results per template: sent, and how many got a reply. Feeds template choice. */
+function ownStats(rows: { status: string; templateId: string; repliedAt: Date | null }[]): TemplateStats {
+  const out: TemplateStats = {};
+  for (const f of rows.filter((r) => r.status === "SENT")) { const s = (out[f.templateId] ??= { sent: 0, replied: 0 }); s.sent++; if (f.repliedAt) s.replied++; }
+  return out;
 }
 
 type DealWithAll = Awaited<ReturnType<typeof loadDeals>>[number];
@@ -85,6 +93,7 @@ async function planOnce() {
   const now = liveNow();
   const [deals, all] = await Promise.all([loadDeals(), db.vyaparFollowup.findMany({ orderBy: { createdAt: "asc" } })]);
   const today = all.filter((f) => f.status !== "SKIPPED" && f.status !== "CANCELLED" && now.getTime() - f.createdAt.getTime() < DAY).length;
+  const stats = ownStats(all);
   let planned = 0;
   for (const deal of deals) {
     if (today + planned >= settings.dailyCap) break;
@@ -94,13 +103,13 @@ async function planOnce() {
     const skipped = mine.filter((f) => f.status === "SKIPPED").at(-1);
     if (skipped && now.getTime() - (skipped.decidedAt ?? skipped.createdAt).getTime() < POLICY.gapDays * DAY) continue;
     const sent = mine.filter((f) => f.status === "SENT").map((f) => ({ at: f.sentAt ?? f.createdAt, templateId: f.templateId }));
-    const e = evaluateFollowup(inputFor(deal, seller, sent), seller.offers, now);
+    const e = evaluateFollowup(inputFor(deal, seller, sent), seller.offers, now, POLICY, stats);
     if (!e.eligible) continue;
     const polished = await personalise(e.text, deal, e.reason.text, seller.offers);
     const checks: Check[] = [...e.checks.filter((c) => !["length", "prices", "private", "pressure", "one_ask"].includes(c.id)), ...contentChecks(polished.text, seller.offers)];
     const slot = nextSlot("quiet", paymentProfile({ id: deal.merchantId, category: deal.merchant.category, qrVolumeBand: deal.merchant.qrVolumeBand }), now);
     const auto = settings.mode === "auto" && e.risk === "low";
-    await db.vyaparFollowup.create({ data: { dealId: deal.id, cohort: e.cohort, attempt: e.attempt, templateId: e.templateId, reason: e.reason.text, text: polished.text, status: auto ? "APPROVED" : "PROPOSED", autoApproved: auto, risk: e.risk, checksJson: JSON.stringify(checks), provider: polished.provider, scheduledFor: slot.at, timingNote: slot.note, createdAt: now } });
+    await db.vyaparFollowup.create({ data: { dealId: deal.id, cohort: e.cohort, attempt: e.attempt, templateId: e.templateId, reason: e.reason.text, text: polished.text, status: auto ? "APPROVED" : "PROPOSED", autoApproved: auto, risk: e.risk, channel: e.channel, whyJson: JSON.stringify(e.why), checksJson: JSON.stringify(checks), provider: polished.provider, scheduledFor: slot.at, timingNote: slot.note, createdAt: now } });
     planned++;
   }
   return { planned };
@@ -121,7 +130,16 @@ export async function runDueFollowups() {
       await db.vyaparFollowup.update({ where: { id: f.id }, data: { status: "CANCELLED", note: replied ? "They replied first" : optOut ? "They asked us to stop" : "Deal moved forward" } });
       continue;
     }
-    await sendMessage(f.dealId, f.text, { author: f.autoApproved ? "Vyapar AI · auto follow-up" : "Vyapar AI · follow-up (approved)", provider: f.provider === "template" ? "template" : f.provider });
+    const author = f.autoApproved ? "Vyapar AI · auto follow-up" : "Vyapar AI · follow-up (approved)";
+    if (f.channel === "voice") {
+      // Voice note (Sarvam Bulbul) for leads who haven't been reading texts; the text rides along as the caption.
+      const wav = isSarvamTtsConfigured() ? await sarvamTts(f.text.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu, "")).catch(() => null) : null;
+      const chat = await deliverToTelegram(f.dealId, f.text, wav, { voiceOnly: true });
+      await db.vyaparMessage.create({ data: { dealId: f.dealId, direction: "out", kind: wav ? "voice" : "text", text: f.text, author, provider: wav ? "sarvam-tts" : f.provider, metaJson: JSON.stringify(chat ? { telegram: true, telegramChat: chat } : {}), createdAt: liveNow() } });
+      await db.vyaparDeal.update({ where: { id: f.dealId }, data: { lastTouchAt: liveNow() } });
+    } else {
+      await sendMessage(f.dealId, f.text, { author, provider: f.provider === "template" ? "template" : f.provider });
+    }
     await db.vyaparFollowup.update({ where: { id: f.id }, data: { status: "SENT", sentAt: liveNow() } });
     await db.vyaparDeal.update({ where: { id: f.dealId }, data: { nextStep: `Follow-up ${f.attempt} sent (${COHORT_LABELS[f.cohort as Cohort].toLowerCase()})` } });
     await logEvent({ sellerId: seller.id, type: "FOLLOWUP_SENT", merchantId: deal.merchantId, dealId: deal.id, meta: { templateId: f.templateId, cohort: f.cohort, attempt: f.attempt, auto: f.autoApproved } });
@@ -163,26 +181,27 @@ export async function getFollowupQueue() {
   const byId = new Map(deals.map((d) => [d.id, d]));
   const view = (f: (typeof rows)[number]) => {
     const d = byId.get(f.dealId);
-    return { ...f, checks: JSON.parse(f.checksJson) as Check[], cohortLabel: COHORT_LABELS[f.cohort as Cohort] ?? f.cohort, merchant: d ? { id: d.merchantId, name: d.merchant.name, category: d.merchant.category } : null, silentDays: d ? Math.floor((now.getTime() - (d.messages.at(-1)?.createdAt ?? d.lastTouchAt).getTime()) / DAY) : 0 };
+    return { ...f, why: f.whyJson ? (JSON.parse(f.whyJson) as { template: string; channel: string }) : null, checks: JSON.parse(f.checksJson) as Check[], cohortLabel: COHORT_LABELS[f.cohort as Cohort] ?? f.cohort, merchant: d ? { id: d.merchantId, name: d.merchant.name, category: d.merchant.category } : null, silentDays: d ? Math.floor((now.getTime() - (d.messages.at(-1)?.createdAt ?? d.lastTouchAt).getTime()) / DAY) : 0 };
   };
   // Silent deals the agent is deliberately leaving alone, with the guardrail that stopped it.
   const held: { dealId: string; name: string; why: string }[] = [];
   for (const d of deals) {
     if (rows.some((f) => f.dealId === d.id && OPEN.includes(f.status))) continue;
     const sent = rows.filter((f) => f.dealId === d.id && f.status === "SENT").map((f) => ({ at: f.sentAt ?? f.createdAt, templateId: f.templateId }));
-    const e: Evaluation = evaluateFollowup(inputFor(d, seller, sent), seller.offers, now);
+    const e: Evaluation = evaluateFollowup(inputFor(d, seller, sent), seller.offers, now, POLICY, ownStats(rows));
     if (!e.eligible && e.blockedBy && e.cohort && e.blockedBy.id !== "silence") held.push({ dealId: d.id, name: d.merchant.name, why: `${HELD[e.blockedBy.id] ?? e.blockedBy.label}: ${e.blockedBy.detail}` });
   }
   const sentRows = rows.filter((f) => f.status === "SENT");
-  const byTemplate = new Map<string, { sent: number; replied: number }>();
-  for (const f of sentRows) { const s = byTemplate.get(f.templateId) ?? { sent: 0, replied: 0 }; s.sent++; if (f.repliedAt) s.replied++; byTemplate.set(f.templateId, s); }
+  const own = ownStats(rows);
+  // What works: every template's reply rate (your results blended with the demo benchmark), best first.
+  const templates = Object.keys(BENCHMARK).map((id) => { const sc = templateScore(id, own); return { id, label: TEMPLATE_LABELS[id] ?? id, rate: Math.round(sc.rate * 100), sent: sc.ownSent, replied: sc.ownReplied }; }).sort((a, b) => b.rate - a.rate);
   return {
     settings,
     waiting: rows.filter((f) => f.status === "PROPOSED").map(view),
     scheduled: rows.filter((f) => f.status === "APPROVED").map(view),
     history: rows.filter((f) => ["SENT", "SKIPPED", "CANCELLED"].includes(f.status)).slice(0, 15).map(view),
     held,
-    stats: { sent: sentRows.length, replied: sentRows.filter((f) => f.repliedAt).length, templates: [...byTemplate.entries()].map(([id, s]) => ({ id, ...s })) },
+    stats: { sent: sentRows.length, replied: sentRows.filter((f) => f.repliedAt).length, templates },
   };
 }
 

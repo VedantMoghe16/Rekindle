@@ -1,5 +1,18 @@
 # Server Agent Handoff
 
+## Latest cycle: navigation, intro, and smarter follow-ups
+
+- **Navigation:** `HomeNav` (the app bar) is at the bottom of every main Vyapar screen with "Vyapar AI" active. `VyaparTabs` became a top tab strip under the AppBar (Find · AI team · Deals · Memory). The back arrow was removed on the four tab roots.
+- **Intro:** the first-run `VyaparIntro` overlay (4 steps, localStorage `vyapar-intro-seen`, reopened by the ? in the Vyapar app bar) replaces the 3-step strip.
+- **Follow-ups learn** (`templateScore`, `BENCHMARK`): templates come in variants per reason. The agent picks the unused variant with the best reply rate: own results plus a 0.25-weighted demo benchmark plus a small exploration bonus. "What works" lists the rates, and each draft explains its choice (`whyJson`).
+- **Voice notes:** `channel` is "voice" for never-replied leads from attempt 2. `runDueFollowups` sends Sarvam TTS as a Telegram voice note (`deliverToTelegram(..., { voiceOnly: true })`) and stores a voice message.
+- **Promises:** `promiseDate` / `latestPromise` read festivals (Diwali 8 Nov 2026 and others), N din/hafte baad, next week, agle mahine / ek mahine ka stock, kal, parso, weekdays and "N tareekh". They also read TIMING memories from calls.
+  - Before the date: held with `promise_wait`.
+  - On the date: reason PROMISE, the "promise" template, and the silence and lost cool-down rules are relaxed.
+  - "60 din ka credit" is not a promise.
+- The old Revive cards were removed from Deals; the follow-up agent covers them, and the hub's revive banner links to Follow-ups. Stale unapproved drafts were cleared once so they re-plan under the new rules.
+- 150 tests pass.
+
 ## Latest cycle: follow-up agent for quiet and lost leads
 
 - **Rules** (`src/lib/vyapar/followups.ts`, 8 tests):

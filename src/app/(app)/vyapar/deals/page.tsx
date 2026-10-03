@@ -1,6 +1,6 @@
 import { AppBar, inr } from "@/components/paytm/ui";
 import { HomeNav, VyaparTabs } from "@/components/paytm/nav";
-import { DealList, ReviveCards } from "@/components/vyapar/deals-board";
+import { DealList } from "@/components/vyapar/deals-board";
 import { AskBox } from "@/components/vyapar/ask-box";
 import { getDealsOverview } from "@/lib/vyapar/server/insights";
 import { visitRoute } from "@/lib/vyapar/server/opportunities";
@@ -38,7 +38,6 @@ export default async function DealsPage() {
           <div className="h"><span className="badge b-amber">Buyer request</span><b className="grow">{pending.length === 1 ? `${pending[0].buyer.name} picked you` : `${pending.length} buyers picked you`}</b></div>
           {pending.map((r) => <Link key={r.id} href={`/vyapar/requests/${r.id}`} className="list-row"><div className="grow"><b>{r.buyer.name}</b><small>Needs {r.terms.quantity.toLocaleString("en-IN")} {PRODUCTS[r.need.productKey as ProductKey].label.toLowerCase()}es by {r.need.neededBy}{r.need.sampleFirst ? " · sample first" : ""}</small></div><span className="btn btn-primary btn-sm">Reply</span></Link>)}
         </div>}
-        <ReviveCards revivals={o.revivals.map((r) => ({ ...r, saidAt: r.saidAt.toISOString() }))} />
         {visits.length > 0 && <div className="card">
           <div className="card-title" style={{ marginBottom: 4 }}><span className="row"><MapPin size={16} />Visit route ({visits.length})</span><span className="xs muted">nearest first</span></div>
           {visits.map((v, i) => <Link key={v.leadId} href={`/vyapar/merchants/${v.merchantId}`} className="list-row"><b style={{ width: 22, height: 22, borderRadius: 11, background: "var(--pt-cyan-50)", display: "grid", placeItems: "center", fontSize: 11 }}>{i + 1}</b><div className="grow"><b>{v.name}</b><small>{v.category} · {v.street} · {v.distanceKm} km</small></div></Link>)}

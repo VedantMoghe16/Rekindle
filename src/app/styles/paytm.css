@@ -605,3 +605,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .intro-dots { display: flex; gap: 6px; margin: 4px 0; }
 .intro-dots i { width: 6px; height: 6px; border-radius: 3px; background: #d0d5dd; }
 .intro-dots i.on { width: 18px; background: var(--pt-cyan); }
+.fu-ai { display: flex; gap: 6px; align-items: flex-start; font-size: 11.5px; color: #3b2a99; background: #f4f1ff; border-radius: 8px; padding: 6px 8px; }
+.fu-ai .lucide { margin-top: 2px; }
+.fu-rate { display: flex; align-items: center; gap: 8px; font-size: 12.5px; padding: 4px 0; }
+.fu-rate small { color: var(--pt-muted); }
+.fu-rate i { height: 6px; border-radius: 3px; background: var(--pt-cyan); flex: none; }
+.fu-rate b { width: 34px; text-align: right; color: var(--pt-navy); }

@@ -328,12 +328,13 @@ export async function processSarvamWebhook(payload: SarvamOutboundWebhook) {
 }
 
 /** "Send on Telegram": deliver to the deal's routed demo chat (or the default demo chat). Returns the chat id, or null. */
-export async function deliverToTelegram(dealId: string, text: string, voice?: Buffer | null): Promise<string | null> {
+export async function deliverToTelegram(dealId: string, text: string, voice?: Buffer | null, opts: { voiceOnly?: boolean } = {}): Promise<string | null> {
   if (!isTelegramConfigured()) return null;
   try {
     const deal = await db.vyaparDeal.findUnique({ where: { id: dealId }, include: { merchant: true } });
     const chat = deal?.demoChatId || demoChatId();
     const header = `💬 To ${deal?.merchant.name ?? "merchant"} (demo · via Vyapar AI)\n\n`;
+    if (voice && opts.voiceOnly) { await tgSendVoice(voice, `🎙️ ${header}${text}`.slice(0, 1000), chat); return chat; }
     await tgSendText(header + text, chat);
     if (voice) await tgSendVoice(voice, `🎙️ Voice note for ${deal?.merchant.name ?? "merchant"}`, chat);
     return chat;
