@@ -1,5 +1,22 @@
 # Server Agent Handoff
 
+## Latest cycle: follow-up agent for quiet and lost leads
+
+- **Rules** (`src/lib/vyapar/followups.ts`, 8 tests):
+  - Cohorts: NO_REPLY, WENT_QUIET, OBJECTION_STALLED, SAMPLE_CHECKIN and LOST_REVIVE.
+  - `newReason` is required: new tier since last contact, credit, backup supplier, quality sample, festive signal, sample still open, or a polite last nudge.
+  - Vetted `TEMPLATES` are never repeated on the same deal.
+  - Guardrails: opt-out words block forever; 4+ silent days; 4+ days between follow-ups; at most 3 unanswered; never while the buyer is waiting on us; lost deals after 14 days (30 if not interested) and only with a new reason; content checks (real prices only, no private data, no pressure, one question, at most 60 words).
+  - risk = review for price changes and lost deals.
+- **Service** (`server/followups.ts`):
+  - `planFollowups` (single-flight) has Gemini personalise the template. If the personalised text fails a content check or changes a price, the template is used.
+  - Each follow-up is scheduled at the shop's quietest hour, with a daily cap of 10.
+  - `runDueFollowups` re-checks before sending. `approve`/`skip` re-check edits. `onBuyerReply` (hooked into `receiveReply` and `receiveCallResult`) cancels queued follow-ups and credits replies.
+  - `ensureFollowupWorker` ticks every 60 s.
+- **Modes** (`FollowupSettings`): review (default), auto (low-risk only) or off.
+- **UI:** `/vyapar/followups` (Deals → Follow-ups card) shows: waiting for you (reason, message, timing, safety checks, Skip/Edit/Send now/Approve), scheduled, "Not messaging, on purpose" with the guardrail that stopped each, and recent results with reply tracking.
+- **Data:** the seed adds Pizza Dabba (lost before the ₹4.20 tier: revivable) and Shake It Up ("message mat bhejo": blocked). Both were inserted into the live database without a reseed.
+
 ## Latest cycle: instant pitch page, Demo button removed
 
 - The pitch page took 10–25 s because it waited for Gemini 2.5 Flash, which was "thinking", so Pitch looked broken.

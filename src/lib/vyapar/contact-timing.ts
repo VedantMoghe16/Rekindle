@@ -57,7 +57,7 @@ export function quietestHour(profile: number[]) {
   return best;
 }
 
-export const hourLabel = (h: number) => `${((h + 11) % 12) + 1} ${h < 12 ? "AM" : "PM"}`;
+export const hourLabel = (hour: number) => { const h = hour % 24; return `${((h + 11) % 12) + 1} ${h < 12 ? "AM" : "PM"}`; };
 
 function istParts(d: Date) {
   const p = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", hourCycle: "h23" }).formatToParts(d);

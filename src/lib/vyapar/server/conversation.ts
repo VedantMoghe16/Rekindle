@@ -40,6 +40,8 @@ async function understand(text: string): Promise<{ u: ReplyUnderstanding; provid
 export async function receiveReply(dealId: string, text: string) {
   const deal = await db.vyaparDeal.findUnique({ where: { id: dealId }, include: { merchant: true } });
   if (!deal) throw new Error("Deal not found");
+  // The buyer spoke: queued follow-ups are cancelled and the last one gets credit for the reply.
+  await import("@/lib/vyapar/server/followups").then((f) => f.onBuyerReply(dealId)).catch(() => null);
   const seller = await getSeller();
   const at = liveNow();
   await db.vyaparMessage.create({ data: { dealId, direction: "in", text, author: deal.merchant.ownerName, createdAt: at } });
@@ -191,6 +193,7 @@ export async function receiveCallResult(dealId: string, r: CallResultInput, tran
   const at = liveNow();
   const summary = { interested: "Interested on the call", sample_requested: "Agreed to a free sample on the call", objection: "Raised an objection on the call", not_interested: "Not interested (call)", callback: `Asked for a callback${r.callback_time ? `: ${r.callback_time}` : ""}` }[r.outcome];
   const ownerFirst = firstName(deal.merchant.ownerName) || "Owner";
+  await import("@/lib/vyapar/server/followups").then((f) => f.onBuyerReply(dealId)).catch(() => null);
   const outcomeLine = `${summary}${r.objection_quote ? `: "${r.objection_quote}"` : ""}`;
   const brief = await summariseCall(transcript, ownerFirst, outcomeLine);
   // The transcript is kept as spoken (Hindi, Tamil, Hinglish…); the summary is what the seller reads first.

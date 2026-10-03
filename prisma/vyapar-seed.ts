@@ -85,11 +85,24 @@ const DEALS: SeedDeal[] = [
     messages: [["out", "2026-10-03T11:00:00", PITCH("Ramesh", "3.3 km")], ["in", "2026-10-03T17:30:00", "Achha, Diwali ke gift box ka price list bhejo."]],
     memories: [{ kind: "PREFERENCE", summary: "Interested in Diwali gift boxes", quote: "Diwali ke gift box ka price list bhejo.", at: "2026-10-03T17:30:00" }],
   },
+  {
+    // Lost before the ₹4.20 bulk tier launched (1 Oct): the follow-up agent can revive it, with the seller's approval.
+    merchantId: "m-pizza-dabba", stage: "LOST", valueInr: 5200, objection: "NOT_NOW", nextStep: "Lost: had stock for a month",
+    messages: [["out", "2026-09-10T11:00:00", PITCH("Harsh", "3.8 km")], ["in", "2026-09-14T15:20:00", "Abhi zaroorat nahi bhai, ek mahine ka stock pada hai."]],
+    memories: [{ kind: "OBJECTION", category: "NOT_NOW", summary: "Has a month of stock; not buying now", quote: "Abhi zaroorat nahi bhai, ek mahine ka stock pada hai.", at: "2026-09-14T15:20:00" }],
+  },
+  {
+    // Asked us to stop: the follow-up agent must never message again.
+    merchantId: "m-shake-it-up", stage: "LOST", valueInr: 3000, nextStep: "Asked not to be messaged",
+    messages: [["out", "2026-09-08T10:00:00", PITCH("Kunal", "3.1 km")], ["in", "2026-09-09T12:00:00", "Bhai message mat bhejo, interest nahi hai."]],
+    memories: [{ kind: "OBJECTION", category: "NOT_INTERESTED", summary: "Not interested; asked not to be messaged", quote: "Bhai message mat bhejo, interest nahi hai.", at: "2026-09-09T12:00:00" }],
+  },
 ];
 
 /** Wipes and reseeds Vyapar AI data. Merchants come from data/merchants.json. Never touches caches. */
 export async function seedVyapar() {
   // Demo contacts and the business brief are user settings: kept across resets.
+  await db.vyaparFollowup.deleteMany();
   await db.fleetTarget.deleteMany();
   await db.fleetRun.deleteMany();
   await db.knowledgeEvent.deleteMany();

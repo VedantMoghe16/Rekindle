@@ -659,3 +659,39 @@ model Translation {
   text      String
   createdAt DateTime @default(now())
 }
+
+/// Follow-up agent: one row per proposed/sent follow-up on a silent deal (see src/lib/vyapar/followups.ts).
+model VyaparFollowup {
+  id           String    @id @default(cuid())
+  dealId       String
+  cohort       String
+  attempt      Int
+  templateId   String
+  reason       String
+  text         String
+  /// PROPOSED (waits for you) | APPROVED (sends at scheduledFor) | SENT | SKIPPED | CANCELLED (they replied / no longer safe)
+  status       String    @default("PROPOSED")
+  /// low = may auto-send in auto mode | review = always needs approval (price change, lost deal)
+  risk         String
+  checksJson   String
+  provider     String
+  scheduledFor DateTime
+  timingNote   String?
+  autoApproved Boolean   @default(false)
+  note         String?
+  createdAt    DateTime
+  decidedAt    DateTime?
+  sentAt       DateTime?
+  repliedAt    DateTime?
+
+  @@index([dealId])
+  @@index([status])
+}
+
+/// How much the follow-up agent may do on its own.
+model FollowupSettings {
+  id       String @id @default("default")
+  /// review = every draft waits for approval | auto = low-risk ones send at the quietest hour | off
+  mode     String @default("review")
+  dailyCap Int    @default(10)
+}

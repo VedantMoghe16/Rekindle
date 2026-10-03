@@ -7,12 +7,15 @@ import { visitRoute } from "@/lib/vyapar/server/opportunities";
 import { sellerRequests } from "@/lib/vyapar/server/needs";
 import { PRODUCTS, type ProductKey } from "@/lib/vyapar/needs";
 import Link from "next/link";
-import { MapPin } from "lucide-react";
+import { ChevronRight, MapPin, RefreshCw } from "lucide-react";
+import { db } from "@/lib/db";
+import { ensureFollowupWorker } from "@/lib/vyapar/server/followups";
 
 export const dynamic = "force-dynamic";
 
 export default async function DealsPage() {
-  const [o, visits, requests] = await Promise.all([getDealsOverview(), visitRoute(), sellerRequests()]);
+  ensureFollowupWorker();
+  const [o, visits, requests, waiting, scheduled] = await Promise.all([getDealsOverview(), visitRoute(), sellerRequests(), db.vyaparFollowup.count({ where: { status: "PROPOSED" } }), db.vyaparFollowup.count({ where: { status: "APPROVED" } })]);
   const pending = requests.filter((r) => r.status === "REQUESTED");
   const max = Math.max(1, o.funnel[0].value);
   return <div className="page">
@@ -25,6 +28,11 @@ export default async function DealsPage() {
           <div className="kpi"><small>Reply rate</small><b>{o.kpis.replyRate}%</b><div className="delta">vs ~9% for cold calls</div></div>
           <div className="kpi"><small>Time saved</small><b>{o.kpis.hoursSaved} hrs</b><div className="delta">no door-to-door</div></div>
         </div>
+        <Link href="/vyapar/followups" className="card row fu-entry">
+          <span className="fu-ic"><RefreshCw size={18} /></span>
+          <div className="grow"><b>Follow-ups</b><small>{waiting ? `${waiting} ready for your OK` : "Quiet & lost leads, followed up safely"}{scheduled ? ` · ${scheduled} scheduled` : ""}</small></div>
+          {waiting > 0 && <span className="badge b-amber">{waiting}</span>}<ChevronRight size={18} />
+        </Link>
         {pending.length > 0 && <div className="revive" style={{ borderColor: "#fde7b0", background: "linear-gradient(135deg,#fff 0%,#fff8e6 100%)" }}>
           <div className="h"><span className="badge b-amber">Buyer request</span><b className="grow">{pending.length === 1 ? `${pending[0].buyer.name} picked you` : `${pending.length} buyers picked you`}</b></div>
           {pending.map((r) => <Link key={r.id} href={`/vyapar/requests/${r.id}`} className="list-row"><div className="grow"><b>{r.buyer.name}</b><small>Needs {r.terms.quantity.toLocaleString("en-IN")} {PRODUCTS[r.need.productKey as ProductKey].label.toLowerCase()}es by {r.need.neededBy}{r.need.sampleFirst ? " · sample first" : ""}</small></div><span className="btn btn-primary btn-sm">Reply</span></Link>)}

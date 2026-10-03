@@ -570,3 +570,21 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .flow-strip b { flex: none; width: 16px; height: 16px; border-radius: 50%; background: var(--pt-cyan); color: #fff; font-size: 10px; display: grid; place-items: center; }
 .page-loading { flex: 1; display: grid; place-content: center; justify-items: center; gap: 8px; color: var(--pt-muted); font-size: 13px; }
 .page-loading .lucide { color: var(--pt-cyan); }
+
+/* ===== Follow-up agent ===== */
+.fu-entry { gap: 10px; }
+.fu-entry b { display: block; color: var(--pt-navy); font-size: 14px; }
+.fu-entry small { color: var(--pt-muted); font-size: 11.5px; }
+.fu-ic { width: 34px; height: 34px; border-radius: 50%; background: var(--pt-cyan-50); color: var(--pt-cyan-600); display: grid; place-items: center; flex: none; }
+.fu-card { background: #fff; border-radius: var(--r-lg); box-shadow: var(--shadow-card); padding: 12px; display: grid; gap: 8px; margin-bottom: 10px; font-size: 13px; }
+.fu-card b { color: var(--pt-navy); }
+.fu-why { font-size: 12px; background: var(--pt-cyan-50); border-radius: 8px; padding: 6px 8px; color: #344054; }
+.fu-msg { background: var(--pt-bg); border: 1px solid var(--pt-line); border-radius: 10px; padding: 8px 10px; line-height: 1.45; white-space: pre-line; }
+.fu-checks-toggle { display: flex; align-items: center; gap: 4px; color: var(--pt-green); font-weight: 600; font-size: 12px; justify-self: start; }
+.fu-checks { display: grid; gap: 3px; font-size: 11.5px; }
+.fu-checks div { display: grid; grid-template-columns: 14px auto 1fr; gap: 6px; align-items: baseline; }
+.fu-checks .ok .lucide { color: var(--pt-green); }
+.fu-checks .bad .lucide { color: var(--pt-red); }
+.fu-checks span { color: var(--pt-muted); }
+.fu-rules summary { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--pt-navy); cursor: pointer; }
+.fu-rules ul { margin: 6px 0 0 18px; display: grid; gap: 3px; font-size: 12px; color: #344054; }
