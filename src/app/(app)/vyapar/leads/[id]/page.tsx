@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 export default async function PitchPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const result = await getPitch(id);
+  const result = await getPitch(id, false, { llm: false });
   if (!result) notFound();
   if (result.lead.dealId) redirect(`/vyapar/deals/${result.lead.dealId}`);
   const { merchant, lead, pitch, opp } = result;

@@ -35,7 +35,7 @@ async function context(leadId: string) {
 }
 
 /** Draft for a lead, chosen by conversation purpose from verified opportunity facts. */
-export async function getPitch(leadId: string, fresh = false) {
+export async function getPitch(leadId: string, fresh = false, opts: { llm?: boolean } = {}) {
   const c = await context(leadId);
   if (!c) return null;
   if (c.lead.pitchJson && !fresh) {
@@ -45,6 +45,8 @@ export async function getPitch(leadId: string, fresh = false) {
   const sellerCtx = { name: c.seller.merchant.name, firstName: c.seller.ownerFirstName, area: c.seller.merchant.area, offers: c.seller.offers };
   const grounded = groundedPitch({ seller: sellerCtx, merchant: c.merchant, opp: c.opp, language: c.plan.language });
   let pitch: StoredPitch = { text: grounded.text, highlights: grounded.highlights, why: grounded.why, provider: "template", angle: grounded.angle, problems: grounded.problems, contact: c.opp.contact, hypothesis: c.opp.hypothesis };
+  // llm: false = instant grounded draft for the page; the AI draft is fetched right after (not stored, so it isn't skipped).
+  if (opts.llm === false) return { lead: c.lead, merchant: c.merchant, opp: c.opp, pitch };
   if (c.opp.angle !== "INTRO") {
     const provider = process.env.SARVAM_DRAFTS === "true" && isProviderConfigured("sarvam") ? "sarvam" : defaultProvider();
     try {

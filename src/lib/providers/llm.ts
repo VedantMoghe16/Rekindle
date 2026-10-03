@@ -117,7 +117,9 @@ async function callGemini<S extends z.ZodTypeAny>(args: StructuredArgs<S>, model
     body: JSON.stringify({
       systemInstruction: { parts: [{ text: args.system }] },
       contents: [{ role: "user", parts: [{ text: args.user + extra }] }],
-      generationConfig: { temperature: 0.3, maxOutputTokens: args.maxTokens ?? 8000, responseMimeType: "application/json", responseJsonSchema: schema },
+      generationConfig: { temperature: 0.3, maxOutputTokens: args.maxTokens ?? 8000, responseMimeType: "application/json", responseJsonSchema: schema,
+        // Fast-tier calls (drafts, classification, plans) skip "thinking": 2.5 Flash then answers in ~2 s instead of 10–25 s.
+        ...(args.tier !== "smart" && /2\.5-flash/.test(model) ? { thinkingConfig: { thinkingBudget: 0 } } : {}) },
     }),
   });
   if (!response.ok) throw new Error(`Gemini returned ${response.status}: ${(await response.text()).slice(0, 200)}`);

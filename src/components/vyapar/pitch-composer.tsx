@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LoaderCircle, MapPin, MessageCircle, Mic, PencilLine, Phone, RefreshCw, Send } from "lucide-react";
 import { ProviderTag } from "@/components/paytm/ui";
@@ -36,6 +36,20 @@ export function PitchComposer({ leadId, initial }: { leadId: string; initial: Pi
   const intro = pitch.angle === "INTRO";
   const PRIVATE = /\b(payment|payments|transaction|transactions|receipts?|revenue|turnover|qr (volume|receipts))\b/i;
   const leak = PRIVATE.test(text);
+  const [polishing, setPolishing] = useState(initial.provider === "template");
+  const touched = useRef(false);
+
+  // The page opens instantly with a grounded draft; the AI-written version replaces it when ready (unless you've edited).
+  useEffect(() => {
+    if (initial.provider !== "template") return;
+    let alive = true;
+    fetch(`/api/vyapar/leads/${leadId}/pitch`).then((r) => r.json()).then((res) => {
+      if (!alive || !res?.ok) return;
+      setPitch(res.data);
+      if (!touched.current) setText(res.data.text);
+    }).catch(() => null).finally(() => { if (alive) setPolishing(false); });
+    return () => { alive = false; };
+  }, [leadId, initial.provider]);
 
   async function rewrite() {
     setBusy("rewrite");
@@ -82,10 +96,10 @@ export function PitchComposer({ leadId, initial }: { leadId: string; initial: Pi
           <div className="row" style={{ marginBottom: 8 }}>
             <span className="badge b-navy">{intro ? "Visit / intro script" : "Hinglish"} · {words} words</span>
             <span className="grow" />
-            <span className="xs muted">Written by</span><ProviderTag provider={pitch.provider} />
+            {polishing ? <span className="xs muted row" style={{ gap: 4 }}><LoaderCircle className="spin" size={12} />AI is personalising…</span> : <><span className="xs muted">Written by</span><ProviderTag provider={pitch.provider} /></>}
             <button className="icon-btn" onClick={() => setEditing((e) => !e)} aria-label="Edit message"><PencilLine size={18} /></button>
           </div>
-          {editing ? <textarea className="draft-edit" value={text} onChange={(e) => setText(e.target.value)} aria-label="Pitch message" /> : <div className="draft">{marked(text, pitch.highlights)}</div>}
+          {editing ? <textarea className="draft-edit" value={text} onChange={(e) => { touched.current = true; setText(e.target.value); }} aria-label="Pitch message" /> : <div className="draft">{marked(text, pitch.highlights)}</div>}
         </div>
         {leak && <div className="badge b-red" style={{ whiteSpace: "normal" }}>This mentions the buyer&apos;s payments or sales. Private Paytm data can&apos;t be used in a pitch.</div>}
         {!intro && channel !== "call" && <VoiceNote text={text} />}

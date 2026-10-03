@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import "../styles/paytm.css";
 import { Lockup, StatusNotch } from "@/components/paytm/ui";
 import { Toaster } from "@/components/paytm/toast";
-import { DemoDrawer } from "@/components/paytm/demo-drawer";
 import { Translator } from "@/components/paytm/translator";
 
 export const metadata: Metadata = { title: "Paytm for Business · Vyapar AI", description: "An AI sales teammate for Paytm merchants: find nearby buyers, pitch in Hinglish, remember objections, close the loop." };
@@ -35,7 +34,6 @@ export default function AppLayout({ children }: Readonly<{ children: React.React
           <Translator />
         </div>
       </div>
-      <DemoDrawer />
     </body>
   </html>;
 }

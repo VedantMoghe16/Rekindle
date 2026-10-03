@@ -1,5 +1,13 @@
 # Server Agent Handoff
 
+## Latest cycle: instant pitch page, Demo button removed
+
+- The pitch page took 10–25 s because it waited for Gemini 2.5 Flash, which was "thinking", so Pitch looked broken.
+  - Fast-tier Gemini calls now send `thinkingConfig.thinkingBudget: 0` (about 2.5 s).
+  - The page renders the grounded draft immediately (`getPitch(id, false, { llm: false })`), then `PitchComposer` fetches `GET /api/vyapar/leads/[id]/pitch` and swaps in the AI draft unless the user has edited it.
+  - `leads/[id]/loading.tsx` adds instant feedback.
+- `DemoDrawer` was removed from the (app) layout. The component file is still there but unused.
+
 ## Latest cycle: Find and the AI team are one flow
 
 - **Find** is where you ask (type or speak). The results page has an `OutreachBar`: "Message & call top 3 · at their quietest hour · real calls", with Start and a plan sheet (1–5 shops, timing, real or simulated calls).
