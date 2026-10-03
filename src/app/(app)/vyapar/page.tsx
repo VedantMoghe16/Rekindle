@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BellRing, Brain, ChevronRight, MessageCircle, Search, Sparkles, Truck } from "lucide-react";
+import { BellRing, ChevronRight, Search, Sparkles } from "lucide-react";
 import { AppBar, dayLabel } from "@/components/paytm/ui";
 import { VyaparTabs } from "@/components/paytm/nav";
 import { PromptBox } from "@/components/vyapar/prompt-box";
@@ -28,13 +28,6 @@ export default async function VyaparHome() {
           <div className="card-title">Recent searches</div>
           {hunts.map((h) => <Link key={h.id} href={`/vyapar/hunts/${h.id}`} className="list-row"><Search size={18} color="var(--pt-cyan-600)" /><div className="grow"><b style={{ fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{h.prompt}</b><small>{h.leads} buyers · {dayLabel(h.createdAt)}</small></div><ChevronRight size={18} /></Link>)}
         </div>}
-        <div className="card-title" style={{ padding: "4px 2px 0" }}>What Vyapar AI does for you</div>
-        <div className="pillars">
-          <div className="pillar"><Search /><b>Find</b><span>Nearby Paytm merchants who need your product</span></div>
-          <div className="pillar"><MessageCircle /><b>Pitch</b><span>Telegram message, voice note and AI call in Hinglish</span></div>
-          <div className="pillar"><Brain /><b>Remember</b><span>Every reply, objection and promise</span></div>
-          <div className="pillar"><Truck /><b>Act</b><span>Books samples, visits and payments</span></div>
-        </div>
       </div>
     </main>
     <VyaparTabs />
