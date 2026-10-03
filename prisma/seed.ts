@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { db } from "../src/lib/db";
 
@@ -43,7 +44,21 @@ const signals = [
   ["bharatfreight", "LEADERSHIP_CHANGE", "Bharat Freight appoints new CTO", "2026-06-20", "News", "demo"],
 ] as const;
 
-async function main() {
+const outcomeHistory: [string, string, number, number, number, number][] = [
+  // stallCategory, signalType, recommendations sent, replied, meetings, won (spec §12.5 target rates)
+  ["BUDGET", "FUNDING", 17, 7, 4, 2],
+  ["NO_OWNER", "HIRING_RELEVANT", 19, 7, 4, 1],
+  ["IMPLEMENTATION_EFFORT", "CAMPAIGN_ENGAGEMENT", 12, 4, 2, 1],
+  ["TIMING", "DATE_REACHED", 9, 2, 1, 0],
+  ["WENT_DARK", "LEADERSHIP_CHANGE", 12, 1, 0, 0],
+];
+
+export async function seed() {
+  await db.outcome.deleteMany();
+  await db.engagementEvent.deleteMany();
+  await db.campaign.deleteMany();
+  await db.draft.deleteMany();
+  await db.company.deleteMany();
   await db.researchRun.deleteMany();
   await db.icpVersion.deleteMany();
   await db.chatMessage.deleteMany();
@@ -139,9 +154,39 @@ async function main() {
   for (const [slug, type, title, date, sourceName, provenance] of signals) {
     await db.signal.create({ data: {
       id: `signal-${slug}-${type.toLowerCase()}`, accountId: `account-${slug}`, dealId: type === "RENEWAL_WINDOW" || type === "FEATURE_SHIPPED" || type === "DATE_REACHED" ? `deal-${slug}` : null,
-      type, title, detail: title, sourceName, occurredAt: new Date(`${date}T06:30:00Z`), provenance, dedupeKey: `${sourceName.toLowerCase()}:${slug}:${type.toLowerCase()}`,
+      type, title, detail: title, sourceName, occurredAt: new Date(`${date}T06:30:00Z`), provenance,
+      dedupeKey: provenance === "computed" ? `computed:deal-${slug}:${type.toLowerCase()}` : `${sourceName.toLowerCase()}:${slug}:${type.toLowerCase()}`,
     }});
+  }
+
+  const companiesPath = join(process.cwd(), "data", "companies.json");
+  if (existsSync(companiesPath)) {
+    const companies = JSON.parse(await readFile(companiesPath, "utf8")) as { id: string; name: string; domain: string; industry: string; city: string; sizeBand: string; fundingStage?: string | null; careersProvider?: string; careersToken?: string | null; tags?: string[]; website?: string | null; description?: string | null }[];
+    for (const company of companies) {
+      await db.company.create({ data: {
+        id: company.id, name: company.name, domain: company.domain, industry: company.industry, city: company.city, sizeBand: company.sizeBand,
+        fundingStage: company.fundingStage ?? null, careersProvider: company.careersProvider ?? "none", careersToken: company.careersToken ?? null,
+        tagsJson: JSON.stringify(company.tags ?? []), website: company.website ?? null, description: company.description ?? null, source: "curated",
+      }});
+    }
+  }
+
+  const allDeals = await db.deal.findMany({ include: { memory: true }, orderBy: { id: "asc" } });
+  let day = 0;
+  for (const [category, signalType, sent, replied, meetings, won] of outcomeHistory) {
+    const pool = allDeals.filter((deal) => deal.memory?.stallCategory === category);
+    const targets = pool.length ? pool : allDeals;
+    for (let i = 0; i < sent; i++) {
+      const deal = targets[i % targets.length];
+      const occurredAt = new Date(Date.UTC(2026, 3, 1) + (day++ % 150) * 86_400_000);
+      const events = ["drafted", "sent", ...(i < replied ? ["replied"] : []), ...(i < meetings ? ["meeting"] : []), ...(i < won ? ["won"] : []), ...(i >= replied ? ["no_response"] : [])];
+      for (const event of events) {
+        await db.outcome.create({ data: { dealId: deal.id, stallCategory: category, signalType, event, isSeeded: true, occurredAt } });
+      }
+    }
   }
 }
 
-main().finally(() => db.$disconnect());
+if (import.meta.url === `file://${process.argv[1]}`) {
+  seed().finally(() => db.$disconnect());
+}

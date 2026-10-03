@@ -1,0 +1,2097 @@
+[
+  {
+    "id": "co-freshworks",
+    "name": "Freshworks",
+    "domain": "freshworks.com",
+    "industry": "SaaS",
+    "city": "Chennai",
+    "sizeBand": "5000+",
+    "fundingStage": "Public",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "enterprise-sales",
+      "global-customers",
+      "soc2",
+      "b2b-saas",
+      "us-hq"
+    ],
+    "website": "https://freshworks.com",
+    "description": "Customer service, IT service and CRM software."
+  },
+  {
+    "id": "co-zoho",
+    "name": "Zoho",
+    "domain": "zoho.com",
+    "industry": "SaaS",
+    "city": "Chennai",
+    "sizeBand": "5000+",
+    "fundingStage": "Bootstrapped",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "enterprise-sales",
+      "global-customers",
+      "b2b-saas",
+      "regulated-data"
+    ],
+    "website": "https://zoho.com",
+    "description": "Suite of business, productivity and CRM applications."
+  },
+  {
+    "id": "co-chargebee",
+    "name": "Chargebee",
+    "domain": "chargebee.com",
+    "industry": "SaaS",
+    "city": "Chennai",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Late stage",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "enterprise-sales",
+      "global-customers",
+      "soc2",
+      "b2b-saas",
+      "payments"
+    ],
+    "website": "https://chargebee.com",
+    "description": "Subscription billing and revenue management."
+  },
+  {
+    "id": "co-postman",
+    "name": "Postman",
+    "domain": "postman.com",
+    "industry": "Devtools",
+    "city": "Bengaluru",
+    "sizeBand": "501–1000",
+    "fundingStage": "Series D",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "api-first",
+      "devops",
+      "enterprise-sales",
+      "global-customers",
+      "soc2",
+      "us-hq"
+    ],
+    "website": "https://postman.com",
+    "description": "API development and collaboration platform."
+  },
+  {
+    "id": "co-browserstack",
+    "name": "BrowserStack",
+    "domain": "browserstack.com",
+    "industry": "Devtools",
+    "city": "Mumbai",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Series B",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "devops",
+      "enterprise-sales",
+      "global-customers",
+      "soc2",
+      "testing"
+    ],
+    "website": "https://browserstack.com",
+    "description": "Cloud web and mobile testing platform."
+  },
+  {
+    "id": "co-druva",
+    "name": "Druva",
+    "domain": "druva.com",
+    "industry": "SaaS",
+    "city": "Pune",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Late stage",
+    "careersProvider": "greenhouse",
+    "careersToken": "druva",
+    "tags": [
+      "data-protection",
+      "security",
+      "enterprise-sales",
+      "global-customers",
+      "soc2",
+      "us-hq"
+    ],
+    "website": "https://druva.com",
+    "description": "SaaS data protection and backup."
+  },
+  {
+    "id": "co-hasura",
+    "name": "Hasura",
+    "domain": "hasura.io",
+    "industry": "Devtools",
+    "city": "Bengaluru",
+    "sizeBand": "201–500",
+    "fundingStage": "Series C",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "api-first",
+      "devops",
+      "enterprise-sales",
+      "global-customers",
+      "platform"
+    ],
+    "website": "https://hasura.io",
+    "description": "GraphQL and data API platform."
+  },
+  {
+    "id": "co-darwinbox",
+    "name": "Darwinbox",
+    "domain": "darwinbox.com",
+    "industry": "HR Tech",
+    "city": "Hyderabad",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Series D",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "hr-data",
+      "enterprise-sales",
+      "regulated-data",
+      "b2b-saas"
+    ],
+    "website": "https://darwinbox.com",
+    "description": "Enterprise HR and payroll platform."
+  },
+  {
+    "id": "co-leadsquared",
+    "name": "LeadSquared",
+    "domain": "leadsquared.com",
+    "industry": "SaaS",
+    "city": "Bengaluru",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Series C",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "enterprise-sales",
+      "b2b-saas",
+      "crm"
+    ],
+    "website": "https://leadsquared.com",
+    "description": "Sales execution CRM and marketing automation."
+  },
+  {
+    "id": "co-whatfix",
+    "name": "Whatfix",
+    "domain": "whatfix.com",
+    "industry": "SaaS",
+    "city": "Bengaluru",
+    "sizeBand": "501–1000",
+    "fundingStage": "Series E",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "enterprise-sales",
+      "global-customers",
+      "b2b-saas",
+      "soc2"
+    ],
+    "website": "https://whatfix.com",
+    "description": "Digital adoption platform."
+  },
+  {
+    "id": "co-mindtickle",
+    "name": "Mindtickle",
+    "domain": "mindtickle.com",
+    "industry": "SaaS",
+    "city": "Pune",
+    "sizeBand": "501–1000",
+    "fundingStage": "Series E",
+    "careersProvider": "lever",
+    "careersToken": "mindtickle",
+    "tags": [
+      "enterprise-sales",
+      "global-customers",
+      "b2b-saas",
+      "soc2"
+    ],
+    "website": "https://mindtickle.com",
+    "description": "Sales readiness and enablement platform."
+  },
+  {
+    "id": "co-clevertap",
+    "name": "CleverTap",
+    "domain": "clevertap.com",
+    "industry": "SaaS",
+    "city": "Mumbai",
+    "sizeBand": "501–1000",
+    "fundingStage": "Series D",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "enterprise-sales",
+      "global-customers",
+      "customer-data",
+      "b2b-saas"
+    ],
+    "website": "https://clevertap.com",
+    "description": "Customer engagement and retention platform."
+  },
+  {
+    "id": "co-moengage",
+    "name": "MoEngage",
+    "domain": "moengage.com",
+    "industry": "SaaS",
+    "city": "Bengaluru",
+    "sizeBand": "501–1000",
+    "fundingStage": "Late stage",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "enterprise-sales",
+      "global-customers",
+      "customer-data",
+      "b2b-saas"
+    ],
+    "website": "https://moengage.com",
+    "description": "Customer engagement platform."
+  },
+  {
+    "id": "co-innovaccer",
+    "name": "Innovaccer",
+    "domain": "innovaccer.com",
+    "industry": "Healthtech",
+    "city": "Noida",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Late stage",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "healthcare-data",
+      "regulated-data",
+      "enterprise-sales",
+      "us-hq"
+    ],
+    "website": "https://innovaccer.com",
+    "description": "Healthcare data and analytics platform."
+  },
+  {
+    "id": "co-hevo-data",
+    "name": "Hevo Data",
+    "domain": "hevodata.com",
+    "industry": "Devtools",
+    "city": "Bengaluru",
+    "sizeBand": "201–500",
+    "fundingStage": "Series B",
+    "careersProvider": "lever",
+    "careersToken": "hevodata",
+    "tags": [
+      "data-platform",
+      "devops",
+      "global-customers",
+      "soc2"
+    ],
+    "website": "https://hevodata.com",
+    "description": "No-code data pipeline platform."
+  },
+  {
+    "id": "co-devrev",
+    "name": "DevRev",
+    "domain": "devrev.ai",
+    "industry": "SaaS",
+    "city": "Bengaluru",
+    "sizeBand": "501–1000",
+    "fundingStage": "Series A",
+    "careersProvider": "greenhouse",
+    "careersToken": "devrev",
+    "tags": [
+      "ai",
+      "b2b-saas",
+      "enterprise-sales",
+      "global-customers",
+      "us-hq"
+    ],
+    "website": "https://devrev.ai",
+    "description": "AI-native support and product platform."
+  },
+  {
+    "id": "co-zenoti",
+    "name": "Zenoti",
+    "domain": "zenoti.com",
+    "industry": "SaaS",
+    "city": "Hyderabad",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Late stage",
+    "careersProvider": "greenhouse",
+    "careersToken": "zenoti",
+    "tags": [
+      "b2b-saas",
+      "global-customers",
+      "payments",
+      "us-hq"
+    ],
+    "website": "https://zenoti.com",
+    "description": "Software for salons, spas and medspas."
+  },
+  {
+    "id": "co-capillary-technologies",
+    "name": "Capillary Technologies",
+    "domain": "capillarytech.com",
+    "industry": "SaaS",
+    "city": "Bengaluru",
+    "sizeBand": "1001–5000",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "enterprise-sales",
+      "global-customers",
+      "customer-data",
+      "b2b-saas"
+    ],
+    "website": "https://capillarytech.com",
+    "description": "Loyalty and customer engagement software."
+  },
+  {
+    "id": "co-icertis",
+    "name": "Icertis",
+    "domain": "icertis.com",
+    "industry": "SaaS",
+    "city": "Pune",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Late stage",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "enterprise-sales",
+      "global-customers",
+      "regulated-data",
+      "us-hq"
+    ],
+    "website": "https://icertis.com",
+    "description": "Contract lifecycle management platform."
+  },
+  {
+    "id": "co-yellow-ai",
+    "name": "Yellow.ai",
+    "domain": "yellow.ai",
+    "industry": "SaaS",
+    "city": "Bengaluru",
+    "sizeBand": "501–1000",
+    "fundingStage": "Series C",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "ai",
+      "enterprise-sales",
+      "global-customers",
+      "b2b-saas"
+    ],
+    "website": "https://yellow.ai",
+    "description": "Conversational AI customer service platform."
+  },
+  {
+    "id": "co-haptik",
+    "name": "Haptik",
+    "domain": "haptik.ai",
+    "industry": "SaaS",
+    "city": "Mumbai",
+    "sizeBand": "201–500",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "ai",
+      "enterprise-sales",
+      "b2b-saas"
+    ],
+    "website": "https://haptik.ai",
+    "description": "Conversational AI for enterprises."
+  },
+  {
+    "id": "co-gupshup",
+    "name": "Gupshup",
+    "domain": "gupshup.io",
+    "industry": "SaaS",
+    "city": "Mumbai",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Late stage",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "api-first",
+      "enterprise-sales",
+      "messaging",
+      "us-hq"
+    ],
+    "website": "https://gupshup.io",
+    "description": "Conversational messaging platform."
+  },
+  {
+    "id": "co-exotel",
+    "name": "Exotel",
+    "domain": "exotel.com",
+    "industry": "SaaS",
+    "city": "Bengaluru",
+    "sizeBand": "501–1000",
+    "fundingStage": "Series D",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "api-first",
+      "enterprise-sales",
+      "messaging",
+      "b2b-saas"
+    ],
+    "website": "https://exotel.com",
+    "description": "Cloud communications and contact center platform."
+  },
+  {
+    "id": "co-uniphore",
+    "name": "Uniphore",
+    "domain": "uniphore.com",
+    "industry": "SaaS",
+    "city": "Chennai",
+    "sizeBand": "501–1000",
+    "fundingStage": "Series E",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "ai",
+      "enterprise-sales",
+      "global-customers",
+      "us-hq"
+    ],
+    "website": "https://uniphore.com",
+    "description": "Conversational AI and automation."
+  },
+  {
+    "id": "co-kissflow",
+    "name": "Kissflow",
+    "domain": "kissflow.com",
+    "industry": "SaaS",
+    "city": "Chennai",
+    "sizeBand": "501–1000",
+    "fundingStage": "Bootstrapped",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "b2b-saas",
+      "enterprise-sales",
+      "low-code"
+    ],
+    "website": "https://kissflow.com",
+    "description": "Low-code workflow and process platform."
+  },
+  {
+    "id": "co-facilio",
+    "name": "Facilio",
+    "domain": "facilio.com",
+    "industry": "SaaS",
+    "city": "Chennai",
+    "sizeBand": "201–500",
+    "fundingStage": "Series B",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "b2b-saas",
+      "enterprise-sales",
+      "iot"
+    ],
+    "website": "https://facilio.com",
+    "description": "Facilities operations and maintenance platform."
+  },
+  {
+    "id": "co-zluri",
+    "name": "Zluri",
+    "domain": "zluri.com",
+    "industry": "SaaS",
+    "city": "Bengaluru",
+    "sizeBand": "201–500",
+    "fundingStage": "Series B",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "security",
+      "it-ops",
+      "b2b-saas",
+      "soc2",
+      "global-customers"
+    ],
+    "website": "https://zluri.com",
+    "description": "SaaS management and access governance."
+  },
+  {
+    "id": "co-rocketlane",
+    "name": "Rocketlane",
+    "domain": "rocketlane.com",
+    "industry": "SaaS",
+    "city": "Chennai",
+    "sizeBand": "201–500",
+    "fundingStage": "Series B",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "b2b-saas",
+      "global-customers",
+      "soc2"
+    ],
+    "website": "https://rocketlane.com",
+    "description": "Customer onboarding and professional services automation."
+  },
+  {
+    "id": "co-sprinto",
+    "name": "Sprinto",
+    "domain": "sprinto.com",
+    "industry": "SaaS",
+    "city": "Bengaluru",
+    "sizeBand": "201–500",
+    "fundingStage": "Series B",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "compliance",
+      "security",
+      "soc2",
+      "compliance-vendor"
+    ],
+    "website": "https://sprinto.com",
+    "description": "Compliance automation platform."
+  },
+  {
+    "id": "co-scrut-automation",
+    "name": "Scrut Automation",
+    "domain": "scrut.io",
+    "industry": "SaaS",
+    "city": "Bengaluru",
+    "sizeBand": "51–200",
+    "fundingStage": "Series A",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "compliance",
+      "security",
+      "soc2",
+      "compliance-vendor"
+    ],
+    "website": "https://scrut.io",
+    "description": "Risk and compliance automation."
+  },
+  {
+    "id": "co-cloudsek",
+    "name": "CloudSEK",
+    "domain": "cloudsek.com",
+    "industry": "SaaS",
+    "city": "Bengaluru",
+    "sizeBand": "201–500",
+    "fundingStage": "Series B",
+    "careersProvider": "greenhouse",
+    "careersToken": "cloudsek",
+    "tags": [
+      "security",
+      "ai",
+      "enterprise-sales",
+      "global-customers"
+    ],
+    "website": "https://cloudsek.com",
+    "description": "AI-driven digital risk and threat intelligence."
+  },
+  {
+    "id": "co-appknox",
+    "name": "Appknox",
+    "domain": "appknox.com",
+    "industry": "SaaS",
+    "city": "Bengaluru",
+    "sizeBand": "51–200",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "security",
+      "mobile",
+      "enterprise-sales"
+    ],
+    "website": "https://appknox.com",
+    "description": "Mobile application security testing."
+  },
+  {
+    "id": "co-acceldata",
+    "name": "Acceldata",
+    "domain": "acceldata.io",
+    "industry": "Devtools",
+    "city": "Bengaluru",
+    "sizeBand": "201–500",
+    "fundingStage": "Series C",
+    "careersProvider": "lever",
+    "careersToken": "acceldata",
+    "tags": [
+      "data-platform",
+      "devops",
+      "enterprise-sales",
+      "us-hq"
+    ],
+    "website": "https://acceldata.io",
+    "description": "Data observability platform."
+  },
+  {
+    "id": "co-lambdatest",
+    "name": "LambdaTest",
+    "domain": "lambdatest.com",
+    "industry": "Devtools",
+    "city": "Noida",
+    "sizeBand": "501–1000",
+    "fundingStage": "Series D",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "devops",
+      "testing",
+      "global-customers",
+      "soc2"
+    ],
+    "website": "https://lambdatest.com",
+    "description": "Cloud test orchestration and execution platform."
+  },
+  {
+    "id": "co-appsmith",
+    "name": "Appsmith",
+    "domain": "appsmith.com",
+    "industry": "Devtools",
+    "city": "Bengaluru",
+    "sizeBand": "51–200",
+    "fundingStage": "Series B",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "devops",
+      "low-code",
+      "open-source",
+      "platform"
+    ],
+    "website": "https://appsmith.com",
+    "description": "Open-source internal tool builder."
+  },
+  {
+    "id": "co-tooljet",
+    "name": "ToolJet",
+    "domain": "tooljet.com",
+    "industry": "Devtools",
+    "city": "Bengaluru",
+    "sizeBand": "51–200",
+    "fundingStage": "Series A",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "devops",
+      "low-code",
+      "open-source"
+    ],
+    "website": "https://tooljet.com",
+    "description": "Open-source low-code app builder."
+  },
+  {
+    "id": "co-vymo",
+    "name": "Vymo",
+    "domain": "getvymo.com",
+    "industry": "SaaS",
+    "city": "Bengaluru",
+    "sizeBand": "201–500",
+    "fundingStage": "Series C",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "enterprise-sales",
+      "regulated-data",
+      "b2b-saas",
+      "bfsi"
+    ],
+    "website": "https://getvymo.com",
+    "description": "Sales engagement platform for financial services."
+  },
+  {
+    "id": "co-vwo",
+    "name": "VWO",
+    "domain": "vwo.com",
+    "industry": "SaaS",
+    "city": "New Delhi",
+    "sizeBand": "201–500",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "b2b-saas",
+      "global-customers",
+      "experimentation"
+    ],
+    "website": "https://vwo.com",
+    "description": "Experimentation and conversion optimisation (Wingify)."
+  },
+  {
+    "id": "co-webengage",
+    "name": "WebEngage",
+    "domain": "webengage.com",
+    "industry": "SaaS",
+    "city": "Mumbai",
+    "sizeBand": "201–500",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "b2b-saas",
+      "customer-data"
+    ],
+    "website": "https://webengage.com",
+    "description": "Customer data and engagement platform."
+  },
+  {
+    "id": "co-netcore-cloud",
+    "name": "Netcore Cloud",
+    "domain": "netcorecloud.com",
+    "industry": "SaaS",
+    "city": "Mumbai",
+    "sizeBand": "1001–5000",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "b2b-saas",
+      "customer-data",
+      "messaging",
+      "enterprise-sales"
+    ],
+    "website": "https://netcorecloud.com",
+    "description": "Email, customer engagement and experience platform."
+  },
+  {
+    "id": "co-kapture-cx",
+    "name": "Kapture CX",
+    "domain": "kapture.cx",
+    "industry": "SaaS",
+    "city": "Bengaluru",
+    "sizeBand": "201–500",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "b2b-saas",
+      "ai",
+      "enterprise-sales"
+    ],
+    "website": "https://kapture.cx",
+    "description": "Customer support automation platform."
+  },
+  {
+    "id": "co-ozonetel",
+    "name": "Ozonetel",
+    "domain": "ozonetel.com",
+    "industry": "SaaS",
+    "city": "Hyderabad",
+    "sizeBand": "201–500",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "b2b-saas",
+      "messaging",
+      "contact-center"
+    ],
+    "website": "https://ozonetel.com",
+    "description": "Cloud contact center software."
+  },
+  {
+    "id": "co-servify",
+    "name": "Servify",
+    "domain": "servify.in",
+    "industry": "SaaS",
+    "city": "Mumbai",
+    "sizeBand": "501–1000",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "b2b-saas",
+      "enterprise-sales"
+    ],
+    "website": "https://servify.in",
+    "description": "Device lifecycle management platform."
+  },
+  {
+    "id": "co-restroworks",
+    "name": "Restroworks",
+    "domain": "restroworks.com",
+    "industry": "SaaS",
+    "city": "New Delhi",
+    "sizeBand": "201–500",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "b2b-saas",
+      "global-customers"
+    ],
+    "website": "https://restroworks.com",
+    "description": "Restaurant technology platform (formerly Posist)."
+  },
+  {
+    "id": "co-rategain",
+    "name": "RateGain",
+    "domain": "rategain.com",
+    "industry": "SaaS",
+    "city": "Noida",
+    "sizeBand": "501–1000",
+    "fundingStage": "Public",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "b2b-saas",
+      "global-customers",
+      "travel-tech"
+    ],
+    "website": "https://rategain.com",
+    "description": "SaaS for hospitality and travel revenue."
+  },
+  {
+    "id": "co-tracxn",
+    "name": "Tracxn",
+    "domain": "tracxn.com",
+    "industry": "SaaS",
+    "city": "Bengaluru",
+    "sizeBand": "201–500",
+    "fundingStage": "Public",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "b2b-saas",
+      "data-platform"
+    ],
+    "website": "https://tracxn.com",
+    "description": "Private market intelligence platform."
+  },
+  {
+    "id": "co-spotdraft",
+    "name": "SpotDraft",
+    "domain": "spotdraft.com",
+    "industry": "SaaS",
+    "city": "Bengaluru",
+    "sizeBand": "201–500",
+    "fundingStage": "Series B",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "b2b-saas",
+      "legal",
+      "regulated-data",
+      "ai"
+    ],
+    "website": "https://spotdraft.com",
+    "description": "AI contract management for legal teams."
+  },
+  {
+    "id": "co-fyle",
+    "name": "Fyle",
+    "domain": "fylehq.com",
+    "industry": "SaaS",
+    "city": "Bengaluru",
+    "sizeBand": "51–200",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "b2b-saas",
+      "expense",
+      "global-customers"
+    ],
+    "website": "https://fylehq.com",
+    "description": "Expense management software."
+  },
+  {
+    "id": "co-inmobi",
+    "name": "InMobi",
+    "domain": "inmobi.com",
+    "industry": "SaaS",
+    "city": "Bengaluru",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Late stage",
+    "careersProvider": "greenhouse",
+    "careersToken": "inmobi",
+    "tags": [
+      "adtech",
+      "ai",
+      "customer-data",
+      "global-customers"
+    ],
+    "website": "https://inmobi.com",
+    "description": "Mobile advertising and marketing technology."
+  },
+  {
+    "id": "co-sarvam-ai",
+    "name": "Sarvam AI",
+    "domain": "sarvam.ai",
+    "industry": "Devtools",
+    "city": "Bengaluru",
+    "sizeBand": "51–200",
+    "fundingStage": "Series A",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "ai",
+      "platform",
+      "api-first"
+    ],
+    "website": "https://sarvam.ai",
+    "description": "Indian-language generative AI models and APIs."
+  },
+  {
+    "id": "co-gnani-ai",
+    "name": "Gnani.ai",
+    "domain": "gnani.ai",
+    "industry": "SaaS",
+    "city": "Bengaluru",
+    "sizeBand": "201–500",
+    "fundingStage": "Series B",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "ai",
+      "enterprise-sales",
+      "bfsi"
+    ],
+    "website": "https://gnani.ai",
+    "description": "Voice AI for enterprise customer service."
+  },
+  {
+    "id": "co-razorpay",
+    "name": "Razorpay",
+    "domain": "razorpay.com",
+    "industry": "Fintech",
+    "city": "Bengaluru",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Late stage",
+    "careersProvider": "greenhouse",
+    "careersToken": "razorpaysoftwareprivatelimited",
+    "tags": [
+      "payments",
+      "regulated-data",
+      "enterprise-sales",
+      "pci-dss"
+    ],
+    "website": "https://razorpay.com",
+    "description": "Payments and banking platform for businesses."
+  },
+  {
+    "id": "co-cred",
+    "name": "CRED",
+    "domain": "cred.club",
+    "industry": "Fintech",
+    "city": "Bengaluru",
+    "sizeBand": "501–1000",
+    "fundingStage": "Late stage",
+    "careersProvider": "lever",
+    "careersToken": "cred",
+    "tags": [
+      "payments",
+      "regulated-data",
+      "consumer-fintech"
+    ],
+    "website": "https://cred.club",
+    "description": "Credit card payments and rewards platform."
+  },
+  {
+    "id": "co-groww",
+    "name": "Groww",
+    "domain": "groww.in",
+    "industry": "Fintech",
+    "city": "Bengaluru",
+    "sizeBand": "1001–5000",
+    "fundingStage": null,
+    "careersProvider": "greenhouse",
+    "careersToken": "groww",
+    "tags": [
+      "regulated-data",
+      "investing",
+      "consumer-fintech"
+    ],
+    "website": "https://groww.in",
+    "description": "Investment and broking platform."
+  },
+  {
+    "id": "co-zeta",
+    "name": "Zeta",
+    "domain": "zeta.tech",
+    "industry": "Fintech",
+    "city": "Bengaluru",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Late stage",
+    "careersProvider": "lever",
+    "careersToken": "zeta",
+    "tags": [
+      "banking-tech",
+      "regulated-data",
+      "enterprise-sales",
+      "pci-dss",
+      "global-customers"
+    ],
+    "website": "https://zeta.tech",
+    "description": "Cloud-native banking and card processing platform."
+  },
+  {
+    "id": "co-paytm",
+    "name": "Paytm",
+    "domain": "paytm.com",
+    "industry": "Fintech",
+    "city": "Noida",
+    "sizeBand": "5000+",
+    "fundingStage": "Public",
+    "careersProvider": "lever",
+    "careersToken": "paytm",
+    "tags": [
+      "payments",
+      "regulated-data",
+      "pci-dss"
+    ],
+    "website": "https://paytm.com",
+    "description": "Payments and financial services."
+  },
+  {
+    "id": "co-juspay",
+    "name": "Juspay",
+    "domain": "juspay.io",
+    "industry": "Fintech",
+    "city": "Bengaluru",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Series D",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "payments",
+      "regulated-data",
+      "enterprise-sales",
+      "api-first"
+    ],
+    "website": "https://juspay.io",
+    "description": "Payment orchestration infrastructure."
+  },
+  {
+    "id": "co-pine-labs",
+    "name": "Pine Labs",
+    "domain": "pinelabs.com",
+    "industry": "Fintech",
+    "city": "Noida",
+    "sizeBand": "1001–5000",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "payments",
+      "regulated-data",
+      "enterprise-sales",
+      "pci-dss"
+    ],
+    "website": "https://pinelabs.com",
+    "description": "Merchant commerce and payments platform."
+  },
+  {
+    "id": "co-m2p-fintech",
+    "name": "M2P Fintech",
+    "domain": "m2pfintech.com",
+    "industry": "Fintech",
+    "city": "Chennai",
+    "sizeBand": "501–1000",
+    "fundingStage": "Series D",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "banking-tech",
+      "api-first",
+      "regulated-data",
+      "enterprise-sales"
+    ],
+    "website": "https://m2pfintech.com",
+    "description": "API infrastructure for cards, lending and banking."
+  },
+  {
+    "id": "co-perfios",
+    "name": "Perfios",
+    "domain": "perfios.com",
+    "industry": "Fintech",
+    "city": "Bengaluru",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Late stage",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "bfsi",
+      "regulated-data",
+      "data-platform",
+      "enterprise-sales"
+    ],
+    "website": "https://perfios.com",
+    "description": "Financial data analytics for lenders."
+  },
+  {
+    "id": "co-setu",
+    "name": "Setu",
+    "domain": "setu.co",
+    "industry": "Fintech",
+    "city": "Bengaluru",
+    "sizeBand": "51–200",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "api-first",
+      "banking-tech",
+      "regulated-data"
+    ],
+    "website": "https://setu.co",
+    "description": "Financial APIs for payments and data."
+  },
+  {
+    "id": "co-signzy",
+    "name": "Signzy",
+    "domain": "signzy.com",
+    "industry": "Fintech",
+    "city": "Bengaluru",
+    "sizeBand": "201–500",
+    "fundingStage": "Series B",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "kyc",
+      "regulated-data",
+      "ai",
+      "enterprise-sales",
+      "bfsi"
+    ],
+    "website": "https://signzy.com",
+    "description": "Digital onboarding and KYC platform."
+  },
+  {
+    "id": "co-hyperverge",
+    "name": "HyperVerge",
+    "domain": "hyperverge.co",
+    "industry": "Fintech",
+    "city": "Bengaluru",
+    "sizeBand": "201–500",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "kyc",
+      "ai",
+      "regulated-data",
+      "global-customers"
+    ],
+    "website": "https://hyperverge.co",
+    "description": "AI identity verification."
+  },
+  {
+    "id": "co-cashfree-payments",
+    "name": "Cashfree Payments",
+    "domain": "cashfree.com",
+    "industry": "Fintech",
+    "city": "Bengaluru",
+    "sizeBand": "501–1000",
+    "fundingStage": "Series B",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "payments",
+      "api-first",
+      "regulated-data",
+      "pci-dss"
+    ],
+    "website": "https://cashfree.com",
+    "description": "Payments and payouts APIs for businesses."
+  },
+  {
+    "id": "co-decentro",
+    "name": "Decentro",
+    "domain": "decentro.tech",
+    "industry": "Fintech",
+    "city": "Bengaluru",
+    "sizeBand": "51–200",
+    "fundingStage": "Series A",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "api-first",
+      "banking-tech",
+      "regulated-data"
+    ],
+    "website": "https://decentro.tech",
+    "description": "Banking and KYC API infrastructure."
+  },
+  {
+    "id": "co-idfy",
+    "name": "IDfy",
+    "domain": "idfy.com",
+    "industry": "Fintech",
+    "city": "Mumbai",
+    "sizeBand": "501–1000",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "kyc",
+      "regulated-data",
+      "enterprise-sales"
+    ],
+    "website": "https://idfy.com",
+    "description": "Identity verification and risk platform."
+  },
+  {
+    "id": "co-credgenics",
+    "name": "Credgenics",
+    "domain": "credgenics.com",
+    "industry": "Fintech",
+    "city": "Noida",
+    "sizeBand": "501–1000",
+    "fundingStage": "Series B",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "bfsi",
+      "regulated-data",
+      "b2b-saas",
+      "enterprise-sales"
+    ],
+    "website": "https://credgenics.com",
+    "description": "Debt collections and legal tech for lenders."
+  },
+  {
+    "id": "co-yubi",
+    "name": "Yubi",
+    "domain": "go-yubi.com",
+    "industry": "Fintech",
+    "city": "Chennai",
+    "sizeBand": "501–1000",
+    "fundingStage": "Series B",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "bfsi",
+      "regulated-data",
+      "enterprise-sales"
+    ],
+    "website": "https://go-yubi.com",
+    "description": "Debt marketplace and credit platform."
+  },
+  {
+    "id": "co-open",
+    "name": "Open",
+    "domain": "open.money",
+    "industry": "Fintech",
+    "city": "Bengaluru",
+    "sizeBand": "501–1000",
+    "fundingStage": "Series D",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "banking-tech",
+      "regulated-data",
+      "smb"
+    ],
+    "website": "https://open.money",
+    "description": "Business banking platform for SMEs."
+  },
+  {
+    "id": "co-fi-money",
+    "name": "Fi Money",
+    "domain": "fi.money",
+    "industry": "Fintech",
+    "city": "Bengaluru",
+    "sizeBand": "201–500",
+    "fundingStage": null,
+    "careersProvider": "lever",
+    "careersToken": "epifi",
+    "tags": [
+      "banking-tech",
+      "regulated-data",
+      "consumer-fintech"
+    ],
+    "website": "https://fi.money",
+    "description": "Neobanking app (epiFi)."
+  },
+  {
+    "id": "co-fampay",
+    "name": "FamPay",
+    "domain": "famapp.in",
+    "industry": "Fintech",
+    "city": "Bengaluru",
+    "sizeBand": "51–200",
+    "fundingStage": "Series A",
+    "careersProvider": "lever",
+    "careersToken": "fampay",
+    "tags": [
+      "payments",
+      "regulated-data",
+      "consumer-fintech"
+    ],
+    "website": "https://famapp.in",
+    "description": "Payments app for young users."
+  },
+  {
+    "id": "co-bharatpe",
+    "name": "BharatPe",
+    "domain": "bharatpe.com",
+    "industry": "Fintech",
+    "city": "New Delhi",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Late stage",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "payments",
+      "regulated-data",
+      "smb"
+    ],
+    "website": "https://bharatpe.com",
+    "description": "Merchant payments and lending."
+  },
+  {
+    "id": "co-easebuzz",
+    "name": "Easebuzz",
+    "domain": "easebuzz.in",
+    "industry": "Fintech",
+    "city": "Pune",
+    "sizeBand": "201–500",
+    "fundingStage": "Series B",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "payments",
+      "regulated-data",
+      "api-first"
+    ],
+    "website": "https://easebuzz.in",
+    "description": "Payment solutions for businesses."
+  },
+  {
+    "id": "co-smallcase",
+    "name": "smallcase",
+    "domain": "smallcase.com",
+    "industry": "Fintech",
+    "city": "Bengaluru",
+    "sizeBand": "201–500",
+    "fundingStage": "Series C",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "investing",
+      "regulated-data",
+      "api-first"
+    ],
+    "website": "https://smallcase.com",
+    "description": "Investment products and platform."
+  },
+  {
+    "id": "co-zerodha",
+    "name": "Zerodha",
+    "domain": "zerodha.com",
+    "industry": "Fintech",
+    "city": "Bengaluru",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Bootstrapped",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "investing",
+      "regulated-data"
+    ],
+    "website": "https://zerodha.com",
+    "description": "Stock broking platform."
+  },
+  {
+    "id": "co-lendingkart",
+    "name": "Lendingkart",
+    "domain": "lendingkart.com",
+    "industry": "Fintech",
+    "city": "Ahmedabad",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Late stage",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "bfsi",
+      "regulated-data",
+      "smb"
+    ],
+    "website": "https://lendingkart.com",
+    "description": "Digital lending for small businesses."
+  },
+  {
+    "id": "co-practo",
+    "name": "Practo",
+    "domain": "practo.com",
+    "industry": "Healthtech",
+    "city": "Bengaluru",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Late stage",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "healthcare-data",
+      "regulated-data",
+      "b2b-saas"
+    ],
+    "website": "https://practo.com",
+    "description": "Healthcare platform and clinic software."
+  },
+  {
+    "id": "co-qure-ai",
+    "name": "Qure.ai",
+    "domain": "qure.ai",
+    "industry": "Healthtech",
+    "city": "Mumbai",
+    "sizeBand": "201–500",
+    "fundingStage": "Series D",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "ai",
+      "healthcare-data",
+      "regulated-data",
+      "global-customers"
+    ],
+    "website": "https://qure.ai",
+    "description": "AI for medical imaging."
+  },
+  {
+    "id": "co-dozee",
+    "name": "Dozee",
+    "domain": "dozee.health",
+    "industry": "Healthtech",
+    "city": "Bengaluru",
+    "sizeBand": "201–500",
+    "fundingStage": null,
+    "careersProvider": "lever",
+    "careersToken": "dozee",
+    "tags": [
+      "healthcare-data",
+      "iot",
+      "regulated-data"
+    ],
+    "website": "https://dozee.health",
+    "description": "Contactless remote patient monitoring."
+  },
+  {
+    "id": "co-tricog",
+    "name": "Tricog",
+    "domain": "tricog.com",
+    "industry": "Healthtech",
+    "city": "Bengaluru",
+    "sizeBand": "201–500",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "healthcare-data",
+      "ai",
+      "regulated-data"
+    ],
+    "website": "https://tricog.com",
+    "description": "Cardiac diagnostics and tele-ECG."
+  },
+  {
+    "id": "co-healthplix",
+    "name": "HealthPlix",
+    "domain": "healthplix.com",
+    "industry": "Healthtech",
+    "city": "Bengaluru",
+    "sizeBand": "201–500",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "healthcare-data",
+      "b2b-saas",
+      "regulated-data"
+    ],
+    "website": "https://healthplix.com",
+    "description": "EMR software for doctors."
+  },
+  {
+    "id": "co-medikabazaar",
+    "name": "Medikabazaar",
+    "domain": "medikabazaar.com",
+    "industry": "Healthtech",
+    "city": "Mumbai",
+    "sizeBand": "501–1000",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "healthcare",
+      "b2b-commerce"
+    ],
+    "website": "https://medikabazaar.com",
+    "description": "B2B marketplace for medical supplies."
+  },
+  {
+    "id": "co-niramai",
+    "name": "Niramai",
+    "domain": "niramai.com",
+    "industry": "Healthtech",
+    "city": "Bengaluru",
+    "sizeBand": "51–200",
+    "fundingStage": "Series A",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "ai",
+      "healthcare-data",
+      "regulated-data"
+    ],
+    "website": "https://niramai.com",
+    "description": "AI-based breast cancer screening."
+  },
+  {
+    "id": "co-sigtuple",
+    "name": "SigTuple",
+    "domain": "sigtuple.com",
+    "industry": "Healthtech",
+    "city": "Bengaluru",
+    "sizeBand": "51–200",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "ai",
+      "healthcare-data"
+    ],
+    "website": "https://sigtuple.com",
+    "description": "AI-assisted pathology."
+  },
+  {
+    "id": "co-eka-care",
+    "name": "Eka Care",
+    "domain": "eka.care",
+    "industry": "Healthtech",
+    "city": "Bengaluru",
+    "sizeBand": "51–200",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "healthcare-data",
+      "regulated-data"
+    ],
+    "website": "https://eka.care",
+    "description": "Digital health records and clinic software."
+  },
+  {
+    "id": "co-medi-assist",
+    "name": "Medi Assist",
+    "domain": "mediassist.in",
+    "industry": "Healthtech",
+    "city": "Bengaluru",
+    "sizeBand": "5000+",
+    "fundingStage": "Public",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "healthcare-data",
+      "regulated-data",
+      "insurance",
+      "enterprise-sales"
+    ],
+    "website": "https://mediassist.in",
+    "description": "Health benefits administration (TPA)."
+  },
+  {
+    "id": "co-cloudphysician",
+    "name": "Cloudphysician",
+    "domain": "cloudphysician.net",
+    "industry": "Healthtech",
+    "city": "Bengaluru",
+    "sizeBand": "201–500",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "healthcare-data",
+      "regulated-data"
+    ],
+    "website": "https://cloudphysician.net",
+    "description": "Tele-ICU care platform."
+  },
+  {
+    "id": "co-shipsy",
+    "name": "Shipsy",
+    "domain": "shipsy.io",
+    "industry": "Logistics",
+    "city": "Gurugram",
+    "sizeBand": "201–500",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "logistics-ops",
+      "b2b-saas",
+      "enterprise-sales",
+      "global-customers"
+    ],
+    "website": "https://shipsy.io",
+    "description": "Logistics management SaaS."
+  },
+  {
+    "id": "co-loginext",
+    "name": "LogiNext",
+    "domain": "loginextsolutions.com",
+    "industry": "Logistics",
+    "city": "Mumbai",
+    "sizeBand": "201–500",
+    "fundingStage": "Series B",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "logistics-ops",
+      "b2b-saas",
+      "global-customers"
+    ],
+    "website": "https://loginextsolutions.com",
+    "description": "Field logistics optimisation software."
+  },
+  {
+    "id": "co-locus",
+    "name": "Locus",
+    "domain": "locus.sh",
+    "industry": "Logistics",
+    "city": "Bengaluru",
+    "sizeBand": "201–500",
+    "fundingStage": "Series C",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "logistics-ops",
+      "b2b-saas",
+      "ai",
+      "enterprise-sales",
+      "global-customers"
+    ],
+    "website": "https://locus.sh",
+    "description": "Dispatch and route optimisation platform."
+  },
+  {
+    "id": "co-fareye",
+    "name": "FarEye",
+    "domain": "getfareye.com",
+    "industry": "Logistics",
+    "city": "Noida",
+    "sizeBand": "501–1000",
+    "fundingStage": "Series E",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "logistics-ops",
+      "b2b-saas",
+      "enterprise-sales",
+      "global-customers"
+    ],
+    "website": "https://getfareye.com",
+    "description": "Delivery management platform."
+  },
+  {
+    "id": "co-shiprocket",
+    "name": "Shiprocket",
+    "domain": "shiprocket.in",
+    "industry": "Logistics",
+    "city": "New Delhi",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Late stage",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "logistics-ops",
+      "ecommerce",
+      "smb"
+    ],
+    "website": "https://shiprocket.in",
+    "description": "Shipping and ecommerce enablement platform."
+  },
+  {
+    "id": "co-delhivery",
+    "name": "Delhivery",
+    "domain": "delhivery.com",
+    "industry": "Logistics",
+    "city": "Gurugram",
+    "sizeBand": "5000+",
+    "fundingStage": "Public",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "logistics-ops",
+      "enterprise-sales"
+    ],
+    "website": "https://delhivery.com",
+    "description": "Logistics and supply chain services."
+  },
+  {
+    "id": "co-shadowfax",
+    "name": "Shadowfax",
+    "domain": "shadowfax.in",
+    "industry": "Logistics",
+    "city": "Bengaluru",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Late stage",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "logistics-ops",
+      "ecommerce"
+    ],
+    "website": "https://shadowfax.in",
+    "description": "Last-mile logistics."
+  },
+  {
+    "id": "co-blackbuck",
+    "name": "BlackBuck",
+    "domain": "blackbuck.com",
+    "industry": "Logistics",
+    "city": "Bengaluru",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Public",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "logistics-ops",
+      "trucking"
+    ],
+    "website": "https://blackbuck.com",
+    "description": "Trucking operator platform (Zinka Logistics)."
+  },
+  {
+    "id": "co-porter",
+    "name": "Porter",
+    "domain": "porter.in",
+    "industry": "Logistics",
+    "city": "Bengaluru",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Late stage",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "logistics-ops",
+      "smb"
+    ],
+    "website": "https://porter.in",
+    "description": "Intra-city logistics marketplace."
+  },
+  {
+    "id": "co-xpressbees",
+    "name": "Xpressbees",
+    "domain": "xpressbees.com",
+    "industry": "Logistics",
+    "city": "Pune",
+    "sizeBand": "5000+",
+    "fundingStage": "Late stage",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "logistics-ops",
+      "ecommerce"
+    ],
+    "website": "https://xpressbees.com",
+    "description": "Express logistics for ecommerce."
+  },
+  {
+    "id": "co-keka",
+    "name": "Keka",
+    "domain": "keka.com",
+    "industry": "HR Tech",
+    "city": "Hyderabad",
+    "sizeBand": "501–1000",
+    "fundingStage": "Series A",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "hr-data",
+      "b2b-saas",
+      "smb",
+      "regulated-data"
+    ],
+    "website": "https://keka.com",
+    "description": "HR and payroll software."
+  },
+  {
+    "id": "co-greythr",
+    "name": "greytHR",
+    "domain": "greythr.com",
+    "industry": "HR Tech",
+    "city": "Bengaluru",
+    "sizeBand": "501–1000",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "hr-data",
+      "b2b-saas",
+      "smb"
+    ],
+    "website": "https://greythr.com",
+    "description": "HR and payroll software for SMEs."
+  },
+  {
+    "id": "co-hackerearth",
+    "name": "HackerEarth",
+    "domain": "hackerearth.com",
+    "industry": "HR Tech",
+    "city": "Bengaluru",
+    "sizeBand": "201–500",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "hr-data",
+      "b2b-saas",
+      "global-customers"
+    ],
+    "website": "https://hackerearth.com",
+    "description": "Technical hiring and assessment platform."
+  },
+  {
+    "id": "co-apna",
+    "name": "apna",
+    "domain": "apna.co",
+    "industry": "HR Tech",
+    "city": "Mumbai",
+    "sizeBand": "501–1000",
+    "fundingStage": "Series C",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "hiring",
+      "marketplace"
+    ],
+    "website": "https://apna.co",
+    "description": "Jobs and professional networking platform."
+  },
+  {
+    "id": "co-springworks",
+    "name": "Springworks",
+    "domain": "springworks.in",
+    "industry": "HR Tech",
+    "city": "Bengaluru",
+    "sizeBand": "51–200",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "hr-data",
+      "b2b-saas"
+    ],
+    "website": "https://springworks.in",
+    "description": "HR tools including background verification."
+  },
+  {
+    "id": "co-plum",
+    "name": "Plum",
+    "domain": "plumhq.com",
+    "industry": "HR Tech",
+    "city": "Bengaluru",
+    "sizeBand": "201–500",
+    "fundingStage": "Series A",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "hr-data",
+      "insurance",
+      "regulated-data"
+    ],
+    "website": "https://plumhq.com",
+    "description": "Employee health insurance and benefits."
+  },
+  {
+    "id": "co-upgrad",
+    "name": "upGrad",
+    "domain": "upgrad.com",
+    "industry": "Edtech",
+    "city": "Mumbai",
+    "sizeBand": "5000+",
+    "fundingStage": "Late stage",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "edtech",
+      "enterprise-learning"
+    ],
+    "website": "https://upgrad.com",
+    "description": "Online higher education and upskilling."
+  },
+  {
+    "id": "co-classplus",
+    "name": "Classplus",
+    "domain": "classplusapp.com",
+    "industry": "Edtech",
+    "city": "Noida",
+    "sizeBand": "501–1000",
+    "fundingStage": "Series D",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "edtech",
+      "b2b-saas",
+      "smb"
+    ],
+    "website": "https://classplusapp.com",
+    "description": "SaaS for educators and coaching institutes."
+  },
+  {
+    "id": "co-simplilearn",
+    "name": "Simplilearn",
+    "domain": "simplilearn.com",
+    "industry": "Edtech",
+    "city": "Bengaluru",
+    "sizeBand": "1001–5000",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "edtech",
+      "enterprise-learning"
+    ],
+    "website": "https://simplilearn.com",
+    "description": "Digital skills training."
+  },
+  {
+    "id": "co-great-learning",
+    "name": "Great Learning",
+    "domain": "mygreatlearning.com",
+    "industry": "Edtech",
+    "city": "Gurugram",
+    "sizeBand": "1001–5000",
+    "fundingStage": null,
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "edtech",
+      "enterprise-learning"
+    ],
+    "website": "https://mygreatlearning.com",
+    "description": "Professional education and upskilling."
+  },
+  {
+    "id": "co-meesho",
+    "name": "Meesho",
+    "domain": "meesho.com",
+    "industry": "Ecommerce enablement",
+    "city": "Bengaluru",
+    "sizeBand": "1001–5000",
+    "fundingStage": null,
+    "careersProvider": "lever",
+    "careersToken": "meesho",
+    "tags": [
+      "ecommerce",
+      "smb",
+      "marketplace"
+    ],
+    "website": "https://meesho.com",
+    "description": "Ecommerce marketplace for small sellers."
+  },
+  {
+    "id": "co-unicommerce",
+    "name": "Unicommerce",
+    "domain": "unicommerce.com",
+    "industry": "Ecommerce enablement",
+    "city": "New Delhi",
+    "sizeBand": "201–500",
+    "fundingStage": "Public",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "ecommerce",
+      "b2b-saas",
+      "logistics-ops"
+    ],
+    "website": "https://unicommerce.com",
+    "description": "Ecommerce operations and warehouse SaaS."
+  },
+  {
+    "id": "co-gokwik",
+    "name": "GoKwik",
+    "domain": "gokwik.co",
+    "industry": "Ecommerce enablement",
+    "city": "New Delhi",
+    "sizeBand": "201–500",
+    "fundingStage": "Series B",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "ecommerce",
+      "payments",
+      "b2b-saas"
+    ],
+    "website": "https://gokwik.co",
+    "description": "Checkout and conversion platform for D2C brands."
+  },
+  {
+    "id": "co-increff",
+    "name": "Increff",
+    "domain": "increff.com",
+    "industry": "Ecommerce enablement",
+    "city": "Bengaluru",
+    "sizeBand": "201–500",
+    "fundingStage": "Series B",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "ecommerce",
+      "b2b-saas",
+      "retail-tech",
+      "global-customers"
+    ],
+    "website": "https://increff.com",
+    "description": "Retail inventory and warehouse software."
+  },
+  {
+    "id": "co-moglix",
+    "name": "Moglix",
+    "domain": "moglix.com",
+    "industry": "Ecommerce enablement",
+    "city": "Noida",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Late stage",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "b2b-commerce",
+      "enterprise-sales",
+      "manufacturing"
+    ],
+    "website": "https://moglix.com",
+    "description": "B2B commerce for industrial supplies."
+  },
+  {
+    "id": "co-udaan",
+    "name": "Udaan",
+    "domain": "udaan.com",
+    "industry": "Ecommerce enablement",
+    "city": "Bengaluru",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Late stage",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "b2b-commerce",
+      "smb"
+    ],
+    "website": "https://udaan.com",
+    "description": "B2B ecommerce for retailers."
+  },
+  {
+    "id": "co-ofbusiness",
+    "name": "OfBusiness",
+    "domain": "ofbusiness.com",
+    "industry": "Ecommerce enablement",
+    "city": "Gurugram",
+    "sizeBand": "1001–5000",
+    "fundingStage": "Late stage",
+    "careersProvider": "none",
+    "careersToken": null,
+    "tags": [
+      "b2b-commerce",
+      "bfsi",
+      "manufacturing"
+    ],
+    "website": "https://ofbusiness.com",
+    "description": "Raw material commerce and financing."
+  }
+]

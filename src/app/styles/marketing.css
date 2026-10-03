@@ -1,0 +1,115 @@
+/* marketing workstream styles: /insights (objections → campaigns → reverse intent) */
+.mk-content { max-width: 1320px; }
+.mk-workspace { display: grid; gap: 16px; }
+.mk-workspace > .kpis { margin-top: 24px; }
+.mk-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.mk-panel-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+.mk-panel-head h2 { margin: 0; }
+.mk-chart { width: 100%; min-height: 120px; }
+.mk-chart .recharts-surface:focus, .mk-chart .recharts-wrapper:focus { outline: none; }
+.mk-tooltip { background: var(--surface); border: 1px solid var(--line); border-radius: 9px; padding: 9px 11px; box-shadow: var(--shadow); font-size: 12px; line-height: 1.5; }
+.mk-tooltip strong { font-size: 13px; }
+.mk-table-toggle { margin-top: 10px; font-size: 12px; color: var(--muted); }
+.mk-table-toggle summary { cursor: pointer; font-weight: 700; }
+.mk-table-toggle table { margin-top: 10px; }
+.mk-gap { margin-top: 16px; }
+.mk-objection-headline { font: 700 21px/1.3 Georgia, serif !important; margin: 8px 0 6px !important; }
+.mk-quotes { display: grid; gap: 9px; margin-top: 8px; }
+.mk-quote { margin: 0; background: #f7f3ee; border-left: 3px solid #b7ada4; border-radius: 5px; padding: 11px 13px; }
+.mk-quote blockquote { margin: 0; font: italic 15px/1.45 Georgia, serif; }
+.mk-quote figcaption { margin-top: 6px; color: var(--muted); font-size: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.mk-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.mk-chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 5px 9px; font-size: 12px; font-weight: 700; background: var(--surface); }
+.mk-chip:hover { border-color: #cdbfb3; }
+.mk-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--slate); }
+.mk-chip.revive .mk-dot { background: var(--ember); }
+.mk-chip.warm .mk-dot { background: var(--amber); }
+.mk-chip-lane { font-size: 9px; letter-spacing: .6px; color: var(--muted); font-weight: 900; }
+.mk-chip.revive { background: #fff0eb; border-color: #f4c3b6; }
+.mk-chip.warm { background: #fff8e6; border-color: #f0dba8; }
+
+.mk-campaign { padding: 24px; box-shadow: var(--shadow); }
+.mk-campaign-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+.mk-campaign-name { margin: 6px 0 8px !important; font: 700 24px Georgia, serif !important; }
+.mk-badges { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.mk-status { font-size: 11px; font-weight: 800; border-radius: 999px; padding: 4px 9px; background: #eef0f1; color: #56606a; }
+.mk-status.launched { background: #e6f3ed; color: var(--green); }
+.mk-status.launched_simulated { background: #fff4d8; color: #8b5c0b; border: 1px dashed #d9b25e; }
+.mk-prov.live { color: var(--green); border-color: #bfe0d2; }
+.mk-prov.cached { color: var(--slate); }
+.mk-prov.template { border-style: dashed; }
+.mk-live { color: var(--green); border-color: #bfe0d2; }
+.mk-live::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+.mk-warn { color: var(--ember-dark); border-color: #f4c3b6; }
+.mk-core { font: 700 clamp(26px, 3.2vw, 38px)/1.15 Georgia, serif; letter-spacing: -.6px; margin: 22px 0 18px; color: var(--ember-dark); }
+.mk-why-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 14px; }
+.mk-why, .mk-channel { border: 1px solid var(--line); border-radius: 11px; padding: 14px 16px; background: #fbf8f3; }
+.mk-why p, .mk-channel p { margin: 7px 0 0; line-height: 1.5; font-size: 13px; color: #4f4843; }
+.mk-channel { background: #fff7f3; border-color: #f4d3c9; }
+.mk-channel-name { display: flex; align-items: baseline; gap: 8px; margin-top: 6px; font: 700 18px Georgia, serif; }
+.mk-channel-name svg { width: 16px; height: 16px; color: var(--ember); align-self: center; }
+.mk-channel-name .meta { font: 12px Arial, Helvetica, sans-serif; margin: 0; }
+
+.mk-confirm { margin-top: 16px; border: 2px solid var(--ember); border-radius: 12px; padding: 16px; background: #fffaf7; display: grid; gap: 12px; }
+.mk-confirm-head { display: flex; justify-content: space-between; gap: 12px; }
+.mk-confirm-head p { margin: 4px 0 0; }
+.mk-confirm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.mk-confirm-item { display: grid; gap: 8px; border: 1px solid var(--line); border-radius: 10px; padding: 11px; background: var(--surface); opacity: .55; cursor: pointer; }
+.mk-confirm-item.on { opacity: 1; border-color: #f0a28f; }
+.mk-confirm-item span { font-weight: 800; font-size: 12px; display: flex; align-items: center; gap: 6px; }
+.mk-confirm-item pre { margin: 0; white-space: pre-wrap; word-break: break-word; font: 12px/1.5 Arial, Helvetica, sans-serif; max-height: 220px; overflow: auto; }
+
+.mk-launched { margin-top: 18px; display: grid; gap: 12px; }
+.mk-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.mk-stats > div { border: 1px solid var(--line); border-radius: 10px; padding: 11px 13px; background: #fbf8f3; display: grid; gap: 4px; }
+.mk-stats strong { font: 700 24px Georgia, serif; }
+.mk-posts { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.mk-post-link { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--ember-dark); border-bottom: 1px solid #f0a28f; }
+.mk-post-link svg { width: 13px; height: 13px; }
+.mk-lane-changes { display: grid; gap: 6px; }
+.mk-lane-change { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; font-size: 13px; padding: 8px 10px; border-radius: 8px; background: #fbf8f3; animation: mk-glow 1.4s ease-out; }
+@keyframes mk-glow { from { box-shadow: 0 0 0 3px rgba(233, 86, 63, .35); } to { box-shadow: 0 0 0 0 rgba(233, 86, 63, 0); } }
+@media (prefers-reduced-motion: reduce) { .mk-lane-change { animation: none; } }
+
+.mk-assets { margin-top: 20px; }
+.mk-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.mk-tab { border: 0; background: none; padding: 10px 13px; font-weight: 700; font-size: 13px; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; display: inline-flex; align-items: center; gap: 6px; }
+.mk-tab.active { color: var(--ink); border-bottom-color: var(--ember); }
+.mk-tab:focus-visible, .mk-campaign-row:focus-visible, .button:focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; }
+.mk-rec { font-size: 9px; font-weight: 900; letter-spacing: .5px; text-transform: uppercase; color: var(--ember-dark); background: #fff0eb; border-radius: 4px; padding: 2px 5px; }
+.mk-tab-body { padding: 18px 0 12px; }
+.mk-li { max-width: 560px; border: 1px solid #dcd6cf; border-radius: 10px; background: white; }
+.mk-li-head { display: flex; gap: 10px; align-items: center; padding: 13px 15px 6px; }
+.mk-li-body { padding: 6px 15px 14px; white-space: pre-wrap; font-size: 14px; line-height: 1.5; }
+.mk-li-foot { display: flex; gap: 18px; border-top: 1px solid #ece7e1; padding: 10px 15px; font-size: 12px; font-weight: 700; color: var(--muted); }
+.mk-avatar { width: 40px; height: 40px; border-radius: 8px; background: var(--nav); color: #f7eee4; display: grid; place-items: center; font-weight: 800; font-size: 13px; flex: none; }
+.mk-avatar.small { width: 34px; height: 34px; border-radius: 50%; font-size: 11px; }
+.mk-count { margin-left: auto; font-size: 11px; color: var(--muted); font-weight: 700; }
+.mk-count.over { color: var(--ember-dark); }
+.mk-thread { list-style: none; margin: 0; padding: 0; max-width: 560px; display: grid; }
+.mk-tweet { display: grid; grid-template-columns: 34px 1fr; gap: 10px; padding: 12px 14px; border: 1px solid #dcd6cf; border-top-width: 0; background: white; position: relative; }
+.mk-tweet:first-child { border-top-width: 1px; border-radius: 10px 10px 0 0; }
+.mk-tweet:last-child { border-radius: 0 0 10px 10px; }
+.mk-tweet:only-child { border-radius: 10px; }
+.mk-tweet p { margin: 4px 0 6px; font-size: 14px; line-height: 1.45; white-space: pre-wrap; }
+.mk-tweet .mk-count { display: block; text-align: right; }
+.mk-email { max-width: 620px; border: 1px solid #dcd6cf; border-radius: 10px; background: white; padding: 14px 16px; display: grid; gap: 10px; }
+.mk-email-row { font-weight: 700; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #ece7e1; padding-bottom: 9px; }
+.mk-email-body { white-space: pre-wrap; line-height: 1.55; font-size: 14px; }
+.mk-hero { max-width: 720px; border-radius: 12px; overflow: hidden; padding: 18px 26px 32px; color: #fff8f2; background: radial-gradient(circle at 85% 10%, rgba(233, 86, 63, .55), transparent 45%), linear-gradient(135deg, #211c19, #3a2a23); }
+.mk-hero-nav { display: flex; gap: 18px; font-size: 12px; color: #d8cbc1; margin-bottom: 34px; }
+.mk-hero-nav strong { color: white; margin-right: auto; }
+.mk-hero h3 { font: 700 34px/1.1 Georgia, serif; margin: 0 0 12px; max-width: 560px; letter-spacing: -.5px; }
+.mk-hero p { margin: 0 0 20px; max-width: 520px; color: #e9ddd3; line-height: 1.5; }
+.mk-hero-cta { display: inline-block; background: var(--ember); color: white; font-weight: 800; padding: 10px 16px; border-radius: 8px; font-size: 13px; }
+.mk-targets { margin-top: 18px; display: grid; gap: 9px; }
+
+.mk-campaign-list { display: grid; gap: 8px; }
+.mk-campaign-row { display: flex; justify-content: space-between; gap: 14px; align-items: center; text-align: left; border: 1px solid var(--line); border-radius: 11px; background: var(--surface); padding: 13px 15px; color: var(--ink); }
+.mk-campaign-row.active { border-color: #f0a28f; box-shadow: 0 0 0 2px #fff0eb; }
+.mk-campaign-row:hover { border-color: #cdbfb3; }
+.mk-row-meta { display: grid; justify-items: end; gap: 5px; }
+.mk-workspace .button:disabled { opacity: .55; cursor: default; }
+
+@media (max-width: 1100px) { .mk-grid, .mk-why-grid { grid-template-columns: 1fr; } .mk-stats { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 760px) { .mk-confirm-grid { grid-template-columns: 1fr; } .mk-stats { grid-template-columns: 1fr 1fr; } .mk-campaign-row { flex-direction: column; align-items: flex-start; } .mk-row-meta { justify-items: start; } }

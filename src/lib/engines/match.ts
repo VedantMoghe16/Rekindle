@@ -13,7 +13,20 @@ export const MATCH_MATRIX: Record<StallCategory, Partial<Record<SignalType, numb
   OTHER: { FUNDING: 40, HIRING_RELEVANT: 40, LEADERSHIP_CHANGE: 40, EXPANSION: 35, PRODUCT_LAUNCH: 30, COMPLIANCE_EVENT: 40, DATE_REACHED: 50, RENEWAL_WINDOW: 30, FEATURE_SHIPPED: 30 },
 };
 
-export type MatchSignal = { id: string; type: SignalType; title: string; occurredAt: Date; provenance: string };
+export type MatchSignal = { id: string; type: SignalType; title: string; occurredAt: Date; provenance: string; campaign?: { events: number; sameCategory: boolean } };
+
+/** Spec §7.5.1: campaign engagement scores by event count and whether the campaign answered this deal's objection. */
+export function campaignScore(events: number, sameCategory: boolean): number {
+  if (events <= 0) return 0;
+  if (events === 1) return sameCategory ? 45 : 35;
+  if (events === 2) return sameCategory ? 65 : 50;
+  return sameCategory ? 85 : 65;
+}
+
+function baseScore(category: StallCategory, signal: MatchSignal): number {
+  if (signal.type === "CAMPAIGN_ENGAGEMENT") return campaignScore(signal.campaign?.events ?? 1, signal.campaign?.sameCategory ?? false);
+  return MATCH_MATRIX[category][signal.type] ?? 0;
+}
 
 export function freshness(signalDate: Date, today: Date, computed = false): number {
   if (computed) return 1;
@@ -29,7 +42,7 @@ export function freshness(signalDate: Date, today: Date, computed = false): numb
 export function scoreMatch(category: StallCategory, signals: MatchSignal[], evidenceDate: Date, today: Date) {
   const scored = signals
     .filter((signal) => signal.occurredAt >= evidenceDate)
-    .map((signal) => ({ signal, score: (MATCH_MATRIX[category][signal.type] ?? 0) * freshness(signal.occurredAt, today, signal.provenance === "computed") }))
+    .map((signal) => ({ signal, score: baseScore(category, signal) * freshness(signal.occurredAt, today, signal.provenance === "computed") }))
     .filter(({ score }) => score > 0)
     .sort((a, b) => b.score - a.score);
   const best = scored[0];
@@ -60,6 +73,7 @@ export function recommendationCopy(category: StallCategory, signal: MatchSignal,
     DATE_REACHED: `${signal.title}: their stated timing has arrived`,
     EXPANSION: `${signal.title}: budget conditions may have changed`,
     LEADERSHIP_CHANGE: `${signal.title}: a new champion may be emerging`,
+    CAMPAIGN_ENGAGEMENT: `${signal.title}: they engaged with the answer to their objection`,
   };
   const label = category.toLowerCase().replaceAll("_", " ");
   return {

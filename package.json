@@ -10,9 +10,12 @@
     "test:watch": "vitest",
     "db:push": "prisma db push",
     "seed": "tsx prisma/seed.ts",
-    "demo:reset": "prisma db push --force-reset && tsx prisma/seed.ts && tsx scripts/run-matcher.ts"
+    "boards:check": "tsx scripts/check-boards.ts",
+    "demo:reset": "prisma db push && tsx scripts/reset-demo.ts",
+    "demo:warm": "tsx scripts/warm-cache.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0",
     "@next/swc-darwin-arm64": "^16.3.8",
     "@prisma/client": "6.12.0",
     "clsx": "2.1.1",

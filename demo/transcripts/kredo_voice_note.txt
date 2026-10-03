@@ -1,0 +1,1 @@
+Meera Iyer (CTO): Dekho, product accha hai, no doubt. The problem is we don't have anyone owning security right now. Mera infra team already stretched hai, and if we buy a tool with no owner, it'll become shelfware. Once we hire a dedicated security lead, that person should evaluate this. We're hoping to start hiring by Q3.

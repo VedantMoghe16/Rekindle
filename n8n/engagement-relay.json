@@ -1,0 +1,335 @@
+{
+  "name": "Rekindle · Engagement relay (LinkedIn + X → sales)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "0cab21fc-e5cc-557f-a089-535ce7b18f6d",
+      "name": "Every 15 minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.APP_BASE_URL }}/api/campaigns",
+        "options": {}
+      },
+      "id": "1ae1e8b4-3cfd-59d0-b3c2-47047e802a44",
+      "name": "List Rekindle campaigns",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// One item per real (non-simulated) published post of a launched campaign.\nconst campaigns = $input.first().json.data || [];\nconst items = [];\nfor (const campaign of campaigns) {\n  if (campaign.status !== 'launched') continue;\n  for (const [platform, url] of Object.entries(campaign.postUrls || {})) {\n    if (!url || url.includes('simulated-')) continue;\n    const postId = platform === 'linkedin' ? (url.match(/urn:li:[a-zA-Z]+:\\d+/) || [])[0] : (url.match(/status\\/(\\d+)/) || [])[1];\n    if (postId) items.push({ json: { campaignId: campaign.id, platform, postId, postUrl: url } });\n  }\n}\nreturn items;"
+      },
+      "id": "d829955f-2329-57a0-9706-61b16f344376",
+      "name": "Campaign posts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.APP_BASE_URL }}/api/campaigns/{{ $json.campaignId }}",
+        "options": {}
+      },
+      "id": "f0fb5b75-80cb-5233-8a56-09146e931bdb",
+      "name": "Campaign targets",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Campaign posts').item.json.platform }}",
+                    "rightValue": "linkedin",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "linkedin"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Campaign posts').item.json.platform }}",
+                    "rightValue": "x",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "x"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "067ae95d-3f59-5274-96dc-db00b1edec0f",
+      "name": "Route by platform",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        880,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://api.linkedin.com/rest/reactions/(entity:{{ encodeURIComponent($('Campaign posts').item.json.postId) }})?q=entity",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "linkedInOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "LinkedIn-Version",
+              "value": "202409"
+            },
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c303dc66-7e86-5753-b6f6-0352371b1e6d",
+      "name": "LinkedIn reactions (placeholder)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        200
+      ],
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "",
+          "name": "LinkedIn account"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "notes": "Placeholder: reaction actors need Community Management API access. Resolve each actor URN to a headline before mapping."
+    },
+    {
+      "parameters": {
+        "url": "=https://api.x.com/2/tweets/{{ $('Campaign posts').item.json.postId }}/liking_users?user.fields=description,name,username",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "twitterOAuth2Api",
+        "options": {}
+      },
+      "id": "8e511c7b-a825-594d-baf9-01ca87dd4318",
+      "name": "X liking users (placeholder)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        400
+      ],
+      "credentials": {
+        "twitterOAuth2Api": {
+          "id": "",
+          "name": "X account"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "notes": "Placeholder: liking_users requires an X API tier with read access."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Map engagers to Rekindle target accounts by company name or domain in their headline / bio.\n// Rekindle dedupes nothing here: send only engagers you have not sent before (staticData keeps a seen-set).\nconst seen = $getWorkflowStaticData('global');\nseen.ids = seen.ids || {};\nconst out = [];\nfor (const [index, item] of $input.all().entries()) {\n  const post = $('Campaign posts').itemMatching(index).json;\n  const detail = $('Campaign targets').itemMatching(index).json.data || { targets: [] };\n  const people = item.json.elements || item.json.data || [];\n  for (const person of people) {\n    const text = `${person.headline || ''} ${person.description || ''} ${person.name || ''} ${person.organization || ''}`.toLowerCase();\n    const target = detail.targets.find((t) => text.includes(t.name.toLowerCase()));\n    if (!target) continue;\n    const key = `${post.campaignId}:${post.platform}:${person.id || person.actor || person.username}`;\n    if (seen.ids[key]) continue;\n    seen.ids[key] = Date.now();\n    out.push({ json: {\n      event: 'engagement',\n      campaignId: post.campaignId,\n      accountId: target.accountId,\n      platform: post.platform,\n      type: item.json.__type || 'like',\n      roleTitle: (person.headline || person.description || '').split(/ at | @ |\\|/)[0].slice(0, 80) || null,\n    } });\n  }\n}\nreturn out;"
+      },
+      "id": "95a69b80-9bfc-5774-9081-00caecabe01d",
+      "name": "Map engagers to accounts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1340,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.APP_BASE_URL }}/api/webhooks/n8n",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-rekindle-secret",
+              "value": "={{ $env.N8N_SHARED_SECRET }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "761f5617-e15c-5b3b-a823-dd05fe1f4262",
+      "name": "Send engagement to Rekindle",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1560,
+        300
+      ],
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Every 15 minutes": {
+      "main": [
+        [
+          {
+            "node": "List Rekindle campaigns",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Rekindle campaigns": {
+      "main": [
+        [
+          {
+            "node": "Campaign posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Campaign posts": {
+      "main": [
+        [
+          {
+            "node": "Campaign targets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Campaign targets": {
+      "main": [
+        [
+          {
+            "node": "Route by platform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by platform": {
+      "main": [
+        [
+          {
+            "node": "LinkedIn reactions (placeholder)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "X liking users (placeholder)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LinkedIn reactions (placeholder)": {
+      "main": [
+        [
+          {
+            "node": "Map engagers to accounts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "X liking users (placeholder)": {
+      "main": [
+        [
+          {
+            "node": "Map engagers to accounts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map engagers to accounts": {
+      "main": [
+        [
+          {
+            "node": "Send engagement to Rekindle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

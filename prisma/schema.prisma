@@ -8,33 +8,34 @@ datasource db {
 }
 
 model SellerProfile {
-  id                String   @id
-  name              String
-  oneLiner          String
-  product           String
-  icp               String
-  personasJson      String
-  proofPointsJson   String
-  roleKeywordsJson  String
-  changelogJson     String
-  repName           String
-  updatedAt         DateTime @updatedAt
+  id               String   @id
+  name             String
+  oneLiner         String
+  product          String
+  icp              String
+  personasJson     String
+  proofPointsJson  String
+  roleKeywordsJson String
+  changelogJson    String
+  repName          String
+  updatedAt        DateTime @updatedAt
 }
 
 model Account {
-  id              String   @id
+  id              String            @id
   name            String
   domain          String?
   industry        String?
   sizeBand        String?
   city            String?
-  careersProvider String   @default("none")
+  careersProvider String            @default("none")
   careersToken    String?
-  isDemo          Boolean  @default(true)
-  createdAt       DateTime @default(now())
+  isDemo          Boolean           @default(true)
+  createdAt       DateTime          @default(now())
   contacts        Contact[]
   deals           Deal[]
   signals         Signal[]
+  engagements     EngagementEvent[]
 }
 
 model Contact {
@@ -47,21 +48,22 @@ model Contact {
 }
 
 model Deal {
-  id              String   @id
+  id              String           @id
   accountId       String
-  account         Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  account         Account          @relation(fields: [accountId], references: [id], onDelete: Cascade)
   ownerName       String
   valueInr        Int
-  stage           String   @default("stalled")
+  stage           String           @default("stalled")
   stalledAt       DateTime?
   lastTouchAt     DateTime?
-  lane            String   @default("WATCH")
-  priorityScore   Int      @default(0)
-  matchScore      Int      @default(0)
+  lane            String           @default("WATCH")
+  priorityScore   Int              @default(0)
+  matchScore      Int              @default(0)
   interactions    Interaction[]
   memory          Memory?
   recommendations Recommendation[]
   laneChanges     LaneChange[]
+  outcomes        Outcome[]
 }
 
 model Interaction {
@@ -79,16 +81,16 @@ model Interaction {
 }
 
 model Memory {
-  id                    String   @id
-  dealId                String   @unique
-  deal                  Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  id                    String    @id
+  dealId                String    @unique
+  deal                  Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
   stallCategory         String
   summary               String
   evidenceQuote         String
   evidenceSpeaker       String?
   evidenceDate          DateTime?
   evidenceInteractionId String?
-  evidenceVerified      Boolean  @default(true)
+  evidenceVerified      Boolean   @default(true)
   timingJson            String
   competitorJson        String
   missingFeatureJson    String
@@ -97,8 +99,8 @@ model Memory {
   sentiment             String
   language              String
   confidence            Float
-  editedByUser          Boolean  @default(false)
-  updatedAt             DateTime @updatedAt
+  editedByUser          Boolean   @default(false)
+  updatedAt             DateTime  @updatedAt
 }
 
 model Signal {
@@ -120,9 +122,9 @@ model Signal {
 }
 
 model Recommendation {
-  id                 String   @id
+  id                 String    @id
   dealId             String
-  deal               Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  deal               Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
   signalIdsJson      String
   effect             String
   matchScore         Int
@@ -131,10 +133,11 @@ model Recommendation {
   headline           String
   explanation        String
   scoreBreakdownJson String
-  status             String   @default("new")
+  status             String    @default("new")
   snoozedUntil       DateTime?
-  isCurrent          Boolean  @default(true)
-  createdAt          DateTime @default(now())
+  isCurrent          Boolean   @default(true)
+  createdAt          DateTime  @default(now())
+  drafts             Draft[]
 }
 
 model LaneChange {
@@ -160,12 +163,12 @@ model DiscoveryThread {
 }
 
 model ChatMessage {
-  id         String          @id @default(cuid())
-  threadId   String
-  thread     DiscoveryThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
-  role       String
-  content    String
-  createdAt  DateTime        @default(now())
+  id        String          @id @default(cuid())
+  threadId  String
+  thread    DiscoveryThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  role      String
+  content   String
+  createdAt DateTime        @default(now())
 }
 
 model IcpVersion {
@@ -209,6 +212,10 @@ model LeadCandidate {
   status            String         @default("SUGGESTED")
   promotedAccountId String?
   isDemo            Boolean        @default(true)
+  source            String         @default("demo")
+  companyId         String?
+  enrichedAt        DateTime?
+  stale             Boolean        @default(false)
   createdAt         DateTime       @default(now())
   evidence          LeadEvidence[]
 }
@@ -225,4 +232,93 @@ model LeadEvidence {
   observedAt  DateTime
   confidence  String
   isDemo      Boolean       @default(true)
+  provenance  String        @default("demo")
+}
+
+model Company {
+  id              String    @id
+  name            String
+  domain          String    @unique
+  industry        String
+  city            String
+  sizeBand        String
+  fundingStage    String?
+  careersProvider String    @default("none")
+  careersToken    String?
+  tagsJson        String
+  website         String?
+  description     String?
+  source          String    @default("curated")
+  lastEnrichedAt  DateTime?
+  createdAt       DateTime  @default(now())
+}
+
+model LlmCache {
+  key        String   @id
+  provider   String
+  model      String
+  schemaName String
+  response   String
+  createdAt  DateTime @default(now())
+}
+
+model SourceCache {
+  key       String   @id
+  response  String
+  fetchedAt DateTime @default(now())
+}
+
+model Draft {
+  id               String         @id @default(cuid())
+  recommendationId String
+  recommendation   Recommendation @relation(fields: [recommendationId], references: [id], onDelete: Cascade)
+  channel          String
+  language         String         @default("en")
+  subject          String?
+  body             String
+  whyJson          String
+  provenance       String         @default("computed")
+  createdAt        DateTime       @default(now())
+}
+
+model Campaign {
+  id                   String            @id @default(cuid())
+  stallCategory        String
+  name                 String
+  coreMessage          String
+  recommendedPlatform  String
+  platformRationale    String
+  assetsJson           String
+  targetAccountIdsJson String
+  status               String            @default("draft")
+  launchedAt           DateTime?
+  postUrlsJson         String?
+  provenance           String            @default("computed")
+  createdAt            DateTime          @default(now())
+  engagements          EngagementEvent[]
+}
+
+model EngagementEvent {
+  id          String   @id @default(cuid())
+  campaignId  String
+  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  accountId   String
+  account     Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  platform    String   @default("linkedin")
+  type        String
+  roleTitle   String?
+  occurredAt  DateTime @default(now())
+  isSimulated Boolean  @default(true)
+}
+
+model Outcome {
+  id               String   @id @default(cuid())
+  dealId           String
+  deal             Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  recommendationId String?
+  stallCategory    String
+  signalType       String?
+  event            String
+  isSeeded         Boolean  @default(false)
+  occurredAt       DateTime @default(now())
 }

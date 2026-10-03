@@ -1,0 +1,175 @@
+{
+  "name": "Rekindle · Signal collector (Google News → signals)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 7 * * *"
+            }
+          ]
+        }
+      },
+      "id": "2774e9ac-f7ea-5926-8c77-b3fed42ab982",
+      "name": "Daily 7:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.APP_BASE_URL }}/api/accounts",
+        "options": {}
+      },
+      "id": "8ee73277-921c-5894-bc98-128b7e9f221b",
+      "name": "List Rekindle accounts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        300
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Accounts to watch. Pulls the live list from Rekindle; falls back to a static list.\nconst accounts = $input.first().json.data || [];\nconst list = accounts.length ? accounts : [\n  { name: 'Finvara Pay', domain: 'finvarapay.example' },\n  { name: 'Kredo Lending', domain: 'kredolending.example' },\n];\n// /api/accounts may omit domains; accountId is sent too so Rekindle can match either way.\nreturn list.filter((a) => a.name).map((a) => ({ json: { accountId: a.id || null, name: a.name, domain: a.domain || null } }));"
+      },
+      "id": "4f5ec62b-3b50-5431-97c6-5667b7fcf86b",
+      "name": "Companies",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://news.google.com/rss/search?q={{ encodeURIComponent('\"' + $json.name + '\"') }}&hl=en-IN&gl=IN&ceid=IN:en",
+        "options": {}
+      },
+      "id": "fcbfd055-14e3-5af1-9666-55c97a76b36c",
+      "name": "Google News RSS",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        660,
+        300
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Keep fresh headlines that mention the company and look like a buying signal.\nconst RULES = [\n  ['FUNDING', /raises|raised|funding|series [a-e]|seed round|investment led by/i],\n  ['LEADERSHIP_CHANGE', /appoints|names .* (cto|ciso|ceo|head)|joins as|new (cto|ciso|ceo)/i],\n  ['HIRING_RELEVANT', /hiring|to hire|jobs|headcount/i],\n  ['EXPANSION', /expands|expansion|new office|enters|launches in/i],\n  ['COMPLIANCE_EVENT', /soc 2|iso 27001|rbi|cert-in|breach|audit|compliance|data protection/i],\n  ['PRODUCT_LAUNCH', /launches|unveils|introduces/i],\n];\nconst weekAgo = Date.now() - 7 * 86400000;\nconst out = [];\nfor (const [index, item] of $input.all().entries()) {\n  const company = $('Companies').itemMatching(index).json;\n  const title = item.json.title || '';\n  const published = new Date(item.json.isoDate || item.json.pubDate || Date.now());\n  if (!title.toLowerCase().includes(company.name.toLowerCase())) continue;\n  if (published.getTime() < weekAgo) continue;\n  const rule = RULES.find(([, re]) => re.test(title));\n  if (!rule) continue;\n  out.push({ json: {\n    accountDomain: company.domain,\n    accountId: company.accountId,\n    type: rule[0],\n    title: title.replace(/ - [^-]+$/, ''),\n    sourceUrl: item.json.link,\n    occurredAt: published.toISOString(),\n    dedupeKey: `news:${company.domain || company.accountId}:${(item.json.guid || item.json.link || title).toString().slice(-120)}`,\n  } });\n}\nreturn out;"
+      },
+      "id": "15af7a6d-0592-56c8-b75e-f9b8a944a3fe",
+      "name": "Filter + classify",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.APP_BASE_URL }}/api/signals/ingest",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-rekindle-secret",
+              "value": "={{ $env.N8N_SHARED_SECRET }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ accountDomain: $json.accountDomain, accountId: $json.accountId, type: $json.type, title: $json.title, sourceUrl: $json.sourceUrl, occurredAt: $json.occurredAt, dedupeKey: $json.dedupeKey }) }}",
+        "options": {}
+      },
+      "id": "e416e970-c152-5014-ad09-944223d97853",
+      "name": "Ingest signal in Rekindle",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        300
+      ],
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Daily 7:00": {
+      "main": [
+        [
+          {
+            "node": "List Rekindle accounts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Rekindle accounts": {
+      "main": [
+        [
+          {
+            "node": "Companies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Companies": {
+      "main": [
+        [
+          {
+            "node": "Google News RSS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google News RSS": {
+      "main": [
+        [
+          {
+            "node": "Filter + classify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter + classify": {
+      "main": [
+        [
+          {
+            "node": "Ingest signal in Rekindle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

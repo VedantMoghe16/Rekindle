@@ -1,0 +1,524 @@
+{
+  "name": "Rekindle · Campaign publish (LinkedIn + X)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rekindle-campaign",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "aa137b8a-f7fc-5d5c-af8a-54a3926be422",
+      "name": "Rekindle webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ],
+      "webhookId": "cc6a88a8-9f36-513f-bec2-54b4566266c6"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "secret-check",
+              "leftValue": "={{ $json.headers['x-rekindle-secret'] }}",
+              "rightValue": "={{ $env.N8N_SHARED_SECRET }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c336e8a8-6b1d-55f4-8bec-998bb37cb23a",
+      "name": "Secret matches?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        220,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"error\": \"invalid secret\" } }}",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "id": "95bd9158-90e8-52aa-ba92-b8c1a465c608",
+      "name": "Reject (401)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        440,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// One item per approved asset. Rekindle sends { campaignId, name, assets: [{ platform, body, thread? }], targetAccounts, callbackUrl }.\nconst body = $('Rekindle webhook').first().json.body;\nreturn (body.assets || []).map((asset) => ({\n  json: {\n    campaignId: body.campaignId,\n    campaignName: body.name,\n    callbackUrl: body.callbackUrl,\n    platform: asset.platform,\n    text: asset.body,\n    thread: asset.thread || [],\n  },\n}));"
+      },
+      "id": "7783265d-9dd6-5b43-89ff-b2d1dfdd9503",
+      "name": "Split assets",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.platform }}",
+                    "rightValue": "linkedin",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "linkedin"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.platform }}",
+                    "rightValue": "x",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "x"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "067ae95d-3f59-5274-96dc-db00b1edec0f",
+      "name": "Route by platform",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        660,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "postAs": "organization",
+        "organization": "={{ $env.LINKEDIN_ORGANIZATION_ID }}",
+        "text": "={{ $json.text }}",
+        "shareMediaCategory": "NONE",
+        "additionalFields": {
+          "visibility": "PUBLIC"
+        }
+      },
+      "id": "ace06aa1-1a8b-51df-819a-ef48de65b5f0",
+      "name": "LinkedIn: create post",
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        900,
+        80
+      ],
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "",
+          "name": "LinkedIn account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// LinkedIn returns the share URN (urn:li:share:… or urn:li:ugcPost:…).\nconst ctx = $('Split assets').itemMatching($itemIndex)?.json ?? $('Split assets').first().json;\nconst urn = $json.urn || $json.id || $json['x-restli-id'] || '';\nreturn {\n  json: {\n    event: 'post.published',\n    campaignId: ctx.campaignId,\n    callbackUrl: ctx.callbackUrl,\n    platform: 'linkedin',\n    postUrl: urn ? `https://www.linkedin.com/feed/update/${urn}` : 'https://www.linkedin.com/feed/',\n  },\n};"
+      },
+      "id": "6f16caba-2d0b-569b-a68e-6d8696ebaabe",
+      "name": "LinkedIn post URL",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "additionalFields": {}
+      },
+      "id": "aa10b4c5-8ab1-55c8-9155-2a9acbaeb8d4",
+      "name": "X: first post",
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 2,
+      "position": [
+        900,
+        320
+      ],
+      "credentials": {
+        "twitterOAuth2Api": {
+          "id": "",
+          "name": "X account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $('Split assets').all().find((item) => item.json.platform === 'x').json;\nconst head = $('X: first post').first().json;\nreturn [{\n  json: {\n    event: 'post.published',\n    campaignId: ctx.campaignId,\n    callbackUrl: ctx.callbackUrl,\n    platform: 'x',\n    postUrl: `https://x.com/i/web/status/${head.id}`,\n  },\n}];"
+      },
+      "id": "49944275-fae0-5664-81c7-328aa2e2ccb0",
+      "name": "X post URL",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Fan the rest of the thread out as items; each is posted as a reply to the previous tweet.\nconst ctx = $('Split assets').all().find((item) => item.json.platform === 'x').json;\nconst head = $('X: first post').first().json;\nconst thread = ctx.thread || [];\nif (!thread.length) return [];\nreturn thread.map((text, index) => ({ json: { text, index, headId: head.id } }));"
+      },
+      "id": "de3e8c99-e73e-56be-979a-c64b51073a25",
+      "name": "Thread replies",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "0c4820e0-12ad-5fdf-ae15-27f11d99c915",
+      "name": "One reply at a time",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1340,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "inReplyToStatusId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "={{ $('X: reply in thread').isExecuted ? $('X: reply in thread').last().json.id : $json.headId }}"
+          }
+        }
+      },
+      "id": "3c001e67-6c16-5cef-bc7f-f5acd2cd3cec",
+      "name": "X: reply in thread",
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 2,
+      "position": [
+        1560,
+        500
+      ],
+      "credentials": {
+        "twitterOAuth2Api": {
+          "id": "",
+          "name": "X account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "1dcb7b60-f234-5376-9ef9-74d25608aa19",
+      "name": "Merge published posts",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1560,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.callbackUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-rekindle-secret",
+              "value": "={{ $env.N8N_SHARED_SECRET }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ event: 'post.published', campaignId: $json.campaignId, platform: $json.platform, postUrl: $json.postUrl }) }}",
+        "options": {}
+      },
+      "id": "6973d633-30c6-58c7-afe2-47948855805d",
+      "name": "Notify Rekindle (post.published)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1780,
+        160
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Response body for Rekindle's launch call: { postUrls: { linkedin?, x? } }.\nconst postUrls = {};\nfor (const item of $('Merge published posts').all()) postUrls[item.json.platform] = item.json.postUrl;\nreturn [{ json: { postUrls } }];"
+      },
+      "id": "5fafd892-4dde-544b-b289-4088aac288e5",
+      "name": "Collect post URLs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2000,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "b298828d-8110-5a19-b8f6-4f3d14ec7ebe",
+      "name": "Respond with postUrls",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        2220,
+        160
+      ]
+    }
+  ],
+  "connections": {
+    "Rekindle webhook": {
+      "main": [
+        [
+          {
+            "node": "Secret matches?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Secret matches?": {
+      "main": [
+        [
+          {
+            "node": "Split assets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reject (401)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split assets": {
+      "main": [
+        [
+          {
+            "node": "Route by platform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by platform": {
+      "main": [
+        [
+          {
+            "node": "LinkedIn: create post",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "X: first post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LinkedIn: create post": {
+      "main": [
+        [
+          {
+            "node": "LinkedIn post URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LinkedIn post URL": {
+      "main": [
+        [
+          {
+            "node": "Merge published posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "X: first post": {
+      "main": [
+        [
+          {
+            "node": "X post URL",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Thread replies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "X post URL": {
+      "main": [
+        [
+          {
+            "node": "Merge published posts",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Thread replies": {
+      "main": [
+        [
+          {
+            "node": "One reply at a time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "One reply at a time": {
+      "main": [
+        [],
+        [
+          {
+            "node": "X: reply in thread",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "X: reply in thread": {
+      "main": [
+        [
+          {
+            "node": "One reply at a time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge published posts": {
+      "main": [
+        [
+          {
+            "node": "Notify Rekindle (post.published)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Rekindle (post.published)": {
+      "main": [
+        [
+          {
+            "node": "Collect post URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect post URLs": {
+      "main": [
+        [
+          {
+            "node": "Respond with postUrls",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}
