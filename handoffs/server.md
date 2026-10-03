@@ -1,5 +1,16 @@
 # Server Agent Handoff
 
+## Latest cycle: smart Sarvam calls (context hook, mid-call tools, KB, states)
+
+- `src/lib/vyapar/agent-brain.ts` (pure, tested): quote from tiers, ≤25-word counter via choosePlays + known competitor price, objection/qty parsing, offer sheet, lessons, top plays.
+- `src/lib/vyapar/server/agent-tools.ts` and `POST /api/vyapar/agent/[tool]` (auth via `?secret=`, `x-vyapar-secret` or Bearer = `VYAPAR_WEBHOOK_SECRET`). Tools: `context` (on_start: known facts, filled slots, past objections, lessons, top 3 plays, offer sheet), `get_counter`, `quote_price`, `log_objection`, `schedule_followup`, `book_sample` (dispatch action plus seller Telegram alert), `send_on_telegram`.
+  - Deal resolution order: deal_id → caller phone (deal.demoPhone) → the AI call in progress → last AI call to the demo phone. This also works for inbound callbacks.
+  - Prisma only; measured 0.08–0.66 s over the tunnel.
+- The chat refreshes every 5 s during a live call, so tool writes appear mid-call.
+- `docs/vyapar/kb/ecopack-knowledge-base.md` is generated from the real offer sheet (`npx tsx scripts/build-agent-kb.ts`), with no invented facts.
+- `docs/vyapar/sarvam-agent-flow.md` has the exact Sarvam configuration: on_start variable mapping, tool bodies/templates, the 6 states, slot filling and layered objections.
+- **Not done (manual, in the Sarvam dashboard):** creating the tools, hook, KB upload and states on the published agent, then publishing a new version and updating `SARVAM_APP_VERSION`.
+
 ## Latest cycle: autonomous AI sales team (onboarding → fleet → sequential calls → Cognee → home report)
 
 - **Onboarding** (`/vyapar/onboarding`, `server/onboarding.ts`): 7 plain questions → Gemini brief (summary, ideal customers, sales needs, offers, hunt prompt). Saved in `VyaparOnboarding` and written to memory.

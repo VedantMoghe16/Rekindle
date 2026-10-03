@@ -53,7 +53,9 @@ export function ChatThread({ dealId, merchant, stage, autopilot: initialAutopilo
     const ref = dialing.ref;
     const timer = setInterval(async () => {
       const res = await fetch(`/api/vyapar/calls/${ref}`).then((r) => r.json()).catch(() => null);
-      if (res?.ok && res.data.status !== "dialing") { clearInterval(timer); router.refresh(); }
+      // Refresh every tick: mid-call tools (objection, sample, follow-up, Telegram) appear while the call is live.
+      router.refresh();
+      if (res?.ok && res.data.status !== "dialing") clearInterval(timer);
     }, 5000);
     return () => clearInterval(timer);
   }, [dialing?.ref, router]);
