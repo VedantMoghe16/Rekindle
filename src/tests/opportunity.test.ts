@@ -58,8 +58,8 @@ describe("opportunity engine", () => {
     const o = evaluate().find((x) => x.provenance === "public" && x.eligibility === "eligible")!;
     expect(o.timing.label).toBe("Timing unknown");
     expect(o.contact.status).toBe("unknown");
-    expect(o.action).toBe("visit");
-    expect(o.angle).toBe("INTRO");
+    expect(o.action).toBe("pitch");
+    expect(o.angle).not.toBe("INTRO");
     expect(o.unknowns).toContain("Who decides purchases and how to reach them");
     expect(o.whyMerchant[0].source).toBe("OpenStreetMap");
   });
@@ -146,12 +146,12 @@ describe("grounded first message", () => {
     expect(p.why.find((w) => w.tag === "PRIVATE")?.text).toMatch(/not used in the message/);
     expect(unsupportedClaims("Aapke QR receipts badh gaye hain!", opp).length).toBeGreaterThan(0);
   });
-  it("asks for an introduction when the contact is unknown", () => {
+  it("pitches a public listing without inventing an owner name", () => {
     const opp = evaluate().find((x) => x.provenance === "public" && x.eligibility === "eligible")!;
     const m = pub.find((x) => x.id === opp.merchantId)!;
     const p = groundedPitch({ seller: sellerCtx, merchant: m, opp, language: "hinglish" });
-    expect(p.angle).toBe("INTRO");
-    expect(p.text).toMatch(/Purchase jo dekhte hain/);
-    expect(p.text).not.toMatch(/undefined/);
+    expect(opp.action).toBe("pitch");
+    expect(p.text).toMatch(/^Namaste ji/);
+    expect(p.text).not.toMatch(/undefined|  /);
   });
 });

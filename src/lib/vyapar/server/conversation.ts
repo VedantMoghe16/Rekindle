@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { callStructured, LlmOfflineMiss } from "@/lib/providers/llm";
 import { isN8nVyaparConfigured, n8nVyapar } from "@/lib/providers/n8n";
 import { choosePlays, stageAfterReply, type CounterPlay } from "@/lib/vyapar/counter";
-import { firstName } from "@/lib/vyapar/pitch";
+import { firstName, tidyGreeting } from "@/lib/vyapar/pitch";
 import { classifyReply, quoteFor, ReplyUnderstanding } from "@/lib/vyapar/replies";
 import { OBJECTION_LABELS, STAGE_LABELS, type Stage } from "@/lib/vyapar/taxonomy";
 import { estimateValue, getSeller, liveNow, remember, shortRef, viewMerchant } from "@/lib/vyapar/server/context";
@@ -71,7 +71,7 @@ export async function receiveReply(dealId: string, text: string) {
 
   const plays = choosePlays(u);
   const ctx = { buyerFirstName: firstName(deal.merchant.ownerName), sellerFirstName: seller.ownerFirstName, offers: seller.offers, understanding: u };
-  const suggestion = { play: plays[0].id, label: plays[0].label, text: plays[0].render(ctx), next: plays[0].next };
+  const suggestion = { play: plays[0].id, label: plays[0].label, text: tidyGreeting(plays[0].render(ctx)), next: plays[0].next };
   if (u.intent === "OBJECTION" || u.intent === "QUESTION" || u.intent === "INTERESTED") {
     events.push({ kind: "counter", chosen: { label: plays[0].label, winRate: plays[0].winRate }, alternatives: plays.slice(1).map((p) => ({ label: p.label, winRate: p.winRate })) });
   }
@@ -294,7 +294,6 @@ export async function pollAgentCall(attemptId: string) {
 export async function ensureDealForLead(leadId: string) {
   const lead = await db.vyaparLead.findUnique({ where: { id: leadId }, include: { merchant: true } });
   if (!lead) throw new Error("Lead not found");
-  if (lead.merchant.contactStatus !== "verified") throw new Error("No verified business contact for this merchant. Plan a visit instead.");
   if (lead.dealId) return lead.dealId;
   const open = await db.vyaparDeal.findFirst({ where: { merchantId: lead.merchantId, stage: { notIn: ["LOST", "ORDER_WON"] } } });
   const at = liveNow();

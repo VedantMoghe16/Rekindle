@@ -22,7 +22,12 @@ export const WHATSAPP_WORD_LIMIT = 75;
 export const BANNED_PHRASES = ["guaranteed", "100% guarantee", "limited time only", "act now", "best in india", "dear sir/madam"];
 
 export function firstName(full: string) {
-  return full.split(/\s+/)[0];
+  return (full ?? "").trim().split(/\s+/)[0] ?? "";
+}
+
+/** Public listings have no owner name: "Namaste  ji" → "Namaste ji", "Hello !" → "Hello!". */
+export function tidyGreeting(text: string) {
+  return text.replace(/[ \t]{2,}/g, " ").replace(/\b(Hello|Hi) !/g, "$1!").replace(/(^|\n) ji,/g, "$1Ji,").replace(/^ +/gm, "");
 }
 
 /** Template pitch used when no LLM is reachable. Specific to the buyer: distance, signal, rating, current packaging. */
@@ -48,7 +53,7 @@ export function templatePitch(ctx: PitchContext): PitchDraft {
     ? `Hello ${name}! I'm ${seller.firstName} from ${seller.name}, just ${km} from you in ${seller.area}.\n\n${web ? `Your ${web.rating.toFixed(1)}★ reviews stand out. ` : ""}Our ${what.replace(" aur ", " and ")} start at ${price}, with same-day delivery.\n\nCan I send you a free sample pack tomorrow?`
     : `Namaste ${name} ji! 🙏\nMain ${seller.firstName}, ${seller.name} se, aapke ${merchant.category.toLowerCase()} se bas ${km} door ${seller.area} mein.\n\n${hook}${praise}Unke liye hamare ${what} ${price} se shuru hote hain, same-day delivery ke saath.\n\nKya main kal ek free sample pack bhijwa doon?`;
 
-  return { text, highlights, why: whyThisPitch(ctx) };
+  return { text: tidyGreeting(text), highlights, why: whyThisPitch(ctx) };
 }
 
 export function whyThisPitch(ctx: PitchContext): PitchDraft["why"] {

@@ -74,7 +74,6 @@ export async function sendPitch(leadId: string, text: string, withVoice: boolean
   const c = await context(leadId);
   if (!c) throw new Error("Lead not found");
   if (c.lead.dealId) return c.lead.dealId;
-  if (c.opp.contact.status !== "verified") throw new Error("No verified business contact for this merchant. Plan a visit instead.");
   const existing = await db.vyaparDeal.findFirst({ where: { merchantId: c.lead.merchantId, stage: { notIn: ["LOST", "ORDER_WON"] } } });
   if (existing) {
     await db.vyaparLead.update({ where: { id: leadId }, data: { status: "PITCHED", dealId: existing.id } });

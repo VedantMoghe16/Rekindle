@@ -1,5 +1,5 @@
 import { formatKm } from "@/lib/vyapar/geo";
-import { firstName, type PitchDraft } from "@/lib/vyapar/pitch";
+import { firstName, tidyGreeting, type PitchDraft } from "@/lib/vyapar/pitch";
 import { unsupportedClaims, type Opportunity } from "@/lib/vyapar/opportunity";
 import { rupees, type SellerOffers } from "@/lib/vyapar/taxonomy";
 
@@ -63,6 +63,7 @@ export function groundedPitch(ctx: GroundedContext): PitchDraft & { angle: Oppor
     if (rating) highlights.push(rating.claim.split(" from")[0]);
   }
 
+  text = tidyGreeting(text);
   const why: PitchDraft["why"] = [];
   for (const e of opp.whyMerchant.filter((x) => x.kind !== "computed").slice(0, 3)) why.push({ tag: e.kind === "public" ? "PUBLIC" : e.kind === "buyer_stated" ? "BUYER" : e.source === "Paytm profile" ? "PAYTM" : "WEB", text: `${e.claim} · ${e.source}${e.kind === "demo" ? " (demo)" : e.observedAt ? `, ${e.observedAt}` : ""}` });
   if (opp.timing.evidence) why.push({ tag: opp.timing.evidence.private ? "PRIVATE" : "SIGNAL", text: `${opp.timing.evidence.claim} · ${opp.timing.evidence.source}, ${opp.timing.evidence.observedAt}${opp.timing.evidence.private ? " (seller-only, not used in the message)" : ""}` });

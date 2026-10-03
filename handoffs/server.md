@@ -1,5 +1,12 @@
 # Server Agent Handoff
 
+## Latest cycle: Pitch for every lead
+
+- Every eligible lead now gets `action: "pitch"`, including public OSM listings with no verified contact. The contact gate stays UNKNOWN and is shown honestly ("Owner not verified yet…"). Pitches and calls route to the demo contact.
+- The angle is chosen from evidence (STRONG_NEED, EXPANSION or CATEGORY_FIT); INTRO is no longer produced. `sendPitch` and `ensureDealForLead` no longer require a verified contact.
+- Nameless listings: `firstName("")` returns "", and `tidyGreeting` turns "Namaste  ji" into "Namaste ji". This applies to drafts, templates, counters and the call opener.
+- The pitch page offers "Prefer to visit? Add to visit route" as a secondary option for unverified contacts.
+
 ## Latest cycle: Paytm-style chat, call summaries, app-wide translation, voice search
 
 - **Chat UI:** the deal conversation uses Paytm tokens and a white app bar (the WhatsApp colours are gone; the `--wa-*` variables now hold Paytm values).

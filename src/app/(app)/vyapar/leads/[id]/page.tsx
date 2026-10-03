@@ -15,7 +15,7 @@ export default async function PitchPage({ params }: { params: Promise<{ id: stri
   const img = imageFor(merchant.category);
   const isPublic = merchant.source === "osm";
   return <div className="page">
-    <AppBar title={opp.action === "visit" ? `Visit ${merchant.name}` : `Pitch ${merchant.name}`} sub={opp.action === "visit" ? "No verified contact · plan an introduction" : "Drafted by Vyapar AI · review before sending"} back={`/vyapar/hunts/${lead.huntId}`} />
+    <AppBar title={`Pitch ${merchant.name}`} sub="Drafted by Vyapar AI · review before sending" back={`/vyapar/hunts/${lead.huntId}`} />
     <div className="target-strip">
       {img ? <span className="avatar" style={{ background: `center / cover url(${img.src})` }} aria-hidden /> : <Avatar name={merchant.name} />}
       <div className="grow"><b>{merchant.name}</b><small>{isPublic ? "Public listing" : merchant.ownerName} · {merchant.category} · {lead.distanceKm} km · {merchant.street ?? merchant.area}</small></div>

@@ -28,6 +28,9 @@ export type TranscriptTurn = { role: string; en_text: string; text?: string; lan
 
 /** Opening line sent per call as app_overrides.initial_bot_message (same text as the dashboard default). */
 export function initialBotMessage(v: AgentVariables): string {
+  return openingLine(v).replace(/ {2,}/g, " ");
+}
+function openingLine(v: AgentVariables): string {
   if (v.past_objections) return `Namaste ${v.owner_name} ji, main ${v.seller_business} se, ${v.seller_name} ji ki taraf se bol rahi hoon. Pichli baar aapne jo bola tha woh humne yaad rakha — ek naya offer hai aapke liye, ek minute milega?`;
   return `Namaste ${v.owner_name} ji, main ${v.seller_business} se, ${v.seller_name} ji ki taraf se bol rahi hoon — hum aapke paas hi, sirf ${v.distance_km} km door hain. Ek minute baat kar sakte hain?`;
 }

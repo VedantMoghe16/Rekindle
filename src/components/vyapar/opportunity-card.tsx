@@ -90,7 +90,6 @@ export function OpportunityCard({ lead, top }: { lead: CardLead; top?: boolean }
       <button className="btn btn-ghost btn-icon" onClick={() => feedback("save")} disabled={busy !== null || lead.status === "SAVED"} aria-label="Save lead"><Bookmark /></button>
       <Link className="btn btn-ghost" href={`/vyapar/merchants/${merchant.id}`}>{isPublic ? <Globe /> : <UserRound />}Profile</Link>
       {lead.dealId ? <Link className="btn btn-navy" href={`/vyapar/deals/${lead.dealId}`}><MessageCircle />Open chat</Link>
-        : opp.action === "visit" ? <Link className="btn btn-primary" href={`/vyapar/leads/${lead.id}`}><MapPin />Plan visit</Link>
         : <Link className="btn btn-primary" href={`/vyapar/leads/${lead.id}`}><Send />Pitch</Link>}
     </div>}
   </article>;

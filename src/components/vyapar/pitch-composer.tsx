@@ -101,6 +101,7 @@ export function PitchComposer({ leadId, initial }: { leadId: string; initial: Pi
           <div className="evidence" style={{ marginTop: 8 }}>{pitch.why.map((w) => <div key={w.text}><span className={`chip ${CHIP[w.tag] ?? "b-grey"}`}>{w.tag}</span><span>{w.text}</span></div>)}</div>
         </div>
         <p className="xs muted" style={{ textAlign: "center" }}>{intro ? "No verified contact, so Vyapar won't message a guessed number. Visit with a sample, or ask a mutual contact for an introduction." : "You approve every first message. Messages go out on Telegram. Replies after this can run on Autopilot."}</p>
+        {!intro && pitch.contact?.status !== "verified" && <button className="btn btn-ghost btn-block btn-sm" onClick={planVisit} disabled={busy !== null}><MapPin />Prefer to visit? Add to visit route</button>}
       </div>
     </main>
     <div className="sticky-cta">

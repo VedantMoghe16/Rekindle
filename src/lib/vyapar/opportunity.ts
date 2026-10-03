@@ -203,21 +203,21 @@ export function evaluateOpportunity(seller: OppSeller, plan: HuntPlan, m: OppMer
   // An active deal always stays visible as "in talks", whatever the gates say about new outreach.
   const eligibility: Eligibility = deal ? "in_talks" : fail ? "excluded" : blockingUnknown ? "needs_check" : "eligible";
   const signalType = timing.evidence && !timing.evidence.private ? m.signals.find((s) => s.title === timing.evidence!.claim)?.type : undefined;
-  const angle: Angle = !verified ? "INTRO" : stated.length ? "STRONG_NEED" : signalType && ["NEW_OUTLET", "MENU_EXPANSION", "FESTIVE_SEASON"].includes(signalType) ? "EXPANSION" : "CATEGORY_FIT";
+  const angle: Angle = stated.length ? "STRONG_NEED" : signalType && ["NEW_OUTLET", "MENU_EXPANSION", "FESTIVE_SEASON"].includes(signalType) ? "EXPANSION" : "CATEGORY_FIT";
   const skuName = sku ? sku.name.replace(/\s*\(.*\)/, "").replace(/ \d+.*$/, "") : plan.product;
   const hypothesis = angle === "STRONG_NEED" ? `Answer their ask: "${stated[0].claim}"`
     : signalType === "NEW_OUTLET" ? `${skuName} sample for the new outlet`
     : signalType === "MENU_EXPANSION" ? `${skuName} for the new menu`
     : signalType === "FESTIVE_SEASON" ? `${skuName} for festive orders`
     : `${skuName} sample for a nearby ${m.category.toLowerCase()}`;
-  const action: Opportunity["action"] = deal ? "open_deal" : eligibility === "excluded" ? "none" : verified ? "pitch" : "visit";
+  const action: Opportunity["action"] = deal ? "open_deal" : eligibility === "excluded" ? "none" : "pitch";
   const priority = eligibility === "excluded" ? -1 : relevance + (timing.status === "fresh" ? 10 : 0);
 
   return {
     merchantId: m.id, provenance, distanceKm, hypothesis, sku: sku ? { sku: sku.sku, name: sku.name, unitPriceInr: sku.unitPriceInr } : null,
     relevance, relevanceParts: { category, distance, capacity, stated: statedPts, saved },
     timing, confidence: { level, reasons },
-    contact: verified ? { status: "verified", name: m.ownerName, role: m.contactRole ?? "Owner", channel: "Telegram", note: "Opted in to Vyapar business chats (demo)" } : { status: "unknown", name: null, role: null, channel: "Visit", note: "Contact not verified. Visit or ask for an introduction." },
+    contact: verified ? { status: "verified", name: m.ownerName, role: m.contactRole ?? "Owner", channel: "Telegram", note: "Opted in to Vyapar business chats (demo)" } : { status: "unknown", name: null, role: null, channel: "Telegram", note: "Owner not verified yet: the pitch goes to the shop's business chat (demo contact). You can also plan a visit." },
     whyMerchant, serve, unknowns, gates, eligibility, excludedReason: fail?.reason ?? null, angle, action, priority, dealId: deal?.id ?? null,
   };
 }
