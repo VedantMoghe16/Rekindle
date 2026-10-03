@@ -46,7 +46,7 @@ export function ChatThread({ dealId, merchant, stage, autopilot: initialAutopilo
   const known = useRef(new Set(items.map((i) => i.id)));
   const [fresh, setFresh] = useState<string[]>([]);
   const end = useRef<HTMLDivElement>(null);
-  const firstName = merchant.ownerName.split(" ")[0];
+  const firstName = merchant.ownerName.trim().split(/\s+/)[0] || "the owner";
   const dialing = items.find((i): i is Extract<ThreadItem, { type: "action" }> => i.type === "action" && i.actionType === "AI_CALL" && i.status === "dialing");
 
   // Live call: poll until the Sarvam webhook (or the Analytics fallback) records the result, then refresh.

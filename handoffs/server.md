@@ -1,5 +1,13 @@
 # Server Agent Handoff
 
+## Latest cycle: Find and the AI team are one flow
+
+- **Find** is where you ask (type or speak). The results page has an `OutreachBar`: "Message & call top 3 · at their quietest hour · real calls", with Start and a plan sheet (1–5 shops, timing, real or simulated calls).
+- Start calls `POST /api/vyapar/fleet {huntId, leadIds, timing, callMode}`. `FleetRun.leadIdsJson` stores the chosen shops, and the run contacts exactly those, ordered by the AI re-ranker. Without leadIds it still runs from the business brief.
+- It returns `{runId, alreadyRunning}` and navigates to `/vyapar/fleet?run=ID`.
+- **AI team** tab: live progress, Stop, results and "Earlier outreach" (`recentRuns`). It has no start controls of its own; the empty state points to Find. The business brief is a small link at the bottom.
+- The Find hub shows a 3-step strip (Ask → Check → Start). The home team card links to Find when nothing has run.
+
 ## Latest cycle: Pitch for every lead
 
 - Every eligible lead now gets `action: "pitch"`, including public OSM listings with no verified contact. The contact gate stays UNKNOWN and is shown honestly ("Owner not verified yet…"). Pitches and calls route to the demo contact.

@@ -190,7 +190,7 @@ export async function receiveCallResult(dealId: string, r: CallResultInput, tran
   const seller = await getSeller();
   const at = liveNow();
   const summary = { interested: "Interested on the call", sample_requested: "Agreed to a free sample on the call", objection: "Raised an objection on the call", not_interested: "Not interested (call)", callback: `Asked for a callback${r.callback_time ? `: ${r.callback_time}` : ""}` }[r.outcome];
-  const ownerFirst = deal.merchant.ownerName.split(" ")[0];
+  const ownerFirst = firstName(deal.merchant.ownerName) || "Owner";
   const outcomeLine = `${summary}${r.objection_quote ? `: "${r.objection_quote}"` : ""}`;
   const brief = await summariseCall(transcript, ownerFirst, outcomeLine);
   // The transcript is kept as spoken (Hindi, Tamil, Hinglish…); the summary is what the seller reads first.

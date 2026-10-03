@@ -7,6 +7,7 @@ import { RadarMap, type Pin } from "@/components/vyapar/radar-map";
 import { OpportunityCard, type CardLead } from "@/components/vyapar/opportunity-card";
 import { ClarifyCard, PreferencePanel } from "@/components/vyapar/hunt-feedback";
 import { ShowMore } from "@/components/vyapar/show-more";
+import { OutreachBar } from "@/components/vyapar/outreach-bar";
 import { imageFor } from "@/lib/vyapar/images";
 import { RANKER_VERSION } from "@/lib/vyapar/opportunity";
 import { MERCHANT_CATEGORIES, type MerchantCategory } from "@/lib/vyapar/taxonomy";
@@ -86,6 +87,7 @@ export default async function HuntPage({ params, searchParams }: { params: Promi
         </div>
       </RevealAfterSteps>
     </main>
+    <OutreachBar huntId={hunt.id} candidates={hunt.shortlist.filter((l) => l.opp.action === "pitch" && !l.dealId).slice(0, 5).map((l) => ({ id: l.id, name: l.merchant.name, category: l.merchant.category, distanceKm: l.opp.distanceKm }))} />
     <VyaparTabs />
   </div>;
 }

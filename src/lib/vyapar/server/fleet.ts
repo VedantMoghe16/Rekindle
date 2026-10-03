@@ -74,14 +74,24 @@ function launch(runId: string) {
     .finally(() => workers.delete(runId));
 }
 
-export async function startFleet(opts: { callMode: "live" | "simulated"; timing?: TimingStrategy }) {
+/**
+ * Starts outreach. From search results (huntId + leadIds) the team contacts exactly the shops shown to the merchant;
+ * without them it runs its own search from the business brief. One run at a time.
+ */
+export async function startFleet(opts: { callMode: "live" | "simulated"; timing?: TimingStrategy; huntId?: string | null; leadIds?: string[] | null }) {
   const running = await db.fleetRun.findFirst({ where: { status: "RUNNING" }, orderBy: { createdAt: "desc" } });
-  if (running) { launch(running.id); return running.id; }
+  if (running) { launch(running.id); return { runId: running.id, alreadyRunning: true }; }
   const seller = await getSeller();
-  const { brief } = await getOnboarding();
-  const run = await db.fleetRun.create({ data: { sellerId: seller.id, goal: brief.huntPrompt, callMode: opts.callMode, timing: opts.timing ?? "quiet", createdAt: liveNow() } });
+  const hunt = opts.huntId ? await db.vyaparHunt.findUnique({ where: { id: opts.huntId } }) : null;
+  const goal = hunt?.prompt ?? (await getOnboarding()).brief.huntPrompt;
+  const run = await db.fleetRun.create({ data: { sellerId: seller.id, goal, huntId: hunt?.id ?? null, leadIdsJson: opts.leadIds?.length ? JSON.stringify(opts.leadIds.slice(0, 5)) : null, callMode: opts.callMode, timing: opts.timing ?? "quiet", createdAt: liveNow() } });
   launch(run.id);
-  return run.id;
+  return { runId: run.id, alreadyRunning: false };
+}
+
+export async function recentRuns(limit = 6) {
+  const runs = await db.fleetRun.findMany({ orderBy: { createdAt: "desc" }, take: limit, include: { targets: { select: { outcome: true } } } });
+  return runs.map((r) => ({ id: r.id, goal: r.goal, status: r.status, createdAt: r.createdAt, shops: r.targets.length, samples: r.targets.filter((t) => t.outcome === "sample_requested").length }));
 }
 
 /** Stop button: no new messages or calls start. A call already ringing finishes and is still recorded. */
@@ -105,21 +115,24 @@ async function runFleet(runId: string) {
   const run = await db.fleetRun.findUniqueOrThrow({ where: { id: runId } });
   const { brief } = await getOnboarding();
   const contacts = await getDemoContacts();
-  const n = Math.max(2, Math.min(3, contacts.filter((c) => c.phone || c.telegramChatId).length));
+  const chosen: string[] | null = run.leadIdsJson ? JSON.parse(run.leadIdsJson) : null;
+  const n = chosen ? chosen.length : Math.max(2, Math.min(3, contacts.filter((c) => c.phone || c.telegramChatId).length));
 
   // 1–3. Find, re-rank, plan timing (only once per run).
   if (!(await db.fleetTarget.count({ where: { runId } }))) {
     await checkCancelled(runId);
-    await step(runId, "Finding businesses near you");
+    await step(runId, chosen ? "Picking up the shops you chose" : "Finding businesses near you");
     const huntId = run.huntId ?? (await createHunt(run.goal));
     await db.fleetRun.update({ where: { id: runId }, data: { huntId } });
     const hunt = await getHunt(huntId);
     const known = new Set((await db.vyaparDeal.findMany({ select: { merchantId: true } })).map((d) => d.merchantId));
-    const reachable = (hunt?.shortlist ?? []).filter((l) => l.opp.action === "pitch" && !known.has(l.merchant.id)).slice(0, 8);
+    const reachable = chosen
+      ? chosen.map((id) => hunt?.shortlist.find((l) => l.id === id)).filter((l): l is HuntLead => Boolean(l && !l.dealId))
+      : (hunt?.shortlist ?? []).filter((l) => l.opp.action === "pitch" && !known.has(l.merchant.id)).slice(0, 8);
     if (!reachable.length) throw new Error("No reachable new businesses found. Check the onboarding answers.");
     await checkCancelled(runId);
-    await step(runId, `Ranking the best ${n} of ${reachable.length} businesses to contact`);
-    const picked = await rerank(reachable, brief, n);
+    await step(runId, chosen ? `Ranking who to contact first among your ${reachable.length} shops` : `Ranking the best ${n} of ${reachable.length} businesses to contact`);
+    const picked = await rerank(reachable, brief, Math.min(n, reachable.length));
     const now = liveNow();
     for (const [i, p] of picked.entries()) {
       const profile = paymentProfile({ id: p.lead.merchant.id, category: p.lead.merchant.category, qrVolumeBand: p.lead.merchant.qrVolumeBand });
@@ -200,7 +213,7 @@ async function recordOutcome(targetId: string, live: boolean) {
   const t = await db.fleetTarget.findUniqueOrThrow({ where: { id: targetId } });
   const action = t.attemptId ? await db.vyaparAction.findFirst({ where: { type: "AI_CALL", ref: t.attemptId } }) : null;
   const deal = await db.vyaparDeal.findUniqueOrThrow({ where: { id: t.dealId! }, include: { merchant: true, memories: { orderBy: { createdAt: "desc" }, take: 3 } } });
-  const first = deal.merchant.ownerName.split(" ")[0];
+  const first = deal.merchant.ownerName.trim().split(/\s+/)[0] || "The owner";
   const objection = deal.memories.find((m) => m.kind === "OBJECTION");
   const timing = deal.memories.find((m) => m.kind === "TIMING");
   let outcome = "unknown";

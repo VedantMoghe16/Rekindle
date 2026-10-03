@@ -36,7 +36,7 @@ export default async function Home() {
         <p>{run?.report ?? "One tap and it finds the best shops for you, pitches them on Telegram and calls them one by one."}</p>
         {run?.targets.slice(0, 3).map((t) => <div key={t.id} className="t-row"><b>#{t.priority}</b><span className="grow"><b>{t.merchant.name}</b>: {t.result ?? (t.callStatus === "CALLING" ? "on the call now…" : "queued")}</span></div>)}
         <div className="row" style={{ gap: 8 }}>
-          <Link className="btn btn-primary btn-sm grow" href="/vyapar/fleet">{run ? "Open AI team" : "Run AI sales team"}</Link>
+          <Link className="btn btn-primary btn-sm grow" href={run ? "/vyapar/fleet" : "/vyapar"}>{run ? "Open AI team" : "Find shops to contact"}</Link>
           <Link className="btn btn-sm" style={{ background: "rgba(255,255,255,.15)", color: "#fff" }} href="/vyapar/memory"><Brain />Memory · {memories}</Link>
         </div>
       </div>

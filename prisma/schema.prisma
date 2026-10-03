@@ -596,6 +596,8 @@ model FleetRun {
   step       String        @default("Understanding your business")
   goal       String
   huntId     String?
+  /// Shops the merchant chose on the search results (in rank order); null = the team picks from the business brief
+  leadIdsJson String?
   callMode   String        @default("live")
   /// When to contact each shop: quiet (fewest payments while open) | after_open | now
   timing     String        @default("quiet")

@@ -18,6 +18,7 @@ export default async function VyaparHome() {
         <div className="greet">Namaste {stats.ownerFirstName} 👋</div>
         <h2>Kya bechna hai, aur <em>kisko?</em></h2>
         <PromptBox />
+        <ol className="flow-strip"><li><b>1</b>Ask who to find</li><li><b>2</b>Check the shops</li><li><b>3</b>Tap Start: AI team messages &amp; calls at their quietest hour</li></ol>
       </div>
       <div className="pad">
         {top && <Link href="/vyapar/deals" className="revive">

@@ -3,17 +3,17 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Bot, Check, CircleDashed, LoaderCircle, MessageCircle, Phone, Play, Save, Send, Square, X } from "lucide-react";
+import { Bot, Check, CircleDashed, LoaderCircle, MessageCircle, Phone, Save, Search, Send, Square, X } from "lucide-react";
 import { toast } from "@/components/paytm/toast";
 
 type Target = { id: string; priority: number; why: string; bestTime: string | null; timingNote: string | null; hoursJson: string | null; scheduledFor: string | null; pitch: string | null; telegramStatus: string; callStatus: string; outcome: string | null; result: string | null; dealId: string | null; merchant: { name: string; category: string; area: string; ownerName: string } };
 type Run = { id: string; status: string; step: string; goal: string; callMode: string; timing: string; report: string | null; error: string | null; createdAt: string; finishedAt: string | null; targets: Target[] };
 type Contact = { priority: number; phone: string | null; telegramChatId: string | null };
 
-const STEPS = ["Finding businesses near you", "Ranking the best businesses", "Writing a personal pitch for each", "Contacting each shop at its best time", "Writing your report"];
+const STEPS = ["Picking up your shops", "Ranking who to contact first", "Writing a personal pitch for each", "Contacting each shop at its best time", "Writing your report"];
 function stepIndex(step: string, status: string) {
   if (status === "DONE") return STEPS.length;
-  if (/^Finding/.test(step)) return 0;
+  if (/^(Finding|Picking)/.test(step)) return 0;
   if (/^Ranking/.test(step)) return 1;
   if (/^Writing a personal/.test(step)) return 2;
   if (/^(Waiting|Sending|Calling)/.test(step)) return 3;
@@ -31,19 +31,16 @@ function Hours({ json, chosen }: { json: string | null; chosen: string | null })
   const h: number[] = JSON.parse(json);
   const max = Math.max(...h, 1);
   const pick = chosen && chosen !== "now" ? (() => { const m = chosen.match(/(\d+) (AM|PM)/); if (!m) return -1; const n = Number(m[1]) % 12; return m[2] === "PM" ? n + 12 : n; })() : -1;
-  return <div className="hours" aria-label="Paytm payments by hour of day (demo data)">
-    {h.map((v, i) => <i key={i} title={`${i}:00 · ${v} payments`} className={i === pick ? "pick" : v >= 1 ? "open" : ""} style={{ height: `${Math.max(6, (v / max) * 100)}%` }} />)}
+  return <div className="hours-wrap" aria-label="Paytm payments by hour of day (demo data)">
+    <div className="hours">{h.map((v, i) => <i key={i} title={`${i}:00 · ${v} payments`} className={i === pick ? "pick" : v >= 1 ? "open" : ""} style={{ height: `${Math.max(6, (v / max) * 100)}%` }} />)}</div>
     <span className="xs muted">Paytm payments by hour of day, midnight → 11 PM (demo data) · <b style={{ color: "var(--pt-green)" }}>■</b> chosen time</span>
   </div>;
 }
 const CALL_BADGE: Record<string, string> = { SCHEDULED: "b-navy", CANCELLED: "b-grey", QUEUED: "b-grey", CALLING: "b-cyan", DONE: "b-green", NO_ANSWER: "b-amber", FAILED: "b-red", SKIPPED: "b-grey" };
 const CALL_LABEL: Record<string, string> = { SCHEDULED: "Call scheduled", CANCELLED: "Cancelled", QUEUED: "Call queued", CALLING: "On the call…", DONE: "Called", NO_ANSWER: "No answer", FAILED: "Call failed", SKIPPED: "Not called" };
 
-export function FleetConsole({ initialRun, contacts: initialContacts, briefed }: { initialRun: Run | null; contacts: Contact[]; briefed: boolean }) {
+export function FleetConsole({ initialRun, contacts: initialContacts }: { initialRun: Run | null; contacts: Contact[] }) {
   const [run, setRun] = useState<Run | null>(initialRun);
-  const [mode, setMode] = useState<"live" | "simulated">("live");
-  const [timing, setTiming] = useState<"quiet" | "after_open" | "now">("quiet");
-  const [busy, setBusy] = useState(false);
   const [contacts, setContacts] = useState<Contact[]>(initialContacts.length ? initialContacts : [{ priority: 1, phone: "", telegramChatId: "" }, { priority: 2, phone: "", telegramChatId: "" }]);
   const router = useRouter();
 
@@ -56,15 +53,6 @@ export function FleetConsole({ initialRun, contacts: initialContacts, briefed }:
     return () => clearInterval(t);
   }, [run?.id, run?.status, router]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  async function start() {
-    setBusy(true);
-    const res = await fetch("/api/vyapar/fleet", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ callMode: mode, timing }) }).then((r) => r.json()).catch(() => null);
-    setBusy(false);
-    if (!res?.ok) return toast("Couldn't start the AI team");
-    const r = await fetch(`/api/vyapar/fleet/${res.data.runId}`).then((x) => x.json()).catch(() => null);
-    if (r?.ok) setRun(r.data);
-    toast("Your AI sales team is on it");
-  }
   async function stop() {
     if (!run) return;
     const res = await fetch(`/api/vyapar/fleet/${run.id}/cancel`, { method: "POST" }).then((r) => r.json()).catch(() => null);
@@ -79,22 +67,15 @@ export function FleetConsole({ initialRun, contacts: initialContacts, briefed }:
   const running = run?.status === "RUNNING";
 
   return <>
-    <div className="card stack" style={{ gap: 10 }}>
-      <div className="row"><Bot size={20} color="var(--pt-cyan-600)" /><b className="grow" style={{ color: "var(--pt-navy)", fontSize: 15 }}>Your AI sales team</b></div>
-      <span className="small">One tap: it finds the best shops for you, sends each a personal pitch on Telegram, then calls them <b>one by one</b> (priority 1 first) and reports back here.</span>
-      {!briefed && <Link href="/vyapar/onboarding" className="badge b-amber" style={{ justifySelf: "start" }}>Tip: tell the team about your business first →</Link>}
-      <div className="seg-mini" style={{ justifySelf: "start" }}><button className={mode === "live" ? "on" : ""} onClick={() => setMode("live")}>Real calls</button><button className={mode === "simulated" ? "on" : ""} onClick={() => setMode("simulated")}>Simulated calls</button></div>
-      <div className="timing-opts" role="radiogroup" aria-label="When to contact">
-        <span className="xs muted" style={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: ".05em" }}>When to message &amp; call</span>
-        {TIMINGS.map((t) => <button key={t.id} role="radio" aria-checked={timing === t.id} className={`timing-opt${timing === t.id ? " on" : ""}`} onClick={() => setTiming(t.id)} disabled={running}><b>{t.label}{t.id === "quiet" ? " (recommended)" : ""}</b><span>{t.detail}</span></button>)}
-      </div>
-      {running
-        ? <div className="row" style={{ gap: 8 }}><button className="btn btn-primary grow" disabled><LoaderCircle className="spin" />Working…</button><button className="btn btn-stop" onClick={stop}><Square />Stop</button></div>
-        : <button className="btn btn-primary btn-block" onClick={start} disabled={busy}>{busy ? <LoaderCircle className="spin" /> : <Play />}Run AI sales team</button>}
-    </div>
-
+    {!run && <div className="card stack empty-team">
+      <Bot size={28} color="var(--pt-cyan-600)" />
+      <b>Your AI team is free</b>
+      <span className="small muted">Tell Vyapar who to find, for example &ldquo;bakeries within 3 km&rdquo;, then tap <b>Start</b> on the results. The team messages and calls each shop at its quietest hour and reports here.</span>
+      <Link className="btn btn-primary" href="/vyapar"><Search />Find shops</Link>
+    </div>}
     {run && <div className="card stack" style={{ gap: 8 }}>
-      <div className="card-title">{running ? "Working on it" : run.status === "CANCELLED" ? "Stopped by you" : run.status === "FAILED" ? "Stopped" : "Last run"} <span className="xs muted">{new Date(run.createdAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })} · {run.callMode === "live" ? "real calls" : "simulated calls"} · {TIMINGS.find((t) => t.id === run.timing)?.label ?? "quietest hour"}</span></div>
+      <div className="row" style={{ alignItems: "flex-start", gap: 8 }}><div className="grow"><b style={{ color: "var(--pt-navy)" }}>{running ? "Working on it" : run.status === "CANCELLED" ? "Stopped by you" : run.status === "FAILED" ? "Stopped" : "Done"}</b><div className="small muted">&ldquo;{run.goal}&rdquo;</div></div>{running && <button className="btn btn-stop btn-sm" onClick={stop}><Square />Stop</button>}</div>
+      <span className="xs muted">{new Date(run.createdAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })} · {run.callMode === "live" ? "real calls" : "simulated calls"} · {TIMINGS.find((t) => t.id === run.timing)?.label ?? "quietest hour"}</span>
       <div className="steps" style={{ marginTop: 0 }}>{STEPS.map((s, i) => <div key={s} className={`step${i < idx ? " done" : i === idx && running ? " run" : ""}`}><span className="st">{i < idx && <Check />}</span>{i === idx && running ? run.step : s}</div>)}</div>
       {running && <div className="now-step">{run.step}</div>}
       {run.error && <div className="badge b-red" style={{ whiteSpace: "normal" }}>{run.error}</div>}
