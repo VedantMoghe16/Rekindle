@@ -1,5 +1,6 @@
 import merchants from "../data/merchants.json";
 import osm from "../data/andheri-osm.json";
+import suppliers from "../data/supplier-offers.json";
 import { db } from "../src/lib/db";
 import type { SellerOffers } from "../src/lib/vyapar/taxonomy";
 
@@ -88,6 +89,13 @@ const DEALS: SeedDeal[] = [
 
 /** Wipes and reseeds Vyapar AI data. Merchants come from data/merchants.json. Never touches caches. */
 export async function seedVyapar() {
+  // Demo contacts and the business brief are user settings: kept across resets.
+  await db.fleetTarget.deleteMany();
+  await db.fleetRun.deleteMany();
+  await db.knowledgeEvent.deleteMany();
+  await db.vyaparIntroduction.deleteMany();
+  await db.vyaparNeed.deleteMany();
+  await db.vyaparOffer.deleteMany();
   await db.vyaparEvent.deleteMany();
   await db.vyaparPreference.deleteMany();
   await db.vyaparCampaign.deleteMany();
@@ -104,6 +112,7 @@ export async function seedVyapar() {
     data: merchants.map(({ profile, signals, ...m }) => ({ ...m, profileJson: JSON.stringify(profile), signalsJson: JSON.stringify(signals) })),
   });
   await db.merchant.createMany({ data: publicListings() });
+  await seedSuppliers();
   await db.vyaparSeller.create({
     data: { id: SELLER_ID, merchantId: SELLER_MERCHANT_ID, ownerFirstName: "Rahul", product: "Paper bags & food boxes", productCategory: "Packaging", unitPriceInr: 5, offersJson: JSON.stringify(ECOPACK_OFFERS), autopilot: true },
   });
@@ -148,4 +157,38 @@ function publicListings() {
     source: "osm", osmId: p.osmId, street: p.street, cuisine: p.cuisine, openingHours: p.openingHours, website: p.website,
     brand: p.brand ?? (REGIONAL_CHAINS.test(p.name) ? p.name : null), contactStatus: "unknown", contactRole: null, paytmStatus: "unknown", observedAt: osm.observedAt,
   }));
+}
+
+/** Demo clock at seed time: DEMO_TODAY's date with the real time of day (matches liveNow()). */
+function seedNow() {
+  const frozen = process.env.DEMO_TODAY;
+  if (!frozen) return new Date();
+  const time = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" }).format(new Date());
+  return new Date(`${frozen}T${time}+05:30`);
+}
+
+/** Fictional packaging suppliers and their structured offers for the buyer-needs flow (Demo data). */
+async function seedSuppliers() {
+  const base = merchants.find((m) => m.id === SELLER_MERCHANT_ID)!;
+  const kmLng = 111 * Math.cos((base.lat * Math.PI) / 180);
+  await db.merchant.createMany({
+    data: suppliers.sellers.map((x, i) => {
+      const r = (x.bearing * Math.PI) / 180;
+      return {
+        id: x.id, mid: `PYTMIND${String(90000 + i * 41).padStart(6, "0")}`, name: x.name, ownerName: x.ownerName, category: "Packaging", mcc: "5113", area: x.area, city: "Mumbai",
+        lat: +(base.lat + (x.km * Math.cos(r)) / 111).toFixed(5), lng: +(base.lng + (x.km * Math.sin(r)) / kmLng).toFixed(5),
+        phoneMasked: null, gstinMasked: null, qrVolumeBand: "Medium", monthlyTxns: null, rating: null, reviewCount: null, language: "hinglish",
+        profileJson: JSON.stringify({ sources: [], instagram: null, highlights: [], currentPackaging: null }), signalsJson: "[]", isDemo: true,
+        source: "demo", contactStatus: "verified", contactRole: "Owner · opted in to Vyapar (demo)", paytmStatus: "verified", observedAt: "2026-10-01",
+      };
+    }),
+  });
+  const now = seedNow();
+  await db.vyaparOffer.createMany({
+    data: suppliers.offers.map((o) => ({
+      id: o.id, sellerMerchantId: o.seller, productKey: o.productKey, name: o.name, unit: o.unit, unitPricePaise: o.unitPricePaise, tiersJson: JSON.stringify(o.tiers),
+      moq: o.moq, stockQty: o.stockQty, stockStatus: o.stockStatus, confirmedAt: new Date(now.getTime() - o.confirmedHoursAgo * 3_600_000),
+      deliveryRadiusKm: o.deliveryRadiusKm, leadTimeHours: o.leadTimeHours, sampleAvailable: o.sampleAvailable, sampleNote: o.sampleNote, provenance: "demo",
+    })),
+  });
 }

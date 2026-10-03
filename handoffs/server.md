@@ -1,5 +1,90 @@
 # Server Agent Handoff
 
+## Latest cycle: autonomous AI sales team (onboarding → fleet → sequential calls → Cognee → home report)
+
+- **Onboarding** (`/vyapar/onboarding`, `server/onboarding.ts`): 7 plain questions → Gemini brief (summary, ideal customers, sales needs, offers, hunt prompt). Saved in `VyaparOnboarding` and written to memory.
+- **Fleet run** (`/vyapar/fleet`, `server/fleet.ts`, `POST /api/vyapar/fleet`, poll `GET /api/vyapar/fleet/[id]`):
+  - Steps: hunt from the brief → new businesses only (no existing deal) → Gemini re-ranker (why + best time; falls back to rules order) → grounded pitch per target → `sendPitch` on Telegram, routed to the demo contact → calls strictly one at a time (start → wait for the webhook/Analytics result → record a plain outcome → next) → Gemini report.
+  - Persisted in `FleetRun` / `FleetTarget`. Only one run at a time.
+  - Always at least 2 targets; a priority without a phone gets a simulated call, labelled as such.
+- **Demo contacts** (`DemoContact`, editable on the fleet page, `PUT /api/vyapar/fleet/contacts`): priority N's Telegram and calls are routed via `VyaparDeal.demoChatId` / `demoPhone`. Priority 1 defaults to +919755812313 / Telegram 2145717919. Priority 2 is still empty.
+- **Business memory** (`KnowledgeEvent` + Cognee): `remember()` now saves a plain-language row and pushes it to Cognee, tracking status as saved / pending / failed / skipped. Shown on `/vyapar/memory`, which has an Ask box over Cognee.
+- **Home:** an "Your AI sales team" card with the latest report, per-target results and memory count, plus an AI Sales Team tile. Vyapar tabs are now Find · AI team · Deals · Memory.
+- **Telegram:** WhatsApp copy → Telegram everywhere. The Telegram listener accepts replies from every demo contact's chat and routes each to the deal last messaged in that chat.
+- **Verified:** a simulated run picked Karan (#1, sample) and Daily Bread (#2, objection), both Telegram pitches were delivered, the report was written, and 10/10 memory events reached the Cognee graph. 128 tests pass and the build passes.
+
+## Latest cycle: demo channels (all calls to one phone, WhatsApp → Telegram)
+
+- **Calls:** every AI call (any merchant) rings `DEMO_CALL_PHONE=+919755812313`. `canCallLive=true` for all verified-contact deals.
+- **"Send on WhatsApp" → Telegram:** `src/lib/providers/telegram.ts` uses the team bot @Rekindle_yaytm_bot; the token was copied from the teammate's `.env`. Messages go to `VYAPAR_TELEGRAM_CHAT_ID=2145717919`:
+  - Pitch text and the Sarvam voice note (converted to OGG/Opus with ffmpeg) are delivered on send.
+  - Every later outbound message (Autopilot counter, revive, buyer-request reply) goes out through `sendMessage → deliverToTelegram`.
+  - Delivered messages carry `metaJson.telegram=true`.
+- **Inbound:** `npm run telegram:poll` runs in screen `vyapar-ui-bot` (log in `.telegram-poll.log`). Text from the demo chat → `receiveTelegramReply` → buyer reply on the deal most recently messaged there → Autopilot answers back in Telegram.
+- **The teammate's own listener (screen `vyapar-bot`) was stopped at the user's request**, since only one getUpdates listener can run per bot. Restart it with `cd ~/shivam/Rekindle-vyapar && npm run vyapar:bot` (stop ours first).
+
+## Latest cycle: Sarvam call flow integrated into the UI (teammate's vyapar-integration work)
+
+- **Same flow as the teammate's CLI/API:** hunt → merchant → Pitch → **AI call**. In the Pitch composer the AI call tab offers "Call now (live)" and "Simulate call" (sample / objection / callback / no answer). `POST /api/vyapar/leads/[id]/call` opens or reuses the deal, then calls.
+- **In the chat:** 📞 opens the panel (11 inputs, opening line, live call, simulator). While a live call is dialing, a "Priya is on the call…" banner polls `GET /api/vyapar/calls/[attemptId]`. That endpoint falls back to Sarvam Analytics (`pollAttempt`) after 15 s if the webhook hasn't arrived.
+- **Simulated calls are real-path:** `src/lib/vyapar/call-simulation.ts` (the teammate's scenarios, with full transcripts) feeds `processSarvamWebhook`, the same code a live webhook uses. They are labelled "(simulated)".
+- **CLI:** `npm run vyapar:call -- <dealId|leadId|merchantId> [--simulated --scenario x | --live --wait]` or `<attemptId> --poll`.
+- **Memory loop verified:** objection call → the next call's `past_objections` carries the quote, the follow-up opening line is used, and the sample is agreed.
+- Calls pitch paper bags at ₹5/bag so the ₹4.20 bulk counter matches.
+- **Config:** `DEMO_KARAN_PHONE` was copied from the teammate's `.env` (their test recipient). The live call preview for Karan is ready (`canCallLive=true`). No live call has been placed from this branch yet.
+
+## Latest cycle: T128–T129 live Gemini + Cognee, Sarvam agent port
+
+- **Gemini:** the key is in `.env` with `LLM_OFFLINE=false`, and `gemini-2.5-flash` works through `callStructured`: the plan, the buyer need (Hinglish) and reply understanding all return correct, schema-valid output. Demo status shows gemini as live.
+- **Cognee:**
+  - `npm run cognee:ingest` added 50 docs and cognify built the graph (stored in `cognee/.data`, gitignored).
+  - `npm run cognee:demo` answered all 5 questions correctly, including multi-hop ones (Mumbai Kraft House ← Sweet Nest grease complaint); see `data/cognee/answers.md`.
+  - The bridge runs on 127.0.0.1:8765 (`npm run cognee:server`). `.env` has `COGNEE_BASE_URL` and `COGNEE_DATASET=vyapar`, and app Ask returns `provenance: cognee`.
+  - The asyncio "Event loop is closed" / SSL tracebacks after a run are harmless teardown noise.
+- **Sarvam voice agent:**
+  - The teammate builds the agent on branch `vyapar-integration` (worktree `../Rekindle-vyapar`), and their `docs/vyapar/sarvam-agent.md` is now adopted here.
+  - Their client is ported as `src/lib/providers/sarvam-agent.ts`. The call preview/start route and webhook use the same path and secret as theirs.
+  - The chat 📞 panel offers "Call now via Sarvam" when configured, and shows the missing settings otherwise.
+  - Sarvam key and all agent IDs (org, workspace, app `Vyapar-SDR-ecff21d0-7347` v1, connection, agent phone) are now in `.env`, with `PUBLIC_BASE_URL` set to the tunnel and a generated `VYAPAR_WEBHOOK_SECRET`. TTS works on `bulbul:v3` with voice `priya` (v2 is deprecated). `sarvam-105b` chat returned empty JSON for pitches (reasoning model), so drafts use Gemini unless `SARVAM_DRAFTS=true`. The only setting left for a live call is `DEMO_KARAN_PHONE`.
+- `../Rekindle-autopilot` (branch `vyapar-autopilot`) is only a snapshot of this branch's earlier work.
+- verify.sh PASS: 20 files, 128 tests, build.
+
+## Latest cycle: T124–T127 Gemini, buyer needs, Cognee SDK, Sarvam agent
+
+### Work completed
+- **Gemini (T124):** a Gemini provider in `src/lib/providers/llm.ts` (generateContent JSON mode plus a zod schema). `defaultProvider()` picks `LLM_PROVIDER`, else Gemini when its key exists. Provider labels now come from `callStructured().provider`.
+- **Buyer needs (T125):**
+  - Engine: `src/lib/vyapar/needs.ts` (pure).
+  - Service: `server/needs.ts`.
+  - Models: VyaparOffer, VyaparNeed, VyaparIntroduction.
+  - Fixtures: `data/supplier-offers.json` (8 fictional suppliers plus EcoPack offers; 3 feasible, 1 stale stock, 5 decoys).
+  - APIs: `needs/preview`, `needs`, `needs/[id]/introductions`, `requests/[id]`.
+  - Pages: `/buy` and `/buy/[id]` (buyer, "Viewing as Karan's Cafe (demo buyer)") and `/vyapar/requests/[id]` (seller). Plus a Buyer-request card on My Deals and a Buy Supplies tile on Home.
+  - Competitor packaging merchants are excluded from Rahul's buyer hunts.
+- **Cognee (T126):**
+  - `scripts/build-cognee-dataset.ts` writes 51 docs to `data/cognee/`.
+  - `cognee/settings.py`, `vyapar_memory.py` and `server.py` (SDK 1.6.2 in `cognee/.venv`, gitignored).
+  - npm scripts: `cognee:dataset`, `cognee:ingest`, `cognee:demo`, `cognee:server`.
+  - `askMemory` falls back to a local search over the dataset for supplier questions.
+  - Docs: `docs/vyapar/cognee.md`.
+- **Sarvam agent (T127):** `docs/vyapar/sarvam-agent.md`, the agent-vars and call-result endpoints, `receiveCallResult` and `agentVariables` in `conversation.ts`, and the chat AI-call panel.
+- **Copy:** n8n removed from the product story; the side panel now explains Sell and Buy.
+
+### Tests
+- 19 files / 124 tests pass, and tsc and the production build pass. New: `src/tests/needs.test.ts`.
+- API golden path:
+  - preview → publish → 3 offers (PackRight ₹8.60, EcoPack ₹9, GreenBox ₹9.50), with Mumbai Kraft House needing confirmation and 5 exclusions with reasons.
+  - Requests: EcoPack accepted, a duplicate was deduplicated, and an excluded offer was rejected (409).
+  - The seller accepted, and the thread shows the buyer's request, a verified memory and one sample task.
+  - Agent vars returned and the call result moved the stage to OBJECTION.
+- Cognee bridge `/health` and `/api/v1/add` were verified. Cognify and search are **not** verified because there is no GEMINI_API_KEY in `.env` yet.
+
+### Blockers / next
+- Add `GEMINI_API_KEY` (and `LLM_OFFLINE=false`) to `.env`, then run `npm run cognee:ingest && npm run cognee:demo`.
+- T128: connect the published Sarvam agent (needs its URL/version and API access).
+
+---
+
 ## Latest cycle: T120–T123 adaptive opportunity engine with real Andheri data
 
 ### Current task

@@ -3,10 +3,11 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Brain, CalendarDays, CheckCheck, ChevronLeft, Clock, LoaderCircle, Lock, Send, Sparkles, Truck, Workflow, CircleCheck } from "lucide-react";
+import { Phone, Brain, CalendarDays, CheckCheck, ChevronLeft, Clock, LoaderCircle, Lock, Send, Sparkles, Truck, Workflow, CircleCheck } from "lucide-react";
 import { Avatar, ProviderTag } from "@/components/paytm/ui";
 import { toast } from "@/components/paytm/toast";
 import { VoiceNote } from "@/components/vyapar/voice";
+import { CallPanel } from "@/components/vyapar/call-panel";
 import { OBJECTION_LABELS, STAGE_LABELS, type Objection, type Stage } from "@/lib/vyapar/taxonomy";
 
 export type ThreadItem =
@@ -34,6 +35,7 @@ const ACTION_ICON: Record<string, typeof Truck> = { SAMPLE_DISPATCH: Truck, MEET
 export function ChatThread({ dealId, merchant, stage, autopilot: initialAutopilot, items, demoReplies, playLabels, memoryProvider }: Props) {
   const router = useRouter();
   const [autopilot, setAutopilot] = useState(initialAutopilot);
+  const [callOpen, setCallOpen] = useState(false);
   const [mode, setMode] = useState<"buyer" | "me">("buyer");
   const [input, setInput] = useState("");
   const [pending, setPending] = useState<{ text: string; as: "buyer" | "me" } | null>(null);
@@ -43,6 +45,18 @@ export function ChatThread({ dealId, merchant, stage, autopilot: initialAutopilo
   const [fresh, setFresh] = useState<string[]>([]);
   const end = useRef<HTMLDivElement>(null);
   const firstName = merchant.ownerName.split(" ")[0];
+  const dialing = items.find((i): i is Extract<ThreadItem, { type: "action" }> => i.type === "action" && i.actionType === "AI_CALL" && i.status === "dialing");
+
+  // Live call: poll until the Sarvam webhook (or the Analytics fallback) records the result, then refresh.
+  useEffect(() => {
+    if (!dialing?.ref) return;
+    const ref = dialing.ref;
+    const timer = setInterval(async () => {
+      const res = await fetch(`/api/vyapar/calls/${ref}`).then((r) => r.json()).catch(() => null);
+      if (res?.ok && res.data.status !== "dialing") { clearInterval(timer); router.refresh(); }
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [dialing?.ref, router]);
 
   // Items that arrive after a refresh animate in one after another (memory → counter → action).
   useEffect(() => {
@@ -110,8 +124,11 @@ export function ChatThread({ dealId, merchant, stage, autopilot: initialAutopilo
       <Link className="icon-btn" href="/vyapar/deals" aria-label="Back"><ChevronLeft /></Link>
       <Avatar name={merchant.name} round />
       <div className="grow" style={{ minWidth: 0 }}><b>{merchant.name}</b><small>{thinking && pending?.as === "buyer" ? "Vyapar AI is reading…" : "via Vyapar AI · Paytm verified"}</small></div>
+      <button className="icon-btn" onClick={() => setCallOpen((o) => !o)} aria-label="AI call"><Phone /></button>
       <Link className="icon-btn" href={`/vyapar/merchants/${merchant.id}`} aria-label="Merchant memory"><Brain /></Link>
     </header>
+    {callOpen && <CallPanel dealId={dealId} onClose={() => setCallOpen(false)} />}
+    {dialing && <div className="call-live"><span className="pulse-dot" /><b className="grow">Priya is on the call with {firstName}…</b><span className="xs muted">result appears here</span></div>}
     <div className="autopilot">
       <Sparkles size={18} color="var(--pt-cyan)" />
       <span><b>Autopilot</b> {autopilot ? "· AI replies for you" : "· off, AI suggests"}</span>
@@ -134,7 +151,7 @@ export function ChatThread({ dealId, merchant, stage, autopilot: initialAutopilo
               <div><b style={{ color: "var(--pt-navy)" }}>✓ {playLabels[play] ?? play}</b> <span className="muted">· {String(item.meta.winRate ?? "")}% in demo benchmark</span></div>
             </div>,
             <div key={item.id} className={`bubble ${item.direction}${item.kind === "voice" ? " voice-b" : ""}${cls}`} style={delay(item.id)}>
-              {item.direction === "out" && <span className="via">{item.author}{item.provider && item.provider !== "human" ? ` · ${item.provider === "sarvam-tts" ? "Sarvam voice" : item.provider}` : ""}</span>}
+              {item.kind === "call" && <span className="via" style={{ color: "#6b4eff" }}>Sarvam voice agent</span>}{item.direction === "out" && <span className="via">{item.author}{item.provider && item.provider !== "human" ? ` · ${item.provider === "sarvam-tts" ? "Sarvam voice" : item.provider}` : ""}</span>}
               {item.kind === "voice" ? <VoiceNote text={item.text} compact /> : item.text}
               <span className="t">{time(item.at)}{item.direction === "out" && <CheckCheck />}</span>
             </div>];

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Handshake, House, Megaphone, ReceiptText, ScanLine, Search, Sparkles, Store, User } from "lucide-react";
+import { Bot, Brain, Handshake, House, ReceiptText, ScanLine, Search, Sparkles, User } from "lucide-react";
 import { toast } from "@/components/paytm/toast";
 
 const soon = (what: string) => () => toast(`${what} is part of the main Paytm app, not this prototype`);
@@ -19,9 +19,9 @@ export function HomeNav() {
 
 const TABS = [
   { href: "/vyapar", label: "Find", Icon: Search, match: (p: string) => p === "/vyapar" || p.startsWith("/vyapar/hunts") || p.startsWith("/vyapar/leads") },
-  { href: "/vyapar/deals", label: "Deals", Icon: Handshake, match: (p: string) => p.startsWith("/vyapar/deals") || p.startsWith("/vyapar/merchants") },
-  { href: "/vyapar/campaigns", label: "Campaigns", Icon: Megaphone, match: (p: string) => p.startsWith("/vyapar/campaigns") },
-  { href: "/vyapar/business", label: "My offers", Icon: Store, match: (p: string) => p.startsWith("/vyapar/business") },
+  { href: "/vyapar/fleet", label: "AI team", Icon: Bot, match: (p: string) => p.startsWith("/vyapar/fleet") || p.startsWith("/vyapar/onboarding") },
+  { href: "/vyapar/deals", label: "Deals", Icon: Handshake, match: (p: string) => p.startsWith("/vyapar/deals") || p.startsWith("/vyapar/merchants") || p.startsWith("/vyapar/requests") },
+  { href: "/vyapar/memory", label: "Memory", Icon: Brain, match: (p: string) => p.startsWith("/vyapar/memory") },
 ];
 
 export function VyaparTabs() {

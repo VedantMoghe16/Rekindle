@@ -1,21 +1,23 @@
 import { db } from "@/lib/db";
-import { callStructured, isProviderConfigured, LlmOfflineMiss } from "@/lib/providers/llm";
+import { callStructured, defaultProvider, isProviderConfigured, LlmOfflineMiss } from "@/lib/providers/llm";
 import { PitchDraft, firstName, validatePitch, WHATSAPP_WORD_LIMIT } from "@/lib/vyapar/pitch";
 import { groundedPitch } from "@/lib/vyapar/grounded";
 import { unsupportedClaims, type Opportunity } from "@/lib/vyapar/opportunity";
 import { evaluateMerchants, logEvent } from "@/lib/vyapar/server/opportunities";
+import { deliverToTelegram } from "@/lib/vyapar/server/conversation";
+import { isSarvamTtsConfigured, sarvamTts } from "@/lib/providers/sarvam";
 import { HuntPlan } from "@/lib/vyapar/planner";
 import { estimateValue, getSeller, liveNow, remember, viewMerchant } from "@/lib/vyapar/server/context";
 
 export type StoredPitch = PitchDraft & {
-  provider: "sarvam" | "claude" | "cached" | "template";
+  provider: "sarvam" | "claude" | "gemini" | "cached" | "template";
   angle?: Opportunity["angle"];
   problems?: string[];
   contact?: Opportunity["contact"];
   hypothesis?: string;
 };
 
-const PITCH_SYSTEM = `You write a first WhatsApp message from one small Indian merchant to another nearby merchant.
+const PITCH_SYSTEM = `You write a first Telegram message from one small Indian merchant to another nearby merchant.
 Write in natural Hinglish (Roman script), warm and respectful ("ji"), like a local business owner, not a marketer.
 Max ${WHATSAPP_WORD_LIMIT} words. Exactly one claim about the buyer, one offer and one question. Use ONLY the evidence lines given;
 never mention the buyer's payments, sales, QR receipts or anything marked private. Do not invent urgency.
@@ -44,7 +46,7 @@ export async function getPitch(leadId: string, fresh = false) {
   const grounded = groundedPitch({ seller: sellerCtx, merchant: c.merchant, opp: c.opp, language: c.plan.language });
   let pitch: StoredPitch = { text: grounded.text, highlights: grounded.highlights, why: grounded.why, provider: "template", angle: grounded.angle, problems: grounded.problems, contact: c.opp.contact, hypothesis: c.opp.hypothesis };
   if (c.opp.angle !== "INTRO") {
-    const provider = isProviderConfigured("sarvam") ? "sarvam" : "anthropic";
+    const provider = process.env.SARVAM_DRAFTS === "true" && isProviderConfigured("sarvam") ? "sarvam" : defaultProvider();
     try {
       const evidence = [...c.opp.whyMerchant.map((e) => `${e.claim} (${e.source})`), ...(c.opp.timing.evidence && !c.opp.timing.evidence.private ? [`${c.opp.timing.evidence.claim} (${c.opp.timing.evidence.source}, ${c.opp.timing.evidence.observedAt})`] : [])];
       const result = await callStructured({
@@ -57,7 +59,7 @@ LANGUAGE: ${c.plan.language}${fresh ? `\nVARIANT: ${Date.now() % 997}` : ""}
 WHY LINES (copy into why): ${JSON.stringify(grounded.why)}`,
       });
       const problems = [...validatePitch(result.data.text), ...unsupportedClaims(result.data.text, c.opp)];
-      if (problems.length === 0) pitch = { ...result.data, why: grounded.why, provider: result.provenance === "cached" ? "cached" : provider === "sarvam" ? "sarvam" : "claude", angle: c.opp.angle, problems: [], contact: c.opp.contact, hypothesis: c.opp.hypothesis };
+      if (problems.length === 0) pitch = { ...result.data, why: grounded.why, provider: result.provenance === "cached" ? "cached" : provider === "sarvam" ? "sarvam" : provider === "gemini" ? "gemini" : "claude", angle: c.opp.angle, problems: [], contact: c.opp.contact, hypothesis: c.opp.hypothesis };
       else console.warn(`[vyapar] LLM pitch rejected (${problems.join("; ")}), using grounded template`);
     } catch (error) {
       if (!(error instanceof LlmOfflineMiss)) console.warn(`[vyapar] pitch via LLM failed, using template: ${error instanceof Error ? error.message : error}`);
@@ -67,8 +69,8 @@ WHY LINES (copy into why): ${JSON.stringify(grounded.why)}`,
   return { lead: c.lead, merchant: c.merchant, opp: c.opp, pitch };
 }
 
-/** Sends the approved pitch: opens a deal and a WhatsApp thread with the merchant. */
-export async function sendPitch(leadId: string, text: string, withVoice: boolean) {
+/** Sends the approved pitch: opens a deal and a Telegram thread with the merchant. */
+export async function sendPitch(leadId: string, text: string, withVoice: boolean, route?: { chatId: string | null; phone: string | null }) {
   const c = await context(leadId);
   if (!c) throw new Error("Lead not found");
   if (c.lead.dealId) return c.lead.dealId;
@@ -76,6 +78,7 @@ export async function sendPitch(leadId: string, text: string, withVoice: boolean
   const existing = await db.vyaparDeal.findFirst({ where: { merchantId: c.lead.merchantId, stage: { notIn: ["LOST", "ORDER_WON"] } } });
   if (existing) {
     await db.vyaparLead.update({ where: { id: leadId }, data: { status: "PITCHED", dealId: existing.id } });
+    if (route) await db.vyaparDeal.update({ where: { id: existing.id }, data: { demoChatId: route.chatId, demoPhone: route.phone } });
     return existing.id;
   }
   const at = liveNow();
@@ -83,7 +86,7 @@ export async function sendPitch(leadId: string, text: string, withVoice: boolean
   const provider = stored?.provider ?? "template";
   const deal = await db.vyaparDeal.create({
     data: {
-      merchantId: c.lead.merchantId, stage: "PITCHED", valueInr: estimateValue(c.lead.merchant.qrVolumeBand, c.opp.sku?.unitPriceInr ?? c.seller.unitPriceInr), autopilot: c.seller.autopilot, lastTouchAt: at, nextStep: "Waiting for reply",
+      merchantId: c.lead.merchantId, stage: "PITCHED", demoChatId: route?.chatId ?? null, demoPhone: route?.phone ?? null, valueInr: estimateValue(c.lead.merchant.qrVolumeBand, c.opp.sku?.unitPriceInr ?? c.seller.unitPriceInr), autopilot: c.seller.autopilot, lastTouchAt: at, nextStep: "Waiting for reply",
       messages: {
         create: [
           { direction: "out", kind: "text", text, author: "Vyapar AI", provider, createdAt: at, metaJson: JSON.stringify({ leadId }) },
@@ -93,9 +96,14 @@ export async function sendPitch(leadId: string, text: string, withVoice: boolean
     },
   });
   await db.vyaparLead.update({ where: { id: leadId }, data: { status: "PITCHED", dealId: deal.id } });
+  // "Send on Telegram" → routed demo chat (text + Sarvam voice note when available).
+  let voice: Buffer | null = null;
+  if (withVoice && isSarvamTtsConfigured()) voice = await sarvamTts(text.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, "")).catch(() => null);
+  const chat = await deliverToTelegram(deal.id, text, voice);
+  if (chat) await db.vyaparMessage.updateMany({ where: { dealId: deal.id, direction: "out" }, data: { metaJson: JSON.stringify({ leadId, telegram: true, telegramChat: chat }) } });
   // Delivery is simulated in the prototype: never logged as a delivered message.
   if (stored && stored.text.trim() !== text.trim()) await logEvent({ sellerId: c.seller.id, type: "DRAFT_EDITED", huntId: c.lead.huntId, leadId, merchantId: c.lead.merchantId, dealId: deal.id, meta: { angle: stored.angle } });
   await logEvent({ sellerId: c.seller.id, type: "APPROVED_SENT", huntId: c.lead.huntId, leadId, merchantId: c.lead.merchantId, dealId: deal.id, position: c.lead.position, provenance: "simulated", meta: { angle: stored?.angle, withVoice } });
-  remember([{ id: `pitch-${deal.id}`, text: `${c.seller.merchant.name} pitched ${c.lead.merchant.name} (${c.lead.merchant.category}, owner ${firstName(c.lead.merchant.ownerName)}) on WhatsApp: ${text}` }]);
+  remember([{ id: `pitch-${deal.id}`, text: `${c.seller.merchant.name} pitched ${c.lead.merchant.name} (${c.lead.merchant.category}, owner ${firstName(c.lead.merchant.ownerName)}) on Telegram: ${text}` }]);
   return deal.id;
 }

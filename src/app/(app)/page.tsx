@@ -1,13 +1,15 @@
 import Link from "next/link";
-import { BookOpen, Calculator, CalendarDays, Check, ClipboardList, CreditCard, FileText, Gauge, Handshake, Landmark, Megaphone, Menu, Music, QrCode, ReceiptText, Sparkles, Speaker, Store, ChartColumn } from "lucide-react";
+import { Bot, Brain, ShoppingCart, BookOpen, Calculator, CalendarDays, Check, ClipboardList, CreditCard, FileText, Gauge, Handshake, Landmark, Megaphone, Menu, Music, QrCode, ReceiptText, Sparkles, Speaker, Store, ChartColumn } from "lucide-react";
 import { HomeNav, SoonButton, SoonTile } from "@/components/paytm/nav";
 import { Lockup, inr } from "@/components/paytm/ui";
 import { getHomeStats } from "@/lib/vyapar/server/insights";
+import { getFleetRun } from "@/lib/vyapar/server/fleet";
+import { db } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const stats = await getHomeStats();
+  const [stats, run, memories] = await Promise.all([getHomeStats(), getFleetRun(), db.knowledgeEvent.count()]);
   return <div className="page">
     <header className="appbar">
       <SoonButton label="Menu" className="icon-btn" ariaLabel="Menu"><Menu /></SoonButton>
@@ -27,6 +29,16 @@ export default async function Home() {
         <div className="meta"><span><Check />46 payments</span><span><Landmark />Settles 7 PM to HDFC ••21</span><span className="badge b-grey" style={{ background: "rgba(255,255,255,.15)", color: "#fff" }}>Demo</span></div>
       </div>
 
+      <div className="team-card">
+        <div className="row"><Bot size={18} /><b className="grow">Your AI sales team</b><span className="badge" style={{ background: "rgba(255,255,255,.15)", color: "#fff" }}>{run ? (run.status === "RUNNING" ? "Working…" : run.status === "DONE" ? "Last run" : "Stopped") : "Not run yet"}</span></div>
+        <p>{run?.report ?? "One tap and it finds the best shops for you, pitches them on Telegram and calls them one by one."}</p>
+        {run?.targets.slice(0, 3).map((t) => <div key={t.id} className="t-row"><b>#{t.priority}</b><span className="grow"><b>{t.merchant.name}</b>: {t.result ?? (t.callStatus === "CALLING" ? "on the call now…" : "queued")}</span></div>)}
+        <div className="row" style={{ gap: 8 }}>
+          <Link className="btn btn-primary btn-sm grow" href="/vyapar/fleet">{run ? "Open AI team" : "Run AI sales team"}</Link>
+          <Link className="btn btn-sm" style={{ background: "rgba(255,255,255,.15)", color: "#fff" }} href="/vyapar/memory"><Brain />Memory · {memories}</Link>
+        </div>
+      </div>
+
       <Link className="vyapar-banner" href="/vyapar">
         <span className="bolt"><Sparkles /></span>
         <span><b>Vyapar AI: find buyers near you</b><span className="copy">{stats.nearbyBuyers} likely buyers within 5 km: {stats.nearbyPaytm} on Paytm, {stats.nearbyPublic} on the public map</span></span>
@@ -37,7 +49,7 @@ export default async function Home() {
         <div className="section-h"><h2>Grow Your Business</h2></div>
         <div className="grid-tiles">
           <Link className="tile ai" href="/vyapar"><span className="ribbon">AI · New</span><span className="ic"><Sparkles /></span>Vyapar AI</Link>
-          <SoonTile label="Request Payment"><span className="ic"><ReceiptText /></span>Request Payment</SoonTile>
+          <Link className="tile" href="/buy"><span className="ribbon">New</span><span className="ic"><ShoppingCart /></span>Buy Supplies</Link>
           <SoonTile label="Photo QR"><span className="ribbon">New</span><span className="ic"><QrCode /></span>Photo QR</SoonTile>
           <SoonTile label="Soundbox"><span className="ribbon">100% Cashback</span><span className="ic"><Speaker /></span>Get Soundbox</SoonTile>
           <SoonTile label="Card Machine"><span className="ribbon">Upto 100% Cashback</span><span className="ic"><CreditCard /></span>Card Machine</SoonTile>
@@ -50,7 +62,7 @@ export default async function Home() {
           <SoonTile label="Attendance"><span className="ic"><CalendarDays /></span>Attendance</SoonTile>
           <SoonTile label="GST Invoices"><span className="ic"><FileText /></span>GST Invoices</SoonTile>
           <SoonTile label="Reports"><span className="ic"><ClipboardList /></span>Reports</SoonTile>
-          <SoonTile label="Business loan"><span className="ic"><Calculator /></span>Loans</SoonTile>
+          <Link className="tile" href="/vyapar/fleet"><span className="ribbon">AI</span><span className="ic"><Bot /></span>AI Sales Team</Link>
         </div>
       </section>
 

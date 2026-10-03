@@ -24,11 +24,11 @@ export function isSarvamTtsConfigured() {
 }
 
 /** Sarvam Bulbul text-to-speech. Returns WAV bytes for a Hinglish/Hindi voice note. */
-export async function sarvamTts(text: string, speaker = process.env.SARVAM_TTS_SPEAKER || "anushka"): Promise<Buffer> {
+export async function sarvamTts(text: string, speaker = process.env.SARVAM_TTS_SPEAKER || "priya"): Promise<Buffer> {
   const response = await fetch("https://api.sarvam.ai/text-to-speech", {
     method: "POST",
     headers: { "content-type": "application/json", "api-subscription-key": process.env.SARVAM_API_KEY ?? "" },
-    body: JSON.stringify({ text: text.slice(0, 1500), target_language_code: "hi-IN", speaker, model: process.env.SARVAM_TTS_MODEL || "bulbul:v2" }),
+    body: JSON.stringify({ text: text.slice(0, 1500), target_language_code: "hi-IN", speaker, model: process.env.SARVAM_TTS_MODEL || "bulbul:v3" }),
     signal: AbortSignal.timeout(30_000),
   });
   if (!response.ok) throw new Error(`Sarvam text-to-speech returned ${response.status}: ${(await response.text()).slice(0, 200)}`);

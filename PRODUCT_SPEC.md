@@ -37,6 +37,11 @@ Merchants are fictional and badged *Demo data*. Every AI artifact shows its prov
 - **Personalisation:** only explicit seller feedback (skip reasons, saves, one capacity clarification). Every change is explained and undoable, and past hunt snapshots are never rewritten.
 - **Golden-path addition:** on Rahul's hunt, answer "Can you supply 1,000+ pcs a month?" and the list re-ranks. Skip a lead with a reason, then Undo. Open a public bakery to see the visit/intro script.
 
+## V9. Simplification and providers (T124–T127)
+- **Two jobs, one app:** *Sell* (find nearby buyers, pitch, remember) and *Buy* (post a need, compare up to 3 offers that can deliver, pick one seller who may then contact you). Nothing else is pitched in the demo.
+- **Providers:** Gemini is the default LLM; Sarvam covers Hinglish drafts, voice notes and the "Vyapar SDR" voice agent; Cognee (Python SDK) holds the vendor/buyer/conversation memory. n8n stays as an optional integration and is no longer part of the story.
+- **Buyer rules:** unknown stock, budget or contact never pass as "ready". Stock counts only if confirmed in the last 48 hours. Max 3 sellers per need. Only the chosen seller may reply. The seller's first reply uses only the shared request and their offer.
+
 ## V7. Golden demo path (3 minutes)
 Home → Vyapar AI → run Rahul's prompt (animated plan, Karan ranked #1) → Pitch Karan (Hinglish draft + voice note) → Send → *Reply as Karan*: "Bhaiya rate zyada hai, ₹3 mein milega? Abhi wale supplier se ₹3.50…" → objection saved, counter (₹4.20 bulk tier) sent by Autopilot → "Theek hai, pehle sample bhejo… Har mahine 5 tareekh ko stock lete hain" → stage *Sample requested*, n8n sample dispatch, restock timing remembered → My Deals: revive Sharma Sweets → Campaigns: launch the price-objection offer. Reset at any time with **Demo → Reset demo data**.
 

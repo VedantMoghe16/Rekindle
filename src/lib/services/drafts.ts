@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { db } from "@/lib/db";
 import { now } from "@/lib/clock";
-import { callStructured, isProviderConfigured, type LlmProvider } from "@/lib/providers/llm";
+import { callStructured, defaultProvider, isProviderConfigured, type LlmProvider } from "@/lib/providers/llm";
 import { DraftOutput } from "@/lib/schemas";
 import { templateDraft, validateDraft, type DraftChannel, type DraftLanguage } from "@/lib/engines/draft-rules";
 import { draftRetrySuffix, draftSystemPrompt, draftUserPrompt } from "@/lib/prompts/draft";
@@ -37,7 +37,7 @@ export async function generateDraft(recommendationId: string, channel: DraftChan
   const lang: DraftLanguage = channel === "email" ? "en" : language;
 
   let result: { subject: string | null; body: string; why: string[]; provenance: DraftProvenance } | null = null;
-  const provider: LlmProvider = lang === "hinglish" && isProviderConfigured("sarvam") ? "sarvam" : "anthropic";
+  const provider: LlmProvider = lang === "hinglish" && process.env.SARVAM_DRAFTS === "true" && isProviderConfigured("sarvam") ? "sarvam" : defaultProvider();
   const system = draftSystemPrompt(repName.split(" ")[0]);
   const user = draftUserPrompt({
     seller: { name: seller?.name ?? "", oneLiner: seller?.oneLiner ?? "" }, repName,

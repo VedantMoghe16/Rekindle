@@ -30,7 +30,7 @@ export type Opportunity = {
   relevanceParts: { category: number; distance: number; capacity: number; stated: number; saved: number };
   timing: { status: "fresh" | "unknown" | "stale" | "future"; label: string; evidence: Evidence | null; ignored: string[] };
   confidence: { level: "high" | "medium" | "low"; reasons: string[] };
-  contact: { status: "verified" | "unknown"; name: string | null; role: string | null; channel: "WhatsApp" | "Visit"; note: string };
+  contact: { status: "verified" | "unknown"; name: string | null; role: string | null; channel: "Telegram" | "Visit"; note: string };
   whyMerchant: Evidence[];
   serve: { label: string; ok: boolean | null }[];
   unknowns: string[];
@@ -217,7 +217,7 @@ export function evaluateOpportunity(seller: OppSeller, plan: HuntPlan, m: OppMer
     merchantId: m.id, provenance, distanceKm, hypothesis, sku: sku ? { sku: sku.sku, name: sku.name, unitPriceInr: sku.unitPriceInr } : null,
     relevance, relevanceParts: { category, distance, capacity, stated: statedPts, saved },
     timing, confidence: { level, reasons },
-    contact: verified ? { status: "verified", name: m.ownerName, role: m.contactRole ?? "Owner", channel: "WhatsApp", note: "Opted in to Vyapar business chats (demo)" } : { status: "unknown", name: null, role: null, channel: "Visit", note: "Contact not verified. Visit or ask for an introduction." },
+    contact: verified ? { status: "verified", name: m.ownerName, role: m.contactRole ?? "Owner", channel: "Telegram", note: "Opted in to Vyapar business chats (demo)" } : { status: "unknown", name: null, role: null, channel: "Visit", note: "Contact not verified. Visit or ask for an introduction." },
     whyMerchant, serve, unknowns, gates, eligibility, excludedReason: fail?.reason ?? null, angle, action, priority, dealId: deal?.id ?? null,
   };
 }

@@ -1,0 +1,3 @@
+Vendor: Sharma Packaging Co. (packaging supplier, Saki Naka, Mumbai). Owner: Vijay Sharma. Paytm merchant (demo data).
+Sharma Packaging Co. sells Pastry box 6 inch, bulk (pastry boxes) at ₹7 per box; minimum order 1000; delivers within 10 km in 24 hours; no samples; stock 10000 confirmed 10 hours before the demo.
+Sharma Packaging Co. only sells in bulk: minimum order 1,000 boxes; cheapest per box but no samples.

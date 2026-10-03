@@ -1,3 +1,5 @@
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { db } from "@/lib/db";
 import { cogneeSearch, isCogneeConfigured } from "@/lib/providers/cognee";
 import { isN8nVyaparConfigured, n8nVyapar } from "@/lib/providers/n8n";
@@ -107,6 +109,10 @@ export async function askMemory(question: string, merchantId?: string): Promise<
       console.warn(`[vyapar] Cognee search failed, using local memory: ${error instanceof Error ? error.message : error}`);
     }
   }
+  if (!merchantId && /\b(supplier|suppliers|vendor|vendors|seller|sellers|deliver|delivery|sample|samples|leak|complaint|stock|moq|minimum order|cheapest)\b/i.test(question)) {
+    const hits = datasetSentences().map((x) => ({ ...x, score: lexicalScore(question, x.text) })).filter((x) => x.score >= 0.25).sort((a, b) => b.score - a.score).slice(0, 4);
+    if (hits.length) return { answer: hits.map((h) => `• ${h.text}`).join("\n"), sources: [], provenance: "local" };
+  }
   const category = ASK_CATEGORIES.find(([, re]) => re.test(question))?.[0];
   const categoryFilter = /bakery|bakeries/i.test(question) ? "Bakery" : /cloud kitchen|kitchen/i.test(question) ? "Cloud kitchen" : /sweet|mithai/i.test(question) ? "Sweet shop" : /cafe/i.test(question) ? "Cafe" : null;
   if (category) {
@@ -166,4 +172,13 @@ export async function launchCampaign(objection: Objection) {
     }
   }
   return db.vyaparCampaign.create({ data: { objection, headline: draft.headline, assetsJson: JSON.stringify(draft.assets), audience: state.audience, status, provider } });
+}
+
+let sentences: { file: string; text: string }[] | null = null;
+/** Sentences from the Cognee dataset (data/cognee), used for an honest local answer when Cognee isn't running. */
+function datasetSentences() {
+  if (sentences) return sentences;
+  const dir = join(process.cwd(), "data", "cognee");
+  sentences = existsSync(dir) ? readdirSync(dir).filter((f) => f.endsWith(".txt")).flatMap((file) => readFileSync(join(dir, file), "utf8").split(/\n+/).map((text) => ({ file, text: text.trim() })).filter((x) => x.text.length > 20)) : [];
+  return sentences;
 }

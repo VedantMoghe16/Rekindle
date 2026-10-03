@@ -31,7 +31,7 @@ export async function loadContext(): Promise<OppContext> {
     const refusal = d.memories.find((m) => m.category === "NOT_INTERESTED");
     if (d.stage === "LOST" && refusal) optOuts.set(d.merchantId, `Said not interested on ${refusal.createdAt.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`);
     for (const m of d.memories.filter((x) => x.kind === "PREFERENCE" && x.quote)) {
-      buyerStated.set(d.merchantId, [...(buyerStated.get(d.merchantId) ?? []), { claim: m.quote!, source: "Buyer said on WhatsApp", kind: "buyer_stated", observedAt: m.createdAt.toISOString().slice(0, 10) }]);
+      buyerStated.set(d.merchantId, [...(buyerStated.get(d.merchantId) ?? []), { claim: m.quote!, source: "Buyer said on Telegram", kind: "buyer_stated", observedAt: m.createdAt.toISOString().slice(0, 10) }]);
     }
   }
   return { activeDeals, optOuts, buyerStated };

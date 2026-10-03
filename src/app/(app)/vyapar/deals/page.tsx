@@ -4,13 +4,16 @@ import { DealList, ReviveCards } from "@/components/vyapar/deals-board";
 import { AskBox } from "@/components/vyapar/ask-box";
 import { getDealsOverview } from "@/lib/vyapar/server/insights";
 import { visitRoute } from "@/lib/vyapar/server/opportunities";
+import { sellerRequests } from "@/lib/vyapar/server/needs";
+import { PRODUCTS, type ProductKey } from "@/lib/vyapar/needs";
 import Link from "next/link";
 import { MapPin } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default async function DealsPage() {
-  const [o, visits] = await Promise.all([getDealsOverview(), visitRoute()]);
+  const [o, visits, requests] = await Promise.all([getDealsOverview(), visitRoute(), sellerRequests()]);
+  const pending = requests.filter((r) => r.status === "REQUESTED");
   const max = Math.max(1, o.funnel[0].value);
   return <div className="page">
     <AppBar title="My Deals" sub="Vyapar AI · your merchant pipeline" back="/vyapar" />
@@ -22,6 +25,10 @@ export default async function DealsPage() {
           <div className="kpi"><small>Reply rate</small><b>{o.kpis.replyRate}%</b><div className="delta">vs ~9% for cold calls</div></div>
           <div className="kpi"><small>Time saved</small><b>{o.kpis.hoursSaved} hrs</b><div className="delta">no door-to-door</div></div>
         </div>
+        {pending.length > 0 && <div className="revive" style={{ borderColor: "#fde7b0", background: "linear-gradient(135deg,#fff 0%,#fff8e6 100%)" }}>
+          <div className="h"><span className="badge b-amber">Buyer request</span><b className="grow">{pending.length === 1 ? `${pending[0].buyer.name} picked you` : `${pending.length} buyers picked you`}</b></div>
+          {pending.map((r) => <Link key={r.id} href={`/vyapar/requests/${r.id}`} className="list-row"><div className="grow"><b>{r.buyer.name}</b><small>Needs {r.terms.quantity.toLocaleString("en-IN")} {PRODUCTS[r.need.productKey as ProductKey].label.toLowerCase()}es by {r.need.neededBy}{r.need.sampleFirst ? " · sample first" : ""}</small></div><span className="btn btn-primary btn-sm">Reply</span></Link>)}
+        </div>}
         <ReviveCards revivals={o.revivals.map((r) => ({ ...r, saidAt: r.saidAt.toISOString() }))} />
         {visits.length > 0 && <div className="card">
           <div className="card-title" style={{ marginBottom: 4 }}><span className="row"><MapPin size={16} />Visit route ({visits.length})</span><span className="xs muted">nearest first</span></div>

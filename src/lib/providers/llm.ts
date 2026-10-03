@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
-import type { z } from "zod";
+import { z } from "zod";
 import { db } from "@/lib/db";
 
 export const PROMPT_VERSION = "v1";
@@ -14,21 +14,30 @@ export class LlmOfflineMiss extends Error {
 }
 
 export type Tier = "smart" | "fast";
-export type LlmProvider = "anthropic" | "sarvam";
+export type LlmProvider = "anthropic" | "sarvam" | "gemini";
 export type Provenance = "live" | "cached";
 
 export function modelFor(provider: LlmProvider, tier: Tier): string {
   if (provider === "sarvam") return process.env.SARVAM_LLM_MODEL || "sarvam-105b";
+  if (provider === "gemini") return tier === "smart" ? process.env.GEMINI_MODEL_SMART || process.env.GEMINI_MODEL || "gemini-2.5-flash" : process.env.GEMINI_MODEL || "gemini-2.5-flash";
   return tier === "smart" ? process.env.LLM_MODEL_SMART || "claude-opus-5-5" : process.env.LLM_MODEL_FAST || "claude-haiku-4-5";
 }
 
 export function isProviderConfigured(provider: LlmProvider): boolean {
   if (process.env.LLM_OFFLINE === "true") return false;
+  if (provider === "gemini") return Boolean(process.env.GEMINI_API_KEY);
   return provider === "sarvam" ? Boolean(process.env.SARVAM_API_KEY) : Boolean(process.env.ANTHROPIC_API_KEY);
 }
 
+/** The general-purpose model: LLM_PROVIDER if set, else Gemini when its key exists, else Claude. */
+export function defaultProvider(): LlmProvider {
+  const chosen = process.env.LLM_PROVIDER;
+  if (chosen === "gemini" || chosen === "anthropic" || chosen === "sarvam") return chosen;
+  return process.env.GEMINI_API_KEY ? "gemini" : "anthropic";
+}
+
 export function isLlmAvailable(): boolean {
-  return isProviderConfigured("anthropic");
+  return isProviderConfigured(defaultProvider());
 }
 
 export function cacheKey(parts: { provider: string; model: string; system: string; user: string; schemaName: string }): string {
@@ -96,19 +105,41 @@ async function callSarvam<S extends z.ZodTypeAny>(args: StructuredArgs<S>, model
   return args.schema.parse(JSON.parse(json));
 }
 
+/** Gemini generateContent in JSON mode; the zod schema is sent as a JSON schema and the reply is zod-validated. */
+async function callGemini<S extends z.ZodTypeAny>(args: StructuredArgs<S>, model: string, extra = ""): Promise<z.infer<S>> {
+  const base = (process.env.GEMINI_BASE_URL || "https://generativelanguage.googleapis.com/v1beta").replace(/\/$/, "");
+  const schema = z.toJSONSchema(args.schema, { target: "draft-7" }) as Record<string, unknown>;
+  delete schema.$schema;
+  const response = await fetch(`${base}/models/${model}:generateContent`, {
+    method: "POST",
+    signal: AbortSignal.timeout(45_000),
+    headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY ?? "" },
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: args.system }] },
+      contents: [{ role: "user", parts: [{ text: args.user + extra }] }],
+      generationConfig: { temperature: 0.3, maxOutputTokens: args.maxTokens ?? 8000, responseMimeType: "application/json", responseJsonSchema: schema },
+    }),
+  });
+  if (!response.ok) throw new Error(`Gemini returned ${response.status}: ${(await response.text()).slice(0, 200)}`);
+  const body = await response.json() as { candidates?: { content?: { parts?: { text?: string }[] }; finishReason?: string }[] };
+  const text = body.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("") ?? "";
+  if (!text) throw new Error(`Gemini returned no content (${body.candidates?.[0]?.finishReason ?? "unknown"})`);
+  return args.schema.parse(JSON.parse(text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1)));
+}
+
 /** Structured LLM call with a durable cache. Throws LlmOfflineMiss when offline and uncached; callers fall back to deterministic engines. */
-export async function callStructured<S extends z.ZodTypeAny>(args: StructuredArgs<S>): Promise<{ data: z.infer<S>; provenance: Provenance; model: string }> {
-  const provider = args.provider ?? "anthropic";
+export async function callStructured<S extends z.ZodTypeAny>(args: StructuredArgs<S>): Promise<{ data: z.infer<S>; provenance: Provenance; model: string; provider: LlmProvider }> {
+  const provider = args.provider ?? defaultProvider();
   const model = modelFor(provider, args.tier);
   const key = cacheKey({ provider, model, system: args.system, user: args.user, schemaName: args.schemaName });
   const cached = await readCache(key);
   if (cached) {
     const parsed = args.schema.safeParse(cached);
-    if (parsed.success) return { data: parsed.data, provenance: "cached", model };
+    if (parsed.success) return { data: parsed.data, provenance: "cached", model, provider };
   }
   if (!isProviderConfigured(provider)) throw new LlmOfflineMiss(args.schemaName);
   const started = Date.now();
-  const call = provider === "sarvam" ? callSarvam : callAnthropic;
+  const call = provider === "sarvam" ? callSarvam : provider === "gemini" ? callGemini : callAnthropic;
   let data: z.infer<S>;
   try {
     data = await call(args, model);
@@ -118,5 +149,5 @@ export async function callStructured<S extends z.ZodTypeAny>(args: StructuredArg
   }
   await writeCache(key, provider, model, args.schemaName, data);
   console.info(`[llm] ${args.schemaName} ${provider}/${model} ${Date.now() - started}ms`);
-  return { data, provenance: "live", model };
+  return { data, provenance: "live", model, provider };
 }

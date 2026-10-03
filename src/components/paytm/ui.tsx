@@ -31,7 +31,7 @@ export function ScoreRing({ value, label = "FIT" }: { value: number; label?: str
   return <div className="score"><b style={{ background: `conic-gradient(${color} ${value}%, var(--pt-line) 0)` }}><span>{value}</span></b><small>{label}</small></div>;
 }
 
-const TAG_NAMES: Record<string, string> = { claude: "Claude", sarvam: "Sarvam", "sarvam-tts": "Sarvam", cognee: "Cognee", n8n: "n8n", paytm: "Paytm", rules: "Rules", template: "Template", simulated: "Simulated", local: "Local", cached: "Cached", human: "You" };
+const TAG_NAMES: Record<string, string> = { gemini: "Gemini", claude: "Claude", sarvam: "Sarvam", "sarvam-tts": "Sarvam", cognee: "Cognee", n8n: "n8n", paytm: "Paytm", rules: "Rules", template: "Template", simulated: "Simulated", local: "Local", cached: "Cached", human: "You" };
 export function ProviderTag({ provider }: { provider: string }) {
   const cls = provider === "sarvam-tts" ? "sarvam" : provider;
   return <span className={`tag ${cls}`}>{TAG_NAMES[provider] ?? provider}</span>;

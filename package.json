@@ -13,7 +13,13 @@
     "boards:check": "tsx scripts/check-boards.ts",
     "demo:reset": "prisma db push && tsx scripts/reset-demo.ts",
     "demo:warm": "tsx scripts/warm-cache.ts",
-    "vyapar:seed": "prisma db push && tsx scripts/seed-vyapar.ts"
+    "vyapar:seed": "prisma db push && tsx scripts/seed-vyapar.ts",
+    "cognee:dataset": "tsx scripts/build-cognee-dataset.ts",
+    "cognee:ingest": "cognee/.venv/bin/python cognee/vyapar_memory.py ingest",
+    "cognee:demo": "cognee/.venv/bin/python cognee/vyapar_memory.py demo",
+    "cognee:server": "cognee/.venv/bin/python cognee/server.py",
+    "vyapar:call": "tsx scripts/vyapar-call.ts",
+    "telegram:poll": "tsx scripts/telegram-poll.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",

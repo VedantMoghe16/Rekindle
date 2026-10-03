@@ -1,0 +1,3 @@
+Vendor: Thane Box Depot (packaging supplier, Thane, Mumbai). Owner: Sunil Patil. Paytm merchant (demo data).
+Thane Box Depot sells Pastry box 6 inch (pastry boxes) at ₹7.20 per box; minimum order 200; delivers within 6 km in 24 hours; samples: Free sample; stock 9000 confirmed 5 hours before the demo.
+Thane Box Depot is cheap but only delivers within 6 km of Thane, which excludes Andheri.

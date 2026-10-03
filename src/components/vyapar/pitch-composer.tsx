@@ -44,6 +44,13 @@ export function PitchComposer({ leadId, initial }: { leadId: string; initial: Pi
     if (res?.ok) { setPitch(res.data); setText(res.data.text); setEditing(false); toast(res.data.provider === "template" ? "Template rewrite (connect Sarvam for AI drafts)" : "Fresh draft ready"); }
     else toast("Couldn't rewrite right now");
   }
+  const [scenario, setScenario] = useState("sample");
+  async function call(provider: "sarvam" | "simulated") {
+    setBusy("send");
+    const res = await fetch(`/api/vyapar/leads/${leadId}/call`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ provider, scenario }) }).then((r) => r.json()).catch(() => null);
+    if (res?.ok) { toast(provider === "sarvam" ? `Calling ${res.data.phoneMasked}… Priya is on the line` : "Simulated call finished"); router.push(`/vyapar/deals/${res.data.dealId}`); }
+    else { setBusy(null); toast(res?.error?.message ?? "Couldn't start the call"); }
+  }
   async function planVisit() {
     setBusy("send");
     const res = await fetch(`/api/vyapar/leads/${leadId}/visit`, { method: "POST" }).then((r) => r.json()).catch(() => null);
@@ -52,10 +59,9 @@ export function PitchComposer({ leadId, initial }: { leadId: string; initial: Pi
   }
   async function send() {
     if (leak) return toast("Remove the payment/sales detail first: private Paytm data can't go in a pitch");
-    if (channel === "call") return toast("AI calling is coming next. Sending on WhatsApp for now");
     setBusy("send");
     const res = await fetch(`/api/vyapar/leads/${leadId}/send`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text, withVoice: channel === "voice" }) }).then((r) => r.json()).catch(() => null);
-    if (res?.ok) { toast("Pitch sent on WhatsApp"); router.push(`/vyapar/deals/${res.data.dealId}`); }
+    if (res?.ok) { toast("Pitch sent on Telegram"); router.push(`/vyapar/deals/${res.data.dealId}`); }
     else { setBusy(null); toast(res?.error?.message ?? "Couldn't send"); }
   }
 
@@ -68,7 +74,7 @@ export function PitchComposer({ leadId, initial }: { leadId: string; initial: Pi
           {pitch.contact && <div className="row"><span className={`badge ${pitch.contact.status === "verified" ? "b-green" : "b-amber"}`}>{pitch.contact.status === "verified" ? "Contact verified" : "Contact unknown"}</span><span className="small">{pitch.contact.status === "verified" ? `${pitch.contact.name} · ${pitch.contact.role}` : pitch.contact.note}</span></div>}
         </div>
         {!intro && <div className="seg" role="tablist" aria-label="Channel">
-          <button className={channel === "wa" ? "on" : ""} onClick={() => setChannel("wa")}><MessageCircle />WhatsApp</button>
+          <button className={channel === "wa" ? "on" : ""} onClick={() => setChannel("wa")}><MessageCircle />Telegram</button>
           <button className={channel === "voice" ? "on" : ""} onClick={() => setChannel("voice")}><Mic />+ Voice note</button>
           <button className={channel === "call" ? "on" : ""} onClick={() => setChannel("call")}><Phone />AI call</button>
         </div>}
@@ -82,19 +88,26 @@ export function PitchComposer({ leadId, initial }: { leadId: string; initial: Pi
           {editing ? <textarea className="draft-edit" value={text} onChange={(e) => setText(e.target.value)} aria-label="Pitch message" /> : <div className="draft">{marked(text, pitch.highlights)}</div>}
         </div>
         {leak && <div className="badge b-red" style={{ whiteSpace: "normal" }}>This mentions the buyer&apos;s payments or sales. Private Paytm data can&apos;t be used in a pitch.</div>}
-        {!intro && <VoiceNote text={text} />}
+        {!intro && channel !== "call" && <VoiceNote text={text} />}
+        {!intro && channel === "call" && <div className="card stack">
+          <div className="card-title">AI call · Sarvam &ldquo;Vyapar SDR&rdquo;</div>
+          <span className="small">Priya calls in Hinglish using this lead&apos;s facts (product, price, offer, past objections), then saves the outcome, objection and transcript to the deal.</span>
+          <button className="btn btn-primary" onClick={() => call("sarvam")} disabled={busy !== null}>{busy === "send" ? <LoaderCircle className="spin" /> : <Phone />}Call now (live)</button>
+          <div className="row"><select className="sel" value={scenario} onChange={(e) => setScenario(e.target.value)} aria-label="Simulated outcome"><option value="sample">Agrees to sample</option><option value="objection">Price objection</option><option value="callback">Call back later</option><option value="no_answer">No answer</option></select><button className="btn btn-ghost grow" onClick={() => call("simulated")} disabled={busy !== null}>Simulate call</button></div>
+          <span className="xs muted">Live calls ring the demo phone (DEMO_CALL_PHONE).</span>
+        </div>}
         <div className="card">
           <div className="card-title">Why this pitch</div>
           <div className="evidence" style={{ marginTop: 8 }}>{pitch.why.map((w) => <div key={w.text}><span className={`chip ${CHIP[w.tag] ?? "b-grey"}`}>{w.tag}</span><span>{w.text}</span></div>)}</div>
         </div>
-        <p className="xs muted" style={{ textAlign: "center" }}>{intro ? "No verified contact, so Vyapar won't message a guessed number. Visit with a sample, or ask a mutual contact for an introduction." : "You approve every first message. Sending is simulated in this prototype. Replies after this can run on Autopilot."}</p>
+        <p className="xs muted" style={{ textAlign: "center" }}>{intro ? "No verified contact, so Vyapar won't message a guessed number. Visit with a sample, or ask a mutual contact for an introduction." : "You approve every first message. Messages go out on Telegram. Replies after this can run on Autopilot."}</p>
       </div>
     </main>
     <div className="sticky-cta">
       <button className="btn btn-ghost" style={{ flex: 1 }} onClick={rewrite} disabled={busy !== null}>{busy === "rewrite" ? <LoaderCircle className="spin" /> : <RefreshCw />}Rewrite</button>
       {intro
         ? <button className="btn btn-primary" style={{ flex: 2 }} onClick={planVisit} disabled={busy !== null}>{busy === "send" ? <LoaderCircle className="spin" /> : <MapPin />}Add to visit route</button>
-        : <button className="btn btn-primary" style={{ flex: 2 }} onClick={send} disabled={busy !== null || leak}>{busy === "send" ? <LoaderCircle className="spin" /> : <Send />}Send on WhatsApp</button>}
+        : channel === "call" ? null : <button className="btn btn-primary" style={{ flex: 2 }} onClick={send} disabled={busy !== null || leak}>{busy === "send" ? <LoaderCircle className="spin" /> : <Send />}Send on Telegram</button>}
     </div>
   </>;
 }

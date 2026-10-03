@@ -23,10 +23,32 @@ export function estimateValue(qrVolumeBand: string, unitPriceInr: number): numbe
   return Math.round((bags * unitPriceInr) / 100) * 100;
 }
 
-/** Best-effort Cognee memory write. Never blocks or fails the user's action. */
-export function remember(docs: { id: string; text: string }[]) {
-  if (!isCogneeConfigured() || !docs.length) return;
-  void cogneeAdd(docs).then(() => cogneeCognify()).catch((error) => console.warn(`[vyapar] Cognee write failed: ${error instanceof Error ? error.message : error}`));
+const KIND_BY_PREFIX: Record<string, { kind: string; label: string }> = {
+  pitch: { kind: "PITCH", label: "Pitch sent" }, reply: { kind: "REPLY", label: "Buyer replied" }, call: { kind: "CALL", label: "AI call result" },
+  need: { kind: "NEED", label: "Buyer need posted" }, fleet: { kind: "FLEET", label: "AI sales team run" }, onboarding: { kind: "BUSINESS", label: "Business profile" },
+};
+
+/**
+ * Business memory write: every fact is saved as a plain-language KnowledgeEvent (the database record people see)
+ * and sent to Cognee for the knowledge graph. Never blocks or fails the user's action.
+ */
+export function remember(docs: { id: string; text: string; title?: string; dealId?: string; runId?: string }[]) {
+  if (!docs.length) return;
+  void (async () => {
+    const rows = await Promise.all(docs.map((d) => {
+      const meta = KIND_BY_PREFIX[d.id.split("-")[0]] ?? { kind: "NOTE", label: "Note" };
+      return db.knowledgeEvent.create({ data: { kind: meta.kind, title: d.title ?? meta.label, text: d.text, dealId: d.dealId ?? null, runId: d.runId ?? null, cognee: isCogneeConfigured() ? "pending" : "skipped", createdAt: liveNow() } });
+    }));
+    if (!isCogneeConfigured()) return;
+    try {
+      await cogneeAdd(docs.map((d) => ({ id: d.id, text: d.text })));
+      await cogneeCognify();
+      await db.knowledgeEvent.updateMany({ where: { id: { in: rows.map((r) => r.id) } }, data: { cognee: "saved" } });
+    } catch (error) {
+      console.warn(`[vyapar] Cognee write failed: ${error instanceof Error ? error.message : error}`);
+      await db.knowledgeEvent.updateMany({ where: { id: { in: rows.map((r) => r.id) } }, data: { cognee: "failed" } });
+    }
+  })().catch((error) => console.warn(`[vyapar] memory write failed: ${error instanceof Error ? error.message : error}`));
 }
 
 export function shortRef(prefix = "VY") {

@@ -53,7 +53,7 @@ export default async function MerchantPage({ params }: { params: Promise<{ id: s
       <div className="pad lift">
         <div className="card">
           <div className="stage-track">{STAGE_TRACK.map((s, i) => <div key={s} className={`s${i < step ? " done" : i === step ? " now" : ""}`}>{s}</div>)}</div>
-          {deal ? <Link href={`/vyapar/deals/${deal.id}`} className="btn btn-wa btn-block btn-sm" style={{ marginTop: 12 }}><MessageCircle />Open WhatsApp thread</Link> : <p className="small muted" style={{ marginTop: 10, textAlign: "center" }}>Not pitched yet</p>}
+          {deal ? <Link href={`/vyapar/deals/${deal.id}`} className="btn btn-wa btn-block btn-sm" style={{ marginTop: 12 }}><MessageCircle />Open Telegram conversation</Link> : <p className="small muted" style={{ marginTop: 10, textAlign: "center" }}>Not pitched yet</p>}
         </div>
         {isPublic && <div className="card stack">
           <div className="card-title">What we actually know</div>

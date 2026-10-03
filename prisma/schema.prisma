@@ -427,6 +427,9 @@ model VyaparDeal {
   objection   String?
   nextStep    String?
   autopilot   Boolean         @default(true)
+  /// Demo routing overrides set by a fleet run (which Telegram chat / phone stands in for this merchant).
+  demoPhone   String?
+  demoChatId  String?
   lastTouchAt DateTime
   createdAt   DateTime        @default(now())
   messages    VyaparMessage[]
@@ -516,4 +519,126 @@ model VyaparEvent {
   provenance    String   @default("simulated")
   metaJson      String   @default("{}")
   createdAt     DateTime @default(now())
+}
+
+// ===== Buyer needs (VYAPAR_BUYER_NEEDS_IMPLEMENTATION_PLAN.md, Release A, simplified) =====
+
+/// A seller's current, structured offer for one product. Money in paise. Stock is a dated seller promise, not a reservation.
+model VyaparOffer {
+  id               String    @id
+  sellerMerchantId String
+  productKey       String
+  name             String
+  unit             String
+  unitPricePaise   Int
+  tiersJson        String    @default("[]")
+  moq              Int
+  stockQty         Int?
+  stockStatus      String
+  confirmedAt      DateTime?
+  deliveryRadiusKm Float
+  leadTimeHours    Int
+  sampleAvailable  Boolean
+  sampleNote       String?
+  provenance       String    @default("demo")
+}
+
+/// A buyer-confirmed purchase need. Unknown budget stays null; it is never zero.
+model VyaparNeed {
+  id                String               @id @default(cuid())
+  buyerMerchantId   String
+  status            String               @default("OPEN")
+  rawInput          String
+  productKey        String
+  quantity          Int
+  maxUnitPricePaise Int?
+  neededBy          String
+  sampleFirst       Boolean              @default(false)
+  backupSupplier    Boolean              @default(false)
+  provenance        String               @default("demo")
+  createdAt         DateTime
+  introductions     VyaparIntroduction[]
+}
+
+/// The buyer chose this seller for this need: only this seller may contact them about it.
+model VyaparIntroduction {
+  id               String     @id @default(cuid())
+  needId           String
+  need             VyaparNeed @relation(fields: [needId], references: [id], onDelete: Cascade)
+  offerId          String
+  sellerMerchantId String
+  status           String     @default("REQUESTED")
+  termsJson        String
+  dealId           String?
+  createdAt        DateTime
+  respondedAt      DateTime?
+
+  @@unique([needId, sellerMerchantId])
+}
+
+// ===== Autonomous AI sales team (onboarding, fleet runs, demo routing, business memory) =====
+
+/// What the AI team knows about the business: the onboarding answers plus Gemini's plain-language brief.
+model VyaparOnboarding {
+  id          String   @id @default(cuid())
+  sellerId    String   @unique
+  answersJson String
+  brief       String
+  provider    String   @default("rules")
+  updatedAt   DateTime @updatedAt
+}
+
+/// One press of "Run AI sales team": find → re-rank → pitch on Telegram → call one by one → report.
+model FleetRun {
+  id         String        @id @default(cuid())
+  sellerId   String
+  status     String        @default("RUNNING")
+  step       String        @default("Understanding your business")
+  goal       String
+  huntId     String?
+  callMode   String        @default("live")
+  report     String?
+  error      String?
+  createdAt  DateTime
+  finishedAt DateTime?
+  targets    FleetTarget[]
+}
+
+model FleetTarget {
+  id             String   @id @default(cuid())
+  runId          String
+  run            FleetRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  priority       Int
+  merchantId     String
+  leadId         String?
+  dealId         String?
+  why            String
+  bestTime       String?
+  pitch          String?
+  telegramStatus String   @default("PENDING")
+  callStatus     String   @default("QUEUED")
+  attemptId      String?
+  outcome        String?
+  result         String?
+  updatedAt      DateTime @updatedAt
+}
+
+/// Demo routing: priority-N target's Telegram messages and calls go to this contact (fictional merchants have none).
+model DemoContact {
+  priority       Int     @id
+  label          String
+  phone          String?
+  telegramChatId String?
+}
+
+/// Plain-language log of everything written to the business memory (Cognee), for non-technical users.
+model KnowledgeEvent {
+  id        String   @id @default(cuid())
+  kind      String
+  title     String
+  text      String
+  dealId    String?
+  runId     String?
+  cognee    String   @default("skipped")
+  createdAt DateTime
 }

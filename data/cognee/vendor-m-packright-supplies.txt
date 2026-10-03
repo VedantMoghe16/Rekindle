@@ -1,0 +1,4 @@
+Vendor: PackRight Supplies (packaging supplier, Marol, Mumbai). Owner: Nitin Desai. Paytm merchant (demo data).
+PackRight Supplies sells Pastry box 6 inch, plain white (pastry boxes) at ₹8.60 per box, ₹7.80 for 2000+; minimum order 300; delivers within 7 km in 48 hours; samples: Paid trial pack: ₹50 for 10 boxes; stock 2500 confirmed 20 hours before the demo.
+PackRight Supplies charges ₹50 for a trial pack instead of free samples.
+Mama's Oven said PackRight Supplies boxes were sturdy but delivery took two days.

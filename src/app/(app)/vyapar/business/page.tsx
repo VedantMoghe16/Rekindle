@@ -48,7 +48,7 @@ export default async function BusinessPage() {
           <div className="list-row"><div className="grow"><b>Leads shown (logged with position)</b></div><b>{learn.exposures}</b></div>
           <div className="list-row"><div className="grow"><b>Your actions</b><small>saves, skips, edits, sends, visits</small></div><b>{learn.sellerActions}</b></div>
           <div className="list-row"><div className="grow"><b>Simulated buyer outcomes</b><small>demo replies, never used for training</small></div><b>{learn.simulatedOutcomes}</b></div>
-          <div className="list-row"><div className="grow"><b>Real delivered contacts with outcomes</b><small>needs WhatsApp integration</small></div><b>{learn.realLabels} / {learn.minimumForTraining}</b></div>
+          <div className="list-row"><div className="grow"><b>Real delivered contacts with outcomes</b><small>from real Telegram/phone outcomes</small></div><b>{learn.realLabels} / {learn.minimumForTraining}</b></div>
           <p className="xs muted" style={{ marginTop: 6 }}>Ranking is a transparent rules engine today. A learned ranker is only trained once enough real, delivered contacts and outcomes exist, evaluated on a later time window.</p>
         </div>
         <div className="card">

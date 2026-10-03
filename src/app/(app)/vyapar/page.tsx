@@ -31,7 +31,7 @@ export default async function VyaparHome() {
         <div className="card-title" style={{ padding: "4px 2px 0" }}>What Vyapar AI does for you</div>
         <div className="pillars">
           <div className="pillar"><Search /><b>Find</b><span>Nearby Paytm merchants who need your product</span></div>
-          <div className="pillar"><MessageCircle /><b>Pitch</b><span>WhatsApp text and voice note in Hinglish</span></div>
+          <div className="pillar"><MessageCircle /><b>Pitch</b><span>Telegram message, voice note and AI call in Hinglish</span></div>
           <div className="pillar"><Brain /><b>Remember</b><span>Every reply, objection and promise</span></div>
           <div className="pillar"><Truck /><b>Act</b><span>Books samples, visits and payments</span></div>
         </div>

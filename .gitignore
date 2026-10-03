@@ -19,3 +19,9 @@ prisma/*.db-journal
 # Editor and OS
 .DS_Store
 .claude/settings.local.json
+
+# Cognee sidecar (Python venv and local graph/vector stores)
+cognee/.venv/
+cognee/.data/
+cognee/__pycache__/
+.telegram-poll.log

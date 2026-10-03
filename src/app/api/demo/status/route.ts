@@ -1,6 +1,6 @@
 import { ok } from "@/lib/api";
 import { db } from "@/lib/db";
-import { isProviderConfigured, modelFor } from "@/lib/providers/llm";
+import { defaultProvider, isProviderConfigured, modelFor } from "@/lib/providers/llm";
 import { isCogneeConfigured } from "@/lib/providers/cognee";
 import { isSarvamSttConfigured, isSarvamTtsConfigured } from "@/lib/providers/sarvam";
 import { isN8nConfigured, isN8nVyaparConfigured } from "@/lib/providers/n8n";
@@ -12,6 +12,7 @@ export async function GET() {
   return ok({
     offline: process.env.LLM_OFFLINE === "true",
     providers: {
+      gemini: { live: isProviderConfigured("gemini"), detail: `${modelFor("gemini", "fast")}${defaultProvider() === "gemini" ? " · default" : ""}` },
       claude: { live: isProviderConfigured("anthropic"), detail: modelFor("anthropic", "smart") },
       sarvam: { live: isProviderConfigured("sarvam") || isSarvamSttConfigured() || isSarvamTtsConfigured(), detail: [isProviderConfigured("sarvam") && "chat", isSarvamTtsConfigured() && "voice", isSarvamSttConfigured() && "STT"].filter(Boolean).join(" + ") || "offline" },
       cognee: { live: isCogneeConfigured(), detail: process.env.COGNEE_DATASET || "rekindle-pipeline" },

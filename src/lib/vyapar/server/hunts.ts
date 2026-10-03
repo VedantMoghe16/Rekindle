@@ -31,12 +31,13 @@ export async function createHunt(prompt: string) {
   try {
     const result = await callStructured({ tier: "fast", schema: HuntPlan, schemaName: "VyaparHuntPlan", system: PLAN_SYSTEM, user: `Seller: ${seller.merchant.name} (${seller.productCategory}), sells ${seller.product} from ₹${seller.unitPriceInr}.\nRequest: ${prompt}` });
     plan = normalisePlan(result.data, ctx);
-    provenance = result.provenance === "live" ? "claude" : "cached";
+    provenance = result.provenance === "live" ? (result.provider === "anthropic" ? "claude" : result.provider) : "cached";
   } catch (error) {
     if (!(error instanceof LlmOfflineMiss)) console.warn(`[vyapar] plan via LLM failed, using rules: ${error instanceof Error ? error.message : error}`);
   }
 
-  const merchants = (await db.merchant.findMany({ where: { id: { not: seller.merchantId } } })).map(viewMerchant);
+  // Other suppliers in the seller's own category are competitors, not buyers.
+  const merchants = (await db.merchant.findMany({ where: { id: { not: seller.merchantId }, category: { not: seller.productCategory } } })).map(viewMerchant);
   const hunt = await db.vyaparHunt.create({ data: { prompt, planJson: JSON.stringify(plan), provenance, scanned: merchants.length } });
   await persistHuntLeads(hunt.id, seller, plan, merchants);
   return hunt.id;

@@ -5,10 +5,13 @@ import { choosePlays, stageAfterReply, type CounterPlay } from "@/lib/vyapar/cou
 import { firstName } from "@/lib/vyapar/pitch";
 import { classifyReply, quoteFor, ReplyUnderstanding } from "@/lib/vyapar/replies";
 import { OBJECTION_LABELS, STAGE_LABELS, type Stage } from "@/lib/vyapar/taxonomy";
-import { getSeller, liveNow, remember, shortRef, viewMerchant } from "@/lib/vyapar/server/context";
+import { estimateValue, getSeller, liveNow, remember, shortRef, viewMerchant } from "@/lib/vyapar/server/context";
 import { logEvent } from "@/lib/vyapar/server/opportunities";
+import { createOutboundCall, initialBotMessage, normalizePhone, parseFinalVariables, pollAttempt, sarvamConfig, SarvamConfigError, webhookUrlFor, type SarvamOutboundWebhook } from "@/lib/providers/sarvam-agent";
+import { buildPayload, type Scenario } from "@/lib/vyapar/call-simulation";
+import { demoChatId, isTelegramConfigured, tgSendText, tgSendVoice } from "@/lib/providers/telegram";
 
-const REPLY_SYSTEM = `You read a WhatsApp reply from an Indian small-business owner (Hinglish, Hindi or English) to a supplier's pitch.
+const REPLY_SYSTEM = `You read a Telegram reply from an Indian small-business owner (Hinglish, Hindi or English) to a supplier's pitch.
 Classify intent: OBJECTION (pushback), WANTS_SAMPLE, WANTS_MEETING, PLACES_ORDER, QUESTION, INTERESTED or NOT_INTERESTED.
 objection is the main pushback (null unless intent is OBJECTION or NOT_INTERESTED); secondaryObjection any second one.
 quote MUST be an exact substring of the reply. Extract prices in rupees: askedPriceInr (what they want to pay) and competitorPriceInr (what their current supplier charges).
@@ -25,14 +28,14 @@ async function understand(text: string): Promise<{ u: ReplyUnderstanding; provid
     const result = await callStructured({ tier: "fast", schema: ReplyUnderstanding, schemaName: "VyaparReply", system: REPLY_SYSTEM, user: `REPLY: ${text}` });
     const u = result.data;
     if (!text.includes(u.quote)) u.quote = quoteFor(text, null);
-    return { u, provider: result.provenance === "live" ? "claude" : "cached" };
+    return { u, provider: result.provenance === "live" ? (result.provider === "anthropic" ? "claude" : result.provider) : "cached" };
   } catch (error) {
     if (!(error instanceof LlmOfflineMiss)) console.warn(`[vyapar] reply understanding via LLM failed, using rules: ${error instanceof Error ? error.message : error}`);
     return { u: classifyReply(text), provider: "rules" };
   }
 }
 
-/** A buyer reply arrives (WhatsApp webhook in production; typed or simulated in the demo). */
+/** A buyer reply arrives (Telegram in the demo; typed or simulated in the demo). */
 export async function receiveReply(dealId: string, text: string) {
   const deal = await db.vyaparDeal.findUnique({ where: { id: dealId }, include: { merchant: true } });
   if (!deal) throw new Error("Deal not found");
@@ -85,7 +88,8 @@ export async function receiveReply(dealId: string, text: string) {
 /** Our outbound message. If it carries a play with a next step, the matching action is created. */
 export async function sendMessage(dealId: string, text: string, opts: { play?: CounterPlay | null; author?: string; provider?: string } = {}, events: ThreadEvent[] = []) {
   const at = liveNow();
-  await db.vyaparMessage.create({ data: { dealId, direction: "out", text, author: opts.author ?? "Rahul", provider: opts.provider ?? "human", createdAt: at, metaJson: JSON.stringify(opts.play ? { play: opts.play.id, winRate: opts.play.winRate } : {}) } });
+  const chat = await deliverToTelegram(dealId, text);
+  await db.vyaparMessage.create({ data: { dealId, direction: "out", text, author: opts.author ?? "Rahul", provider: opts.provider ?? "human", createdAt: at, metaJson: JSON.stringify({ ...(opts.play ? { play: opts.play.id, winRate: opts.play.winRate } : {}), ...(chat ? { telegram: true, telegramChat: chat } : {}) }) } });
   await db.vyaparDeal.update({ where: { id: dealId }, data: { lastTouchAt: at } });
   if (opts.play?.next) events.push(await triggerAction(dealId, opts.play.next));
   return events;
@@ -99,10 +103,12 @@ const ACTION_COPY: Record<string, { title: string; lines: (merchant: string, are
 };
 
 /** Hands the next step to n8n (warehouse, calendar, payments). Simulated, and labelled so, when n8n is not configured. */
-export async function triggerAction(dealId: string, type: string): Promise<ThreadEvent> {
+export async function triggerAction(dealId: string, type: string, when?: string): Promise<ThreadEvent> {
   const deal = await db.vyaparDeal.findUniqueOrThrow({ where: { id: dealId }, include: { merchant: true } });
   const copy = ACTION_COPY[type] ?? ACTION_COPY.FOLLOW_UP;
   const lines = copy.lines(deal.merchant.name, deal.merchant.area);
+  // Use the time the merchant actually agreed to (e.g. from the voice agent) instead of the default slot.
+  if (when && lines.length > 1) lines[1] = `${type === "FOLLOW_UP" ? "Call back" : type === "MEETING" ? "Visit" : "Delivery"} ${when} · ${deal.merchant.area}`;
   let ref = shortRef(type === "PAYMENT_LINK" ? "PTM-LNK" : "VY");
   let provider = "simulated";
   if (isN8nVyaparConfigured()) {
@@ -147,4 +153,167 @@ export function demoReplies(merchantName: string, stage: string): string[] {
     : ["Theek hai, sample bhejo.", "Kal shop pe aa jao, baat karte hain.", "Nahi chahiye abhi."];
   if (stage === "SAMPLE_REQUESTED" || stage === "SAMPLE_SENT" || stage === "MEETING_BOOKED") return ["Sample achha tha! 1000 bags bhej do, order confirm.", "Quality theek hai, par delivery time pe hogi na?"];
   return ["Achha, price list bhejo."];
+}
+
+export const CallResult = {
+  outcomes: ["interested", "sample_requested", "objection", "not_interested", "callback"] as const,
+  objections: ["price", "moq", "quality", "timing", "existing_supplier", "other", "none"] as const,
+};
+export type CallResultInput = { outcome: (typeof CallResult.outcomes)[number]; objection_type: (typeof CallResult.objections)[number]; objection_quote: string; callback_time: string };
+
+const OBJECTION_MAP: Record<string, string> = { price: "PRICE_TOO_HIGH", moq: "BULK_ONLY_MOQ", quality: "QUALITY_DOUBT", timing: "NOT_NOW", existing_supplier: "HAS_SUPPLIER", other: "OTHER" };
+
+/** Structured outcome from the Sarvam "Vyapar SDR" voice agent (docs/vyapar/sarvam-agent.md) → memory, stage, follow-up. */
+export async function receiveCallResult(dealId: string, r: CallResultInput, transcript: { role: string; en_text: string }[] = [], simulated = false) {
+  const deal = await db.vyaparDeal.findUnique({ where: { id: dealId }, include: { merchant: true } });
+  if (!deal) throw new Error("Deal not found");
+  const seller = await getSeller();
+  const at = liveNow();
+  const summary = { interested: "Interested on the call", sample_requested: "Agreed to a free sample on the call", objection: "Raised an objection on the call", not_interested: "Not interested (call)", callback: `Asked for a callback${r.callback_time ? `: ${r.callback_time}` : ""}` }[r.outcome];
+  await db.vyaparMessage.create({ data: { dealId, direction: "in", kind: "call", text: `📞 AI call${simulated ? " (simulated)" : " · Sarvam agent"}: ${summary}${r.objection_quote ? `\n"${r.objection_quote}"` : ""}${transcript.length ? `\n\n${transcript.slice(-12).map((t) => `${t.role === "agent" ? "Priya" : deal.merchant.ownerName.split(" ")[0]}: ${t.en_text}`).join("\n")}` : ""}`, author: deal.merchant.ownerName, provider: "sarvam-agent", metaJson: JSON.stringify(r), createdAt: at } });
+  const objection = r.objection_type !== "none" ? OBJECTION_MAP[r.objection_type] : null;
+  if (objection || r.outcome === "not_interested") await db.vyaparMemory.create({ data: { dealId, merchantId: deal.merchantId, kind: "OBJECTION", category: r.outcome === "not_interested" ? "NOT_INTERESTED" : objection, summary, quote: r.objection_quote || null, verified: false, createdAt: at } });
+  if (r.callback_time) await db.vyaparMemory.create({ data: { dealId, merchantId: deal.merchantId, kind: "TIMING", summary: r.outcome === "sample_requested" ? `Sample delivery: ${r.callback_time}` : `Call back: ${r.callback_time}`, quote: null, createdAt: at } });
+  const stage = { interested: deal.stage === "PITCHED" ? "REPLIED" : deal.stage, sample_requested: "SAMPLE_REQUESTED", objection: "OBJECTION", not_interested: "LOST", callback: deal.stage === "PITCHED" ? "REPLIED" : deal.stage }[r.outcome];
+  await db.vyaparDeal.update({ where: { id: dealId }, data: { stage, objection: objection ?? deal.objection, lastTouchAt: at, nextStep: summary } });
+  await logEvent({ sellerId: seller.id, type: "CALL_RESULT", merchantId: deal.merchantId, dealId, provenance: "simulated", meta: { outcome: r.outcome, objection: r.objection_type } });
+  if (r.outcome === "sample_requested") await triggerAction(dealId, "SAMPLE_DISPATCH", r.callback_time || undefined);
+  if (r.outcome === "callback") await triggerAction(dealId, "FOLLOW_UP", r.callback_time || undefined);
+  remember([{ id: `call-${dealId}-${at.getTime()}`, text: `AI call with ${deal.merchant.name}: ${summary}.${r.objection_quote ? ` They said: "${r.objection_quote}".` : ""}` }]);
+  return { stage };
+}
+
+/** Input variables for the Sarvam agent, built only from shareable facts about this deal. */
+export async function agentVariables(dealId: string) {
+  const deal = await db.vyaparDeal.findUnique({ where: { id: dealId }, include: { merchant: true, memories: { orderBy: { createdAt: "desc" } } } });
+  if (!deal) return null;
+  const seller = await getSeller();
+  const m = viewMerchant(deal.merchant);
+  const web = m.profile.sources[0];
+  // The call pitches the hero product (paper bags) so price, past objection and the bulk counter-offer all refer to the same item.
+  const product = seller.offers.catalog.find((c) => c.sku === "PB-S") ?? seller.offers.catalog.find((c) => c.servesCategories.includes(m.category)) ?? seller.offers.catalog[0];
+  const tier = seller.offers.tiers[0];
+  const objections = deal.memories.filter((x) => x.kind === "OBJECTION");
+  const km = Math.round(Math.hypot((m.lat - seller.merchant.lat) * 111, (m.lng - seller.merchant.lng) * 111 * Math.cos((m.lat * Math.PI) / 180)) * 10) / 10;
+  return {
+    owner_name: firstName(m.ownerName), merchant_name: m.name, seller_name: seller.ownerFirstName, seller_business: seller.merchant.name,
+    rating_hook: web ? `${web.rating.toFixed(1)}★ on ${web.source}${m.profile.highlights[0] ? `, ${m.profile.highlights[0].toLowerCase()}` : ""}` : "",
+    distance_km: String(km), product: product ? product.name.replace(/\s*\(.*\)/, "").toLowerCase() + "s" : seller.product, price: product ? `₹${product.unitPriceInr} per ${product.name.toLowerCase().includes("bag") ? "bag" : "piece"}` : "",
+    offer: seller.offers.freeSample.enabled ? `Free sample: ${seller.offers.freeSample.contents}` : "",
+    past_objections: objections.map((o) => `${o.summary}${o.quote ? ` ("${o.quote}")` : ""}`).join("; "),
+    counter_offer: tier ? `₹${tier.unitPriceInr.toFixed(2)} each for ${tier.minQty.toLocaleString("en-IN")}+ pcs, plus a free sample` : "",
+  };
+}
+
+// ---------- Live calls through the published Sarvam "Vyapar SDR" agent ----------
+
+/** Only the demo buyer can be dialled: fictional merchants have no real numbers (DEMO_KARAN_PHONE = your own phone). */
+function dialPhone(deal: { demoPhone: string | null }): string | null {
+  // DECISION (demo): fictional merchants have no real numbers. A fleet run routes each target to a demo contact
+  // (deal.demoPhone); otherwise every AI call rings the one demo phone.
+  const demo = (deal.demoPhone || process.env.DEMO_CALL_PHONE || process.env.DEMO_KARAN_PHONE)?.trim();
+  return demo ? normalizePhone(demo) : null;
+}
+const mask = (p: string | null) => (p ? `${p.slice(0, 3)}••••••${p.slice(-4)}` : "No phone configured");
+
+export async function previewAgentCall(dealId: string) {
+  const vars = await agentVariables(dealId);
+  if (!vars) return null;
+  const deal = await db.vyaparDeal.findUniqueOrThrow({ where: { id: dealId } });
+  const phone = dialPhone(deal);
+  const missing: string[] = [];
+  try { sarvamConfig(); } catch (error) { if (error instanceof SarvamConfigError) missing.push(...error.missing); else throw error; }
+  if (!phone) missing.push("DEMO_CALL_PHONE (the one demo phone every AI call rings)");
+  return { variables: vars, initialBotMessage: initialBotMessage(vars), phoneMasked: mask(phone), missing, canCallLive: missing.length === 0 };
+}
+
+/**
+ * Starts an AI call for a deal. "sarvam" places ONE real call (never retried; the result arrives on the webhook or
+ * via Analytics polling). "simulated" builds a realistic Sarvam payload (teammate's scenarios) and runs it through
+ * the same webhook processor, so the demo exercises the real code path without dialling.
+ */
+export async function startAgentCall(dealId: string, opts: { provider?: "sarvam" | "simulated"; scenario?: Scenario } = {}) {
+  const provider = opts.provider ?? "sarvam";
+  const preview = await previewAgentCall(dealId);
+  if (!preview) throw new Error("Deal not found");
+  if (provider === "simulated") {
+    const attemptId = `sim-${Date.now().toString(36)}`;
+    await db.vyaparAction.create({ data: { dealId, type: "AI_CALL", status: "dialing", summary: "AI call · Sarvam Vyapar SDR (simulated)", payloadJson: JSON.stringify({ lines: [`Opening: ${preview.initialBotMessage}`] }), ref: attemptId, provider: "simulated", createdAt: liveNow() } });
+    const result = await processSarvamWebhook(buildPayload(attemptId, opts.scenario ?? "sample", preview.variables));
+    return { attemptId, provider, phoneMasked: "simulated", result };
+  }
+  if (!preview.canCallLive) throw new SarvamConfigError(preview.missing);
+  const deal = await db.vyaparDeal.findUniqueOrThrow({ where: { id: dealId } });
+  const cfg = sarvamConfig();
+  const { attemptId } = await createOutboundCall({ phone: dialPhone(deal)!, variables: preview.variables, webhookUrl: webhookUrlFor(cfg), webhookMetadata: { dealId, secret: cfg.webhookSecret }, initialBotMessage: preview.initialBotMessage, initialLanguageName: "Hindi" }, { config: cfg });
+  await db.vyaparAction.create({ data: { dealId, type: "AI_CALL", status: "dialing", summary: `AI call · Sarvam Vyapar SDR · ${preview.phoneMasked}`, payloadJson: JSON.stringify({ lines: [`Calling ${preview.phoneMasked}`, `Opening: ${preview.initialBotMessage}`] }), ref: attemptId, provider: "sarvam", createdAt: liveNow() } });
+  return { attemptId, provider, phoneMasked: preview.phoneMasked, result: null };
+}
+
+/** Webhook fallback: if the call is still "dialing", ask Sarvam Analytics and process the result once it is terminal. */
+export async function pollAgentCall(attemptId: string) {
+  const action = await db.vyaparAction.findFirst({ where: { type: "AI_CALL", ref: attemptId } });
+  if (!action) return { status: "unknown" as const };
+  if (action.status !== "dialing") return { status: action.status, dealId: action.dealId };
+  if (action.provider !== "sarvam" || Date.now() - action.createdAt.getTime() < 15_000) return { status: "dialing", dealId: action.dealId };
+  try {
+    const polled = await pollAttempt(attemptId, { since: new Date(action.createdAt.getTime() - 60_000) });
+    if (polled.terminal && polled.payload) { await processSarvamWebhook(polled.payload); return { status: "completed", dealId: action.dealId }; }
+  } catch (error) {
+    console.warn(`[vyapar] Sarvam analytics poll failed: ${error instanceof Error ? error.message : error}`);
+  }
+  return { status: "dialing", dealId: action.dealId };
+}
+
+/** Calling straight from a lead (Pitch → AI call): reuse the merchant's open deal or open one. */
+export async function ensureDealForLead(leadId: string) {
+  const lead = await db.vyaparLead.findUnique({ where: { id: leadId }, include: { merchant: true } });
+  if (!lead) throw new Error("Lead not found");
+  if (lead.merchant.contactStatus !== "verified") throw new Error("No verified business contact for this merchant. Plan a visit instead.");
+  if (lead.dealId) return lead.dealId;
+  const open = await db.vyaparDeal.findFirst({ where: { merchantId: lead.merchantId, stage: { notIn: ["LOST", "ORDER_WON"] } } });
+  const at = liveNow();
+  const deal = open ?? await db.vyaparDeal.create({ data: { merchantId: lead.merchantId, stage: "PITCHED", valueInr: estimateValue(lead.merchant.qrVolumeBand, 5), autopilot: true, lastTouchAt: at, nextStep: "AI call placed", createdAt: at } });
+  await db.vyaparLead.update({ where: { id: leadId }, data: { status: "PITCHED", dealId: deal.id } });
+  return deal.id;
+}
+
+/** Sarvam post-call webhook (or Analytics poll). Idempotent on attempt_id. */
+export async function processSarvamWebhook(payload: SarvamOutboundWebhook) {
+  const action = await db.vyaparAction.findFirst({ where: { type: "AI_CALL", ref: payload.attempt_id } });
+  if (!action) return { ok: false, reason: "unknown attempt_id" };
+  if (action.status !== "dialing") return { ok: true, duplicate: true };
+  if (payload.status !== "connected") {
+    await db.vyaparAction.update({ where: { id: action.id }, data: { status: payload.status, summary: `${action.summary} · ${payload.status.replace("_", " ")}` } });
+    await db.vyaparMessage.create({ data: { dealId: action.dealId, direction: "in", kind: "call", text: `📞 AI call${action.provider === "simulated" ? " (simulated)" : ""} not connected (${payload.status.replace("_", " ")})${payload.failure_reason ? `: ${payload.failure_reason}` : ""}`, author: "Sarvam agent", provider: "sarvam-agent", metaJson: JSON.stringify({ attemptId: payload.attempt_id }), createdAt: liveNow() } });
+    return { ok: true, status: payload.status };
+  }
+  const v = parseFinalVariables(payload.final_agent_variables ?? {});
+  const outcome = v.outcome ?? (v.objection_type && v.objection_type !== "none" ? "objection" : "callback");
+  const result = await receiveCallResult(action.dealId, { outcome, objection_type: v.objection_type ?? "none", objection_quote: v.objection_quote ?? "", callback_time: v.callback_time ?? "" }, payload.interaction_transcript ?? [], action.provider === "simulated");
+  await db.vyaparAction.update({ where: { id: action.id }, data: { status: "completed", summary: `${action.summary} · ${outcome.replace("_", " ")}${payload.duration ? ` · ${Math.round(payload.duration)}s` : ""}` } });
+  return { ok: true, status: "connected", outcome, stage: result.stage };
+}
+
+/** "Send on Telegram": deliver to the deal's routed demo chat (or the default demo chat). Returns the chat id, or null. */
+export async function deliverToTelegram(dealId: string, text: string, voice?: Buffer | null): Promise<string | null> {
+  if (!isTelegramConfigured()) return null;
+  try {
+    const deal = await db.vyaparDeal.findUnique({ where: { id: dealId }, include: { merchant: true } });
+    const chat = deal?.demoChatId || demoChatId();
+    const header = `💬 To ${deal?.merchant.name ?? "merchant"} (demo · via Vyapar AI)\n\n`;
+    await tgSendText(header + text, chat);
+    if (voice) await tgSendVoice(voice, `🎙️ Voice note for ${deal?.merchant.name ?? "merchant"}`, chat);
+    return chat;
+  } catch (error) {
+    console.warn(`[vyapar] Telegram delivery failed: ${error instanceof Error ? error.message : error}`);
+    return null;
+  }
+}
+
+/** Reply typed in a demo Telegram chat → buyer reply on the deal most recently messaged in that chat. */
+export async function receiveTelegramReply(text: string, chatId: string) {
+  const last = await db.vyaparMessage.findFirst({ where: { direction: "out", OR: [{ metaJson: { contains: `"telegramChat":"${chatId}"` } }, ...(chatId === demoChatId() ? [{ metaJson: { contains: '"telegram":true' } }] : [])] }, orderBy: { createdAt: "desc" } });
+  if (!last) return null;
+  return { dealId: last.dealId, ...(await receiveReply(last.dealId, text)) };
 }

@@ -19,13 +19,12 @@ export default function AppLayout({ children }: Readonly<{ children: React.React
           <div className="lockup-wrap"><Lockup /></div>
           <span className="pill">Vyapar AI</span>
           <h1>Your own AI sales team, inside Paytm for Business</h1>
-          <p>Paytm already knows every merchant's location, category and payment volume. Vyapar AI turns that into a B2B network: it finds nearby merchants who need what you sell, pitches them on WhatsApp in Hinglish, remembers every objection and books the sample.</p>
+          <p>Paytm merchants buy from and sell to each other every day. Vyapar AI makes that easy both ways: sellers find nearby buyers, and buyers post a need and get up to 3 offers that can actually deliver.</p>
           <ol>
-            <li><b>1</b>Tell it what to sell, in Hinglish</li>
-            <li><b>2</b>It ranks nearby Paytm merchants</li>
-            <li><b>3</b>Sarvam writes and speaks the pitch</li>
-            <li><b>4</b>Cognee remembers every objection</li>
-            <li><b>5</b>n8n books samples, meetings, payments</li>
+            <li><b>1</b>Sell: find nearby buyers, with reasons</li>
+            <li><b>2</b>Buy: post a need, compare 3 real offers</li>
+            <li><b>3</b>Gemini + Sarvam write, speak and call in Hinglish</li>
+            <li><b>4</b>Cognee remembers every vendor, buyer and objection</li>
           </ol>
         </aside>
         <div className="device">
