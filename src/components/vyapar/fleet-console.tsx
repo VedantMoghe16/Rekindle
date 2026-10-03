@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Bot, Check, CircleDashed, LoaderCircle, MessageCircle, Phone, Save, Search, Send, Square, X } from "lucide-react";
 import { toast } from "@/components/paytm/toast";
 
-type Target = { id: string; priority: number; why: string; bestTime: string | null; timingNote: string | null; hoursJson: string | null; scheduledFor: string | null; pitch: string | null; telegramStatus: string; callStatus: string; outcome: string | null; result: string | null; dealId: string | null; merchant: { name: string; category: string; area: string; ownerName: string } };
+type Target = { id: string; priority: number; why: string; bestTime: string | null; timingNote: string | null; scheduledFor: string | null; pitch: string | null; telegramStatus: string; callStatus: string; outcome: string | null; result: string | null; dealId: string | null; merchant: { name: string; category: string; area: string; ownerName: string } };
 type Run = { id: string; status: string; step: string; goal: string; callMode: string; timing: string; report: string | null; error: string | null; createdAt: string; finishedAt: string | null; targets: Target[] };
 type Contact = { priority: number; phone: string | null; telegramChatId: string | null };
 
@@ -26,16 +26,6 @@ const TIMINGS = [
   { id: "now", label: "Right now", detail: "Contact immediately (best for live demos)" },
 ] as const;
 
-function Hours({ json, chosen }: { json: string | null; chosen: string | null }) {
-  if (!json) return null;
-  const h: number[] = JSON.parse(json);
-  const max = Math.max(...h, 1);
-  const pick = chosen && chosen !== "now" ? (() => { const m = chosen.match(/(\d+) (AM|PM)/); if (!m) return -1; const n = Number(m[1]) % 12; return m[2] === "PM" ? n + 12 : n; })() : -1;
-  return <div className="hours-wrap" aria-label="Paytm payments by hour of day (demo data)">
-    <div className="hours">{h.map((v, i) => <i key={i} title={`${i}:00 · ${v} payments`} className={i === pick ? "pick" : v >= 1 ? "open" : ""} style={{ height: `${Math.max(6, (v / max) * 100)}%` }} />)}</div>
-    <span className="xs muted">Paytm payments by hour of day, midnight → 11 PM (demo data) · <b style={{ color: "var(--pt-green)" }}>■</b> chosen time</span>
-  </div>;
-}
 const CALL_BADGE: Record<string, string> = { SCHEDULED: "b-navy", CANCELLED: "b-grey", QUEUED: "b-grey", CALLING: "b-cyan", DONE: "b-green", NO_ANSWER: "b-amber", FAILED: "b-red", SKIPPED: "b-grey" };
 const CALL_LABEL: Record<string, string> = { SCHEDULED: "Call scheduled", CANCELLED: "Cancelled", QUEUED: "Call queued", CALLING: "On the call…", DONE: "Called", NO_ANSWER: "No answer", FAILED: "Call failed", SKIPPED: "Not called" };
 
@@ -86,7 +76,6 @@ export function FleetConsole({ initialRun, contacts: initialContacts }: { initia
     {run?.targets.map((t) => <article key={t.id} className="opp">
       <div className="row"><span className="prio">#{t.priority}</span><div className="grow"><b>{t.merchant.name}</b><div className="xs muted">{t.merchant.category} · {t.merchant.area}</div></div></div>
       {t.timingNote && <div className="small"><span className="muted">When: </span>{t.timingNote}</div>}
-      <Hours json={t.hoursJson} chosen={t.bestTime} />
       <div className="small"><span className="muted">Why first: </span>{t.why}</div>
       <div className="row" style={{ gap: 6, flexWrap: "wrap" }}>
         <span className={`badge ${t.telegramStatus === "SENT" ? "b-green" : ["PENDING", "SCHEDULED", "CANCELLED"].includes(t.telegramStatus) ? "b-grey" : "b-red"}`}>{t.telegramStatus === "SENT" ? <Send /> : <CircleDashed />}Telegram {t.telegramStatus === "SENT" ? "sent" : t.telegramStatus === "SCHEDULED" && t.scheduledFor ? `at ${new Date(t.scheduledFor).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "numeric", minute: "2-digit" })}` : t.telegramStatus.toLowerCase().replace("_", " ")}</span>

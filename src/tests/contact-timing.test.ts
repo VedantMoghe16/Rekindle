@@ -22,6 +22,12 @@ describe("contact timing from the payment pattern", () => {
     expect(nextSlot("quiet", bakery, new Date(`2026-10-04T${String(q).padStart(2, "0")}:30:00+05:30`)).note).toMatch(/^Now/);
     expect(nextSlot("now", bakery, evening).at).toEqual(evening);
   });
+  it("never puts another shop's payment data or hours in the note the seller sees", () => {
+    for (const strategy of ["quiet", "after_open", "now"] as const) {
+      const note = nextSlot(strategy, bakery, new Date("2026-10-04T09:00:00+05:30")).note;
+      expect(note).not.toMatch(/payment|open \d|\d+(\.\d+)? on average|–/i);
+    }
+  });
   it("is stable per shop", () => {
     expect(paymentProfile({ id: "m-karan", category: "Bakery", qrVolumeBand: "High" })).toEqual(bakery);
   });

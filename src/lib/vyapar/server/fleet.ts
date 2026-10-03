@@ -137,7 +137,7 @@ async function runFleet(runId: string) {
     for (const [i, p] of picked.entries()) {
       const profile = paymentProfile({ id: p.lead.merchant.id, category: p.lead.merchant.category, qrVolumeBand: p.lead.merchant.qrVolumeBand });
       const slot = nextSlot((run.timing as TimingStrategy) || "quiet", profile, now);
-      await db.fleetTarget.create({ data: { runId, priority: i + 1, merchantId: p.lead.merchant.id, leadId: p.lead.id, why: p.why, bestTime: slot.hour != null ? hourLabel(slot.hour) : "now", scheduledFor: slot.at, timingNote: slot.note, hoursJson: JSON.stringify(profile), telegramStatus: "SCHEDULED", callStatus: "SCHEDULED" } });
+      await db.fleetTarget.create({ data: { runId, priority: i + 1, merchantId: p.lead.merchant.id, leadId: p.lead.id, why: p.why, bestTime: slot.hour != null ? hourLabel(slot.hour) : "now", scheduledFor: slot.at, timingNote: slot.note, hoursJson: null, telegramStatus: "SCHEDULED", callStatus: "SCHEDULED" } });
     }
   }
 
@@ -246,5 +246,6 @@ export async function getFleetRun(id?: string) {
   const run = id ? await db.fleetRun.findUnique({ where: { id }, include: { targets: { orderBy: { priority: "asc" } } } }) : await db.fleetRun.findFirst({ orderBy: { createdAt: "desc" }, include: { targets: { orderBy: { priority: "asc" } } } });
   if (!run) return null;
   const merchants = await db.merchant.findMany({ where: { id: { in: run.targets.map((t) => t.merchantId) } } });
-  return { ...run, targets: run.targets.map((t) => ({ ...t, merchant: merchants.find((m) => m.id === t.merchantId)! })) };
+  // Never send another shop's hourly payment pattern to the client.
+  return { ...run, targets: run.targets.map(({ hoursJson: _hours, ...t }) => ({ ...t, merchant: merchants.find((m) => m.id === t.merchantId)! })) };
 }

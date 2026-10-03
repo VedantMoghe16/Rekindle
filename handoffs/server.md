@@ -1,5 +1,11 @@
 # Server Agent Handoff
 
+## Latest cycle: privacy of other shops' payment patterns
+
+- The hourly payments chart was removed from the AI team console. `nextSlot` notes now say only when ("Tomorrow 2 PM: usually a quiet time for them"), never payment counts or opening hours (tested).
+- `hoursJson` is no longer stored, and `getFleetRun` strips it from API responses. The hourly pattern is used only inside the scheduler.
+- Existing fleet targets, follow-ups, run steps and 3 KnowledgeEvents were scrubbed. Copies already sent to the Cognee graph before this change still contain the old wording.
+
 ## Latest cycle: the AI's voice matches the seller's gender
 
 - `VyaparSeller.ownerGender` (male | female; null means not chosen, which falls back to female). The seed sets Rahul to male, and the live DB was updated.

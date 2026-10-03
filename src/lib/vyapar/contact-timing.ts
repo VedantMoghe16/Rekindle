@@ -65,16 +65,19 @@ function istParts(d: Date) {
   return { date: `${get("year")}-${get("month")}-${get("day")}`, hour: Number(get("hour")) };
 }
 
-/** Next time to contact (IST): within the target hour today if still possible, otherwise the same hour tomorrow. */
+/**
+ * Next time to contact (IST): within the target hour today if still possible, otherwise the same hour tomorrow.
+ * PRIVACY: the note is shown to the seller, so it says only *when*, never the other shop's payment counts or
+ * opening hours. The hourly pattern stays inside the scheduler.
+ */
 export function nextSlot(strategy: TimingStrategy, profile: number[], now: Date): { at: Date; hour: number | null; note: string } {
   const { open, close } = businessHours(profile);
-  const hours = `open ${hourLabel(open)}–${hourLabel(close + 1)}`;
-  if (strategy === "now") return { at: now, hour: null, note: `Right now (${hours})` };
+  if (strategy === "now") return { at: now, hour: null, note: "Right now" };
   const hour = strategy === "quiet" ? quietestHour(profile) : Math.min(open + 1, close);
   const { date, hour: current } = istParts(now);
-  const why = strategy === "quiet" ? `quietest hour, ${profile[hour]} payments on average` : "just after opening, before the rush";
-  if (current === hour) return { at: now, hour, note: `Now: ${hourLabel(hour)} is their ${why} (${hours})` };
+  const why = strategy === "quiet" ? "usually a quiet time for them" : "just after they usually open, before the rush";
+  if (current === hour) return { at: now, hour, note: `Now: ${hourLabel(hour)} is ${why}` };
   const day = current < hour ? date : istParts(new Date(now.getTime() + 24 * 3_600_000)).date;
   const at = new Date(`${day}T${String(hour).padStart(2, "0")}:05:00+05:30`);
-  return { at, hour, note: `${current < hour ? "Today" : "Tomorrow"} ${hourLabel(hour)}: their ${why} (${hours})` };
+  return { at, hour, note: `${current < hour ? "Today" : "Tomorrow"} ${hourLabel(hour)}: ${why}` };
 }
