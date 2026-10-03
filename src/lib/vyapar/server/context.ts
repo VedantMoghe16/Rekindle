@@ -1,3 +1,4 @@
+import { persona } from "@/lib/vyapar/persona";
 import type { Merchant } from "@prisma/client";
 import { db } from "@/lib/db";
 import { cogneeAdd, cogneeCognify, isCogneeConfigured } from "@/lib/providers/cognee";
@@ -13,7 +14,7 @@ export function viewMerchant(m: Merchant): MerchantView {
 export async function getSeller() {
   const seller = await db.vyaparSeller.findFirst({ include: { merchant: true } });
   if (!seller) throw new Error("Vyapar AI is not set up. Run npm run demo:reset.");
-  return { ...seller, merchant: viewMerchant(seller.merchant), offers: SellerOffers.parse(JSON.parse(seller.offersJson)) };
+  return { ...seller, merchant: viewMerchant(seller.merchant), offers: SellerOffers.parse(JSON.parse(seller.offersJson)), persona: persona(seller.ownerGender) };
 }
 export type SellerView = Awaited<ReturnType<typeof getSeller>>;
 

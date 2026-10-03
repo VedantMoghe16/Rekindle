@@ -62,7 +62,7 @@ export function PitchComposer({ leadId, initial }: { leadId: string; initial: Pi
   async function call(provider: "sarvam" | "simulated") {
     setBusy("send");
     const res = await fetch(`/api/vyapar/leads/${leadId}/call`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ provider, scenario }) }).then((r) => r.json()).catch(() => null);
-    if (res?.ok) { toast(provider === "sarvam" ? `Calling ${res.data.phoneMasked}… Priya is on the line` : "Simulated call finished"); router.push(`/vyapar/deals/${res.data.dealId}`); }
+    if (res?.ok) { toast(provider === "sarvam" ? `Calling ${res.data.phoneMasked}… your AI agent is on the line` : "Simulated call finished"); router.push(`/vyapar/deals/${res.data.dealId}`); }
     else { setBusy(null); toast(res?.error?.message ?? "Couldn't start the call"); }
   }
   async function planVisit() {
@@ -105,7 +105,7 @@ export function PitchComposer({ leadId, initial }: { leadId: string; initial: Pi
         {!intro && channel !== "call" && <VoiceNote text={text} />}
         {!intro && channel === "call" && <div className="card stack">
           <div className="card-title">AI call · Sarvam &ldquo;Vyapar SDR&rdquo;</div>
-          <span className="small">Priya calls in Hinglish using this lead&apos;s facts (product, price, offer, past objections), then saves the outcome, objection and transcript to the deal.</span>
+          <span className="small">Your AI agent calls in Hinglish, in your voice (set in AI team), using this lead&apos;s facts (product, price, offer, past objections), then saves the outcome, objection and transcript to the deal.</span>
           <button className="btn btn-primary" onClick={() => call("sarvam")} disabled={busy !== null}>{busy === "send" ? <LoaderCircle className="spin" /> : <Phone />}Call now (live)</button>
           <div className="row"><select className="sel" value={scenario} onChange={(e) => setScenario(e.target.value)} aria-label="Simulated outcome"><option value="sample">Agrees to sample</option><option value="objection">Price objection</option><option value="callback">Call back later</option><option value="no_answer">No answer</option></select><button className="btn btn-ghost grow" onClick={() => call("simulated")} disabled={busy !== null}>Simulate call</button></div>
           <span className="xs muted">Live calls ring the demo phone (DEMO_CALL_PHONE).</span>

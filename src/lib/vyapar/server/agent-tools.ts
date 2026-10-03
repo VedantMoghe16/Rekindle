@@ -123,7 +123,7 @@ export async function scheduleFollowup(input: ToolInput) {
 
 export async function bookSample(input: ToolInput) {
   const { deal, merchant } = await load(input);
-  if (!deal || !merchant) return { ok: false, say: "Ji, sample ke liye Rahul ji aapko Telegram pe confirm karenge." };
+  if (!deal || !merchant) return { ok: false, say: `Ji, sample ke liye ${(await getSeller()).ownerFirstName} ji aapko Telegram pe confirm karenge.` };
   const when = str(input.time ?? input.when) || "tomorrow 11 am";
   const place = str(input.place ?? input.address) || merchant.name;
   await triggerAction(deal.id, "SAMPLE_DISPATCH", `${when} · ${place}`);
@@ -142,8 +142,8 @@ export async function sendOnTelegram(input: ToolInput) {
   const body = /sample/.test(what) ? `Free sample: ${o.freeSample.contents}. Bas reply karein "SAMPLE" aur time batayein.`
     : /offer|bulk|discount/.test(what) ? `Bulk offer: ${o.tiers.map((t) => `${t.minQty.toLocaleString("en-IN")}+ pcs @ ₹${t.unitPriceInr.toFixed(2)}`).join(", ")}. Free sample pehle. ${o.credit.days}-day credit via Paytm Postpaid.`
     : `Price list (${seller.merchant.name}):\n${o.catalog.map((c) => `• ${c.name}: ₹${c.unitPriceInr}`).join("\n")}\n${o.tiers.map((t) => `• ${t.label}: ₹${t.unitPriceInr.toFixed(2)} for ${t.minQty.toLocaleString("en-IN")}+`).join("\n")}\nMOQ ${o.moq} · same-day delivery within ${o.deliveryRadiusKm} km`;
-  const chat = await deliverToTelegram(deal.id, `${body}\n\n(Sent during your call with Priya)`);
-  await db.vyaparMessage.create({ data: { dealId: deal.id, direction: "out", text: body, author: "Priya · sent during call", provider: "sarvam-agent", metaJson: JSON.stringify(chat ? { telegram: true, telegramChat: chat } : {}), createdAt: liveNow() } });
+  const chat = await deliverToTelegram(deal.id, `${body}\n\n(Sent during your call with ${seller.persona.agentName})`);
+  await db.vyaparMessage.create({ data: { dealId: deal.id, direction: "out", text: body, author: `${seller.persona.agentName} · sent during call`, provider: "sarvam-agent", metaJson: JSON.stringify(chat ? { telegram: true, telegramChat: chat } : {}), createdAt: liveNow() } });
   return { ok: Boolean(chat), say: `${merchant ? firstName(merchant.ownerName) : ""} ji, maine Telegram pe bhej diya hai.`.trim() };
 }
 

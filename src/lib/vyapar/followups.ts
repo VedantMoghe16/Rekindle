@@ -1,4 +1,5 @@
 import { rupees, type SellerOffers } from "@/lib/vyapar/taxonomy";
+import { speakAs } from "@/lib/vyapar/persona";
 
 /**
  * Follow-up agent for leads that went silent (pure, no I/O, unit-tested).
@@ -34,6 +35,8 @@ export type FollowupInput = {
   ownerFirst: string;
   sellerFirst: string;
   sellerName: string;
+  /** Seller's gender: the follow-up is written in their voice ("bhejta/bhejti hoon"). */
+  sellerGender?: "male" | "female";
   distanceKm: number;
   messages: FollowupMessage[]; // oldest first
   memories: { kind: string; category: string | null; summary: string; createdAt: Date }[];
@@ -260,7 +263,7 @@ export function evaluateFollowup(input: FollowupInput, offers: SellerOffers, now
     checks.push({ id: "fresh", label: "Not repeating ourselves", ok: false, detail: "Every suitable template was already used" });
     return { eligible: false, cohort, silentDays, blockedBy: checks.at(-1)!, checks };
   }
-  const text = template.render({ name: input.ownerFirst, seller: input.sellerFirst, business: input.sellerName, km: `${input.distanceKm} km`, offers, phrase: promise?.phrase, quote: promise?.quote });
+  const text = speakAs(template.render({ name: input.ownerFirst, seller: input.sellerFirst, business: input.sellerName, km: `${input.distanceKm} km`, offers, phrase: promise?.phrase, quote: promise?.quote }), input.sellerGender ?? "male");
   const content = contentChecks(text, offers, policy.maxWords);
   checks.push(...content);
   const bad = content.find((c) => !c.ok);

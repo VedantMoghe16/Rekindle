@@ -119,3 +119,15 @@ describe("follow-up agent: promises, learning, voice", () => {
     expect(first.eligible && first.channel).toBe("text");
   });
 });
+
+describe("voice persona", () => {
+  it("makes the seller's Hinglish agree with their gender", async () => {
+    const { speakAs, persona } = await import("@/lib/vyapar/persona");
+    expect(speakAs("Samajh sakta hoon ji. Kal sample bhej deta hoon, yaad dila dunga.", "female")).toBe("Samajh sakti hoon ji. Kal sample bhej deti hoon, yaad dila dungi.");
+    expect(speakAs("Main EcoPack se bol rahi hoon. Samajh gayi ji, main call karti hoon.", "male")).toBe("Main EcoPack se bol raha hoon. Samajh gaya ji, main call karta hoon.");
+    expect(speakAs("Hum aapke paas hain, sample bhej doon?", "female")).toBe("Hum aapke paas hain, sample bhej doon?");
+    expect(persona("male").speaker).toBe("aditya");
+    expect(persona("female").speaker).toBe("priya");
+    expect(persona("male").agentName).toBe("Arjun");
+  });
+});

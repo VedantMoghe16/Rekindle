@@ -27,12 +27,12 @@ export type SarvamOutboundWebhook = z.infer<typeof SarvamOutboundWebhook>;
 export type TranscriptTurn = { role: string; en_text: string; text?: string; language?: string };
 
 /** Opening line sent per call as app_overrides.initial_bot_message (same text as the dashboard default). */
-export function initialBotMessage(v: AgentVariables): string {
-  return openingLine(v).replace(/ {2,}/g, " ");
+export function initialBotMessage(v: AgentVariables, gender: "male" | "female" = "female"): string {
+  return openingLine(v, gender === "male" ? "raha" : "rahi").replace(/ {2,}/g, " ");
 }
-function openingLine(v: AgentVariables): string {
-  if (v.past_objections) return `Namaste ${v.owner_name} ji, main ${v.seller_business} se, ${v.seller_name} ji ki taraf se bol rahi hoon. Pichli baar aapne jo bola tha woh humne yaad rakha — ek naya offer hai aapke liye, ek minute milega?`;
-  return `Namaste ${v.owner_name} ji, main ${v.seller_business} se, ${v.seller_name} ji ki taraf se bol rahi hoon — hum aapke paas hi, sirf ${v.distance_km} km door hain. Ek minute baat kar sakte hain?`;
+function openingLine(v: AgentVariables, rahaRahi: string): string {
+  if (v.past_objections) return `Namaste ${v.owner_name} ji, main ${v.seller_business} se, ${v.seller_name} ji ki taraf se bol ${rahaRahi} hoon. Pichli baar aapne jo bola tha woh humne yaad rakha — ek naya offer hai aapke liye, ek minute milega?`;
+  return `Namaste ${v.owner_name} ji, main ${v.seller_business} se, ${v.seller_name} ji ki taraf se bol ${rahaRahi} hoon — hum aapke paas hi, sirf ${v.distance_km} km door hain. Ek minute baat kar sakte hain?`;
 }
 const norm = (v: unknown) => (typeof v === "string" ? v.trim().toLowerCase().replace(/[\s-]+/g, "_") : undefined);
 
@@ -96,6 +96,20 @@ const REQUIRED = [
   "SARVAM_API_KEY", "SARVAM_ORG_ID", "SARVAM_WORKSPACE_ID", "SARVAM_APP_ID", "SARVAM_APP_VERSION",
   "SARVAM_CONNECTION_ID", "SARVAM_AGENT_PHONE", "PUBLIC_BASE_URL", "VYAPAR_WEBHOOK_SECRET",
 ] as const;
+
+/**
+ * Sarvam sets the agent's voice per app (the call API can't override it), so a male-voice copy of the agent is
+ * configured as SARVAM_APP_ID_MALE / SARVAM_APP_VERSION_MALE. Returns the config for the seller's gender, and
+ * whether the voice actually matches (false = male seller but no male app yet, so the default voice is used).
+ */
+export function sarvamConfigFor(gender: "male" | "female", env: Record<string, string | undefined> = process.env): SarvamConfig & { voiceMatches: boolean } {
+  const cfg = sarvamConfig(env);
+  const maleApp = (env.SARVAM_APP_ID_MALE ?? "").trim();
+  const maleVersion = Number((env.SARVAM_APP_VERSION_MALE ?? "").trim());
+  if (gender === "male" && maleApp && Number.isInteger(maleVersion) && maleVersion > 0) return { ...cfg, appId: maleApp, appVersion: maleVersion, voiceMatches: true };
+  // The default app is the female voice ("Priya").
+  return { ...cfg, voiceMatches: gender === "female" };
+}
 
 /** Validates env and returns config; throws SarvamConfigError listing every missing var. */
 export function sarvamConfig(env: Record<string, string | undefined> = process.env): SarvamConfig {

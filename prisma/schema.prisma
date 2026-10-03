@@ -377,6 +377,8 @@ model VyaparSeller {
   merchantId     String     @unique
   merchant       Merchant   @relation(fields: [merchantId], references: [id], onDelete: Cascade)
   ownerFirstName String
+  /// male | female: the voice and Hindi grammar the AI uses when it speaks for the seller (null = not chosen yet)
+  ownerGender    String?
   product        String
   productCategory String
   unitPriceInr   Float

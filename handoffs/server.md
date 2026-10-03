@@ -1,5 +1,16 @@
 # Server Agent Handoff
 
+## Latest cycle: the AI's voice matches the seller's gender
+
+- `VyaparSeller.ownerGender` (male | female; null means not chosen, which falls back to female). The seed sets Rahul to male, and the live DB was updated.
+- `persona(gender)` in `src/lib/vyapar/persona.ts` returns the agent name (Arjun or Priya) and the Bulbul v3 speaker (aditya or priya, overridable by env). `getSeller()` returns `persona`.
+- `speakAs(text, gender)` fixes first-person Hinglish verbs (ta/ti hoon, raha/rahi, unga/ungi, samajh gaya/gayi). It is applied to grounded pitches, counter suggestions, follow-up templates, agent tool `say` replies and simulated agent turns, and never to buyer lines. Gemini prompts for pitches and follow-ups are told the seller's gender.
+- **TTS:** pitches, follow-up voice notes and `/api/vyapar/tts` (in-app playback, cache keyed by speaker) use the seller's speaker.
+- **Calls:** `initialBotMessage(v, gender)` uses "bol raha/rahi hoon".
+  - `sarvamConfigFor(gender)` routes male sellers to `SARVAM_APP_ID_MALE` / `SARVAM_APP_VERSION_MALE` when configured, because Sarvam sets the voice per app and `app_overrides` cannot change it.
+  - `voiceMatches` is shown on AI team and in the call panel. Portal steps are in docs/vyapar/sarvam-agent.md.
+- **UI:** AI team → "Your AI's voice" (Male/Female, Hear it). The agent name replaces the hard-coded "Priya" in the live-call banner, transcripts, summaries and Telegram notes.
+
 ## Latest cycle: real map
 
 - The search results now use `LiveMap` (Leaflet 1.9.4 with OpenStreetMap standard tiles and attribution) instead of the drawn SVG radar; `radar-map.tsx` was removed.

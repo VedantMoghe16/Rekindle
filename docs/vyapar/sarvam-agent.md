@@ -119,3 +119,20 @@ RULES
 - **Who can be called.** Only the demo buyer (Karan) is ever dialled, at `DEMO_KARAN_PHONE` (your own phone). The fictional merchants have no real numbers.
 
 Required `.env`: `SARVAM_API_KEY`, `SARVAM_ORG_ID`, `SARVAM_WORKSPACE_ID`, `SARVAM_APP_ID`, `SARVAM_APP_VERSION`, `SARVAM_CONNECTION_ID`, `SARVAM_AGENT_PHONE`, `PUBLIC_BASE_URL` (the public tunnel URL), `VYAPAR_WEBHOOK_SECRET` and `DEMO_KARAN_PHONE`. Optional: `SARVAM_VA_BASE`.
+
+## Voice matches the seller's gender
+
+The agent speaks for the seller, so its voice and Hindi grammar match the seller's gender. The seller sets this in **AI team → Your AI's voice**, and it is stored in `VyaparSeller.ownerGender`.
+
+- **Voice notes and in-app playback:** Sarvam Bulbul v3, using speaker `aditya` (male) or `priya` (female). Override with `SARVAM_TTS_SPEAKER_MALE` and `SARVAM_TTS_SPEAKER_FEMALE`.
+- **Text the AI writes as the seller** (pitches, counters, follow-ups) and **lines the agent says** (opening line, tool replies, simulated calls) use matching verb forms: "bhejta/bhejti hoon", "dunga/dungi", "samajh gaya/gayi". See `speakAs` in `src/lib/vyapar/persona.ts`.
+- **Live calls:** Sarvam sets the voice per *app*, and the call API's `app_overrides` only cover the opening line, start state and language. So a male seller needs a male-voice copy of the agent.
+
+### Sarvam portal steps for the male-voice agent
+
+1. Open the Vyapar SDR app and choose **Duplicate**. Name the copy, for example "Vyapar SDR (male)".
+2. Under **Voice / TTS**, pick a male Bulbul v3 voice (aditya, rahul, rohan, amit or ashutosh).
+3. In the prompt, change the persona to a male agent named **Arjun** (`SARVAM_AGENT_NAME_MALE`) and tell it to use masculine first-person Hindi ("bol raha hoon", "bhej deta hoon"). Keep the variables, tools, knowledge base and states the same as the original app.
+4. Publish, then set `SARVAM_APP_ID_MALE` and `SARVAM_APP_VERSION_MALE` in `.env`.
+
+Until those are set, a male seller's calls already use the masculine opening line, but the voice stays the default female one. The AI team screen and the call panel both point this out.

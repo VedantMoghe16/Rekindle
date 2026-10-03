@@ -26,6 +26,7 @@ type Props = {
   demoReplies: string[];
   playLabels: Record<string, string>;
   memoryProvider: "cognee" | "local";
+  agentName: string;
 };
 
 type Suggestion = { play: string; label: string; text: string };
@@ -34,7 +35,7 @@ const time = (iso: string) => new Intl.DateTimeFormat("en-IN", { timeZone: "Asia
 const day = (iso: string) => new Intl.DateTimeFormat("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short", year: "numeric" }).format(new Date(iso));
 const ACTION_ICON: Record<string, typeof Truck> = { SAMPLE_DISPATCH: Truck, MEETING: CalendarDays, PAYMENT_LINK: CircleCheck, FOLLOW_UP: Clock };
 
-export function ChatThread({ dealId, merchant, stage, autopilot: initialAutopilot, items, demoReplies, playLabels, memoryProvider }: Props) {
+export function ChatThread({ dealId, merchant, stage, autopilot: initialAutopilot, items, demoReplies, playLabels, memoryProvider, agentName }: Props) {
   const router = useRouter();
   const [autopilot, setAutopilot] = useState(initialAutopilot);
   const [callOpen, setCallOpen] = useState(false);
@@ -133,7 +134,7 @@ export function ChatThread({ dealId, merchant, stage, autopilot: initialAutopilo
       <LanguageButton />
     </header>
     {callOpen && <CallPanel dealId={dealId} onClose={() => setCallOpen(false)} />}
-    {dialing && <div className="call-live"><span className="pulse-dot" /><b className="grow">Priya is on the call with {firstName}…</b><span className="xs muted">result appears here</span></div>}
+    {dialing && <div className="call-live"><span className="pulse-dot" /><b className="grow">{agentName} is on the call with {firstName}…</b><span className="xs muted">result appears here</span></div>}
     <div className="autopilot">
       <Sparkles size={18} color="var(--pt-cyan)" />
       <span><b>Autopilot</b> {autopilot ? "· AI replies for you" : "· off, AI suggests"}</span>

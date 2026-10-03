@@ -1,6 +1,8 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { TOOLS, type ToolName } from "@/lib/vyapar/server/agent-tools";
+import { getSeller } from "@/lib/vyapar/server/context";
+import { speakAs } from "@/lib/vyapar/persona";
 
 export const dynamic = "force-dynamic";
 
@@ -33,12 +35,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ too
   const body = await request.json().catch(() => ({}));
   const query = Object.fromEntries(new URL(request.url).searchParams.entries());
   try {
-    const result = await handler({ ...query, ...(body && typeof body === "object" ? body : {}) });
+    const [result, seller] = await Promise.all([handler({ ...query, ...(body && typeof body === "object" ? body : {}) }), getSeller()]);
     console.info(`[vyapar/agent] ${tool} ${Date.now() - started}ms`);
-    return NextResponse.json(result);
+    // What the agent says agrees with its voice, which matches the seller ("samajh gaya/gayi").
+    const say = (result as { say?: unknown }).say;
+    return NextResponse.json(typeof say === "string" ? { ...result, say: speakAs(say, seller.persona.gender) } : result);
   } catch (error) {
     console.error(`[vyapar/agent] ${tool} failed`, error);
-    return NextResponse.json({ ok: false, say: "Ek second ji, main Rahul ji se confirm karke batati hoon.", error: "failed" }, { status: 200 });
+    const seller = await getSeller().catch(() => null);
+    return NextResponse.json({ ok: false, say: speakAs(`Ek second ji, main ${seller?.ownerFirstName ?? "malik"} ji se confirm karke batati hoon.`, seller?.persona.gender ?? "female"), error: "failed" }, { status: 200 });
   }
 }
 

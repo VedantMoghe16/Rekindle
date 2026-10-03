@@ -4,6 +4,9 @@ import { AppBar } from "@/components/paytm/ui";
 import { HomeNav, VyaparTabs } from "@/components/paytm/nav";
 import { FleetConsole } from "@/components/vyapar/fleet-console";
 import { ensureWorker, getDemoContacts, getFleetRun, recentRuns } from "@/lib/vyapar/server/fleet";
+import { getSeller } from "@/lib/vyapar/server/context";
+import { sarvamConfigFor } from "@/lib/providers/sarvam-agent";
+import { VoiceSetting } from "@/components/vyapar/voice-setting";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +15,9 @@ const STATUS: Record<string, { label: string; cls: string }> = { RUNNING: { labe
 /** AI team = where outreach started from Find is carried out and reported: live progress, results, past runs. */
 export default async function FleetPage({ searchParams }: { searchParams: Promise<{ run?: string }> }) {
   const { run: runId } = await searchParams;
-  const [run, contacts, runs] = await Promise.all([getFleetRun(runId), getDemoContacts(), recentRuns()]);
+  const [run, contacts, runs, seller] = await Promise.all([getFleetRun(runId), getDemoContacts(), recentRuns(), getSeller()]);
+  let callVoiceMatches = seller.persona.gender === "female";
+  try { callVoiceMatches = sarvamConfigFor(seller.persona.gender).voiceMatches; } catch { /* live calls not configured */ }
   if (run) ensureWorker(run);
   const past = runs.filter((r) => r.id !== run?.id);
   return <div className="page">
@@ -27,6 +32,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
           <span className={`badge ${STATUS[r.status]?.cls ?? "b-grey"}`}>{STATUS[r.status]?.label ?? r.status}</span><ChevronRight size={16} />
         </Link>)}
       </div>}
+      <VoiceSetting initial={{ gender: seller.ownerGender, persona: { name: seller.persona.agentName, speaker: seller.persona.speaker }, callVoiceMatches }} sellerFirst={seller.ownerFirstName} />
       <Link href="/vyapar/onboarding" className="card row" style={{ gap: 10 }}>
         <Settings2 size={18} color="var(--pt-muted)" />
         <div className="grow"><b style={{ fontSize: 13 }}>Business brief</b><div className="xs muted">What the team says about your products and offers</div></div>

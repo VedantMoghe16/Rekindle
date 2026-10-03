@@ -15,7 +15,7 @@ const SIMS = [
 /** Sarvam "Vyapar SDR" voice agent: shows the input variables it needs and records its structured outcome. */
 export function CallPanel({ dealId, onClose }: { dealId: string; onClose: () => void }) {
   const [vars, setVars] = useState<Record<string, string> | null>(null);
-  const [live, setLive] = useState<{ canCallLive: boolean; missing: string[]; phoneMasked: string; initialBotMessage: string } | null>(null);
+  const [live, setLive] = useState<{ canCallLive: boolean; missing: string[]; phoneMasked: string; initialBotMessage: string; agent?: { name: string; gender: string; voiceMatches: boolean } } | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const router = useRouter();
   useEffect(() => {
@@ -41,6 +41,7 @@ export function CallPanel({ dealId, onClose }: { dealId: string; onClose: () => 
     {live && (live.canCallLive
       ? <button className="btn btn-primary" onClick={callNow} disabled={busy !== null}>{busy === "live" ? <LoaderCircle className="spin" /> : <PhoneCall />}Call now via Sarvam ({live.phoneMasked})</button>
       : <div className="xs muted">Live calling needs: {live.missing.join(", ")}</div>)}
+    {live?.agent && <div className="xs"><b>Agent:</b> {live.agent.name} · {live.agent.gender} voice{live.agent.voiceMatches ? "" : " (live calls use the default voice until the male-voice agent is published)"}</div>}
     {live && <div className="xs"><b>Opening line:</b> {live.initialBotMessage}</div>}
     <span className="small"><b>Or run a simulated call</b> (full transcript, no dialling):</span>
     <div className="row" style={{ flexWrap: "wrap", gap: 6 }}>{SIMS.map((s) => <button key={s.label} className="btn btn-ghost btn-sm" onClick={() => simulate(s.label, s.scenario)} disabled={busy !== null}>{busy === s.label && <LoaderCircle className="spin" />}{s.label}</button>)}</div>

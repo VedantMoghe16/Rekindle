@@ -3,11 +3,12 @@ import { callStructured, LlmOfflineMiss } from "@/lib/providers/llm";
 import { isN8nVyaparConfigured, n8nVyapar } from "@/lib/providers/n8n";
 import { choosePlays, stageAfterReply, type CounterPlay } from "@/lib/vyapar/counter";
 import { firstName, tidyGreeting } from "@/lib/vyapar/pitch";
+import { speakAs } from "@/lib/vyapar/persona";
 import { classifyReply, quoteFor, ReplyUnderstanding } from "@/lib/vyapar/replies";
 import { OBJECTION_LABELS, STAGE_LABELS, type Stage } from "@/lib/vyapar/taxonomy";
 import { estimateValue, getSeller, liveNow, remember, shortRef, viewMerchant } from "@/lib/vyapar/server/context";
 import { logEvent } from "@/lib/vyapar/server/opportunities";
-import { createOutboundCall, fetchTranscript, initialBotMessage, normalizePhone, parseFinalVariables, pollAttempt, sarvamConfig, SarvamConfigError, webhookUrlFor, type SarvamOutboundWebhook, type TranscriptTurn } from "@/lib/providers/sarvam-agent";
+import { createOutboundCall, fetchTranscript, initialBotMessage, normalizePhone, parseFinalVariables, pollAttempt, sarvamConfig, sarvamConfigFor, SarvamConfigError, webhookUrlFor, type SarvamOutboundWebhook, type TranscriptTurn } from "@/lib/providers/sarvam-agent";
 import { z } from "zod";
 import { buildPayload, type Scenario } from "@/lib/vyapar/call-simulation";
 import { demoChatId, isTelegramConfigured, tgSendText, tgSendVoice } from "@/lib/providers/telegram";
@@ -73,7 +74,7 @@ export async function receiveReply(dealId: string, text: string) {
 
   const plays = choosePlays(u);
   const ctx = { buyerFirstName: firstName(deal.merchant.ownerName), sellerFirstName: seller.ownerFirstName, offers: seller.offers, understanding: u };
-  const suggestion = { play: plays[0].id, label: plays[0].label, text: tidyGreeting(plays[0].render(ctx)), next: plays[0].next };
+  const suggestion = { play: plays[0].id, label: plays[0].label, text: speakAs(tidyGreeting(plays[0].render(ctx)), seller.persona.gender), next: plays[0].next };
   if (u.intent === "OBJECTION" || u.intent === "QUESTION" || u.intent === "INTERESTED") {
     events.push({ kind: "counter", chosen: { label: plays[0].label, winRate: plays[0].winRate }, alternatives: plays.slice(1).map((p) => ({ label: p.label, winRate: p.winRate })) });
   }
@@ -167,16 +168,16 @@ export type CallResultInput = { outcome: (typeof CallResult.outcomes)[number]; o
 const OBJECTION_MAP: Record<string, string> = { price: "PRICE_TOO_HIGH", moq: "BULK_ONLY_MOQ", quality: "QUALITY_DOUBT", timing: "NOT_NOW", existing_supplier: "HAS_SUPPLIER", other: "OTHER" };
 
 const CallSummary = z.object({ summary: z.string(), nextStep: z.string() });
-const SUMMARY_SYSTEM = `You summarise a sales call between Priya (an AI calling agent for a packaging supplier) and an Indian shop owner, for the supplier.
+const SUMMARY_SYSTEM = `You summarise a sales call between an AI calling agent (named in the transcript) for a packaging supplier and an Indian shop owner, for the supplier.
 Write in plain, simple English that a busy shop owner understands at a glance, whatever language the call was in.
 summary: 2-3 short sentences: what the owner said, their main concern or interest, and what was agreed. No jargon, no invented facts.
 nextStep: one short line on what happens next.`;
 
 /** Plain-language call summary (Gemini), falling back to the agent's structured outcome. */
-async function summariseCall(transcript: TranscriptTurn[], ownerFirst: string, fallback: string) {
+async function summariseCall(transcript: TranscriptTurn[], ownerFirst: string, fallback: string, agentName: string) {
   if (transcript.length < 2) return { summary: fallback, nextStep: "", provider: "rules" };
   try {
-    const lines = transcript.map((t) => `${t.role === "agent" ? "Priya" : ownerFirst}: ${t.text ?? t.en_text}`).join("\n");
+    const lines = transcript.map((t) => `${t.role === "agent" ? agentName : ownerFirst}: ${t.text ?? t.en_text}`).join("\n");
     const result = await callStructured({ tier: "fast", schema: CallSummary, schemaName: "VyaparCallSummary", system: SUMMARY_SYSTEM, user: `Agent's recorded outcome: ${fallback}\n\nCALL:\n${lines}` });
     return { ...result.data, provider: result.provenance === "live" ? result.provider : "cached" };
   } catch (error) {
@@ -195,9 +196,9 @@ export async function receiveCallResult(dealId: string, r: CallResultInput, tran
   const ownerFirst = firstName(deal.merchant.ownerName) || "Owner";
   await import("@/lib/vyapar/server/followups").then((f) => f.onBuyerReply(dealId)).catch(() => null);
   const outcomeLine = `${summary}${r.objection_quote ? `: "${r.objection_quote}"` : ""}`;
-  const brief = await summariseCall(transcript, ownerFirst, outcomeLine);
+  const brief = await summariseCall(transcript, ownerFirst, outcomeLine, seller.persona.agentName);
   // The transcript is kept as spoken (Hindi, Tamil, Hinglish…); the summary is what the seller reads first.
-  const turns = transcript.map((t) => ({ who: t.role === "agent" ? "Priya" : ownerFirst, role: t.role, text: t.text ?? t.en_text, en: t.text && t.en_text !== t.text ? t.en_text : null, language: t.language ?? null }));
+  const turns = transcript.map((t) => ({ who: t.role === "agent" ? seller.persona.agentName : ownerFirst, role: t.role, text: t.text ?? t.en_text, en: t.text && t.en_text !== t.text ? t.en_text : null, language: t.language ?? null }));
   await db.vyaparMessage.create({ data: { dealId, direction: "in", kind: "call", text: brief.summary, author: deal.merchant.ownerName, provider: "sarvam-agent", metaJson: JSON.stringify({ ...r, outcomeLabel: summary, summary: brief.summary, nextStep: brief.nextStep, summaryBy: brief.provider, transcript: turns, simulated, duration: extra.duration ?? null }), createdAt: at } });
   const objection = r.objection_type !== "none" ? OBJECTION_MAP[r.objection_type] : null;
   if (objection || r.outcome === "not_interested") await db.vyaparMemory.create({ data: { dealId, merchantId: deal.merchantId, kind: "OBJECTION", category: r.outcome === "not_interested" ? "NOT_INTERESTED" : objection, summary, quote: r.objection_quote || null, verified: false, createdAt: at } });
@@ -252,7 +253,10 @@ export async function previewAgentCall(dealId: string) {
   const missing: string[] = [];
   try { sarvamConfig(); } catch (error) { if (error instanceof SarvamConfigError) missing.push(...error.missing); else throw error; }
   if (!phone) missing.push("DEMO_CALL_PHONE (the one demo phone every AI call rings)");
-  return { variables: vars, initialBotMessage: initialBotMessage(vars), phoneMasked: mask(phone), missing, canCallLive: missing.length === 0 };
+  const { persona } = await getSeller();
+  let voiceMatches = true;
+  try { voiceMatches = sarvamConfigFor(persona.gender).voiceMatches; } catch { /* reported in missing */ }
+  return { variables: vars, initialBotMessage: initialBotMessage(vars, persona.gender), phoneMasked: mask(phone), missing, canCallLive: missing.length === 0, agent: { name: persona.agentName, gender: persona.gender, voiceMatches } };
 }
 
 /**
@@ -267,12 +271,13 @@ export async function startAgentCall(dealId: string, opts: { provider?: "sarvam"
   if (provider === "simulated") {
     const attemptId = `sim-${Date.now().toString(36)}`;
     await db.vyaparAction.create({ data: { dealId, type: "AI_CALL", status: "dialing", summary: "AI call · Sarvam Vyapar SDR (simulated)", payloadJson: JSON.stringify({ lines: [`Opening: ${preview.initialBotMessage}`] }), ref: attemptId, provider: "simulated", createdAt: liveNow() } });
-    const result = await processSarvamWebhook(buildPayload(attemptId, opts.scenario ?? "sample", preview.variables));
+    const result = await processSarvamWebhook(buildPayload(attemptId, opts.scenario ?? "sample", preview.variables, preview.agent.gender));
     return { attemptId, provider, phoneMasked: "simulated", result };
   }
   if (!preview.canCallLive) throw new SarvamConfigError(preview.missing);
   const deal = await db.vyaparDeal.findUniqueOrThrow({ where: { id: dealId } });
-  const cfg = sarvamConfig();
+  // The male-voice app for a male seller (Sarvam sets the voice per app); the opening line already agrees in gender.
+  const cfg = sarvamConfigFor(preview.agent.gender);
   const { attemptId } = await createOutboundCall({ phone: dialPhone(deal)!, variables: preview.variables, webhookUrl: webhookUrlFor(cfg), webhookMetadata: { dealId, secret: cfg.webhookSecret }, initialBotMessage: preview.initialBotMessage, initialLanguageName: "Hindi" }, { config: cfg });
   await db.vyaparAction.create({ data: { dealId, type: "AI_CALL", status: "dialing", summary: `AI call · Sarvam Vyapar SDR · ${preview.phoneMasked}`, payloadJson: JSON.stringify({ lines: [`Calling ${preview.phoneMasked}`, `Opening: ${preview.initialBotMessage}`] }), ref: attemptId, provider: "sarvam", createdAt: liveNow() } });
   return { attemptId, provider, phoneMasked: preview.phoneMasked, result: null };

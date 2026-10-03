@@ -1,8 +1,9 @@
 // Realistic simulated Sarvam call results (full transcript), ported from the teammate's vyapar-integration branch.
 // The payload goes through the same processSarvamWebhook path as a live call.
 import type { AgentVariables, SarvamOutboundWebhook } from "@/lib/providers/sarvam-agent";
+import { speakAs, type Gender } from "@/lib/vyapar/persona";
 export type Scenario = "objection" | "sample" | "callback" | "no_answer";
-export function buildPayload(attemptId: string, scenario: Scenario, v: Partial<AgentVariables>): SarvamOutboundWebhook {
+export function buildPayload(attemptId: string, scenario: Scenario, v: Partial<AgentVariables>, gender: Gender = "female"): SarvamOutboundWebhook {
   const owner = (v.owner_name ?? "Karan").split(" ")[0];
   const biz = v.seller_business ?? "EcoPack Solutions";
   const seller = (v.seller_name ?? "Rahul").split(" ")[0];
@@ -17,7 +18,8 @@ export function buildPayload(attemptId: string, scenario: Scenario, v: Partial<A
     return { ...base, status: "no_answer", duration: null, interaction_id: null, failure_reason: null, final_agent_variables: null, interaction_transcript: null };
   }
   // Spoken lines are Hinglish (as the agent and merchant actually talk); en_text is the English version.
-  const turn = (role: "agent" | "user", text: string, en_text: string) => ({ role, text, en_text, language: "Hinglish" });
+  // The agent speaks in the seller's gender ("bol raha/rahi hoon"); the merchant's lines are theirs and stay as written.
+  const turn = (role: "agent" | "user", text: string, en_text: string) => ({ role, text: role === "agent" ? speakAs(text, gender) : text, en_text, language: "Hinglish" });
   const opener = turn("agent", `Namaste ${owner} ji, main ${biz} se, ${seller} ji ki taraf se bol rahi hoon. Hum aapki shop se sirf ${km} km door hain. Ek minute baat kar sakte hain?`, `Namaste ${owner} ji, I'm calling from ${biz} on behalf of ${seller} ji. We are just ${km} km from your shop. Do you have one minute?`);
   const interaction_id = `sim/${attemptId}`;
   if (scenario === "objection") {

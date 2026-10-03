@@ -127,7 +127,7 @@ export async function seedVyapar() {
   await db.merchant.createMany({ data: publicListings() });
   await seedSuppliers();
   await db.vyaparSeller.create({
-    data: { id: SELLER_ID, merchantId: SELLER_MERCHANT_ID, ownerFirstName: "Rahul", product: "Paper bags & food boxes", productCategory: "Packaging", unitPriceInr: 5, offersJson: JSON.stringify(ECOPACK_OFFERS), autopilot: true },
+    data: { id: SELLER_ID, merchantId: SELLER_MERCHANT_ID, ownerFirstName: "Rahul", ownerGender: "male", product: "Paper bags & food boxes", productCategory: "Packaging", unitPriceInr: 5, offersJson: JSON.stringify(ECOPACK_OFFERS), autopilot: true },
   });
 
   for (const d of DEALS) {

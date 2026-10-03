@@ -6,6 +6,7 @@ import { unsupportedClaims, type Opportunity } from "@/lib/vyapar/opportunity";
 import { evaluateMerchants, logEvent } from "@/lib/vyapar/server/opportunities";
 import { deliverToTelegram } from "@/lib/vyapar/server/conversation";
 import { isSarvamTtsConfigured, sarvamTts } from "@/lib/providers/sarvam";
+import { speakAs } from "@/lib/vyapar/persona";
 import { HuntPlan } from "@/lib/vyapar/planner";
 import { estimateValue, getSeller, liveNow, remember, viewMerchant } from "@/lib/vyapar/server/context";
 
@@ -44,7 +45,7 @@ export async function getPitch(leadId: string, fresh = false, opts: { llm?: bool
   }
   const sellerCtx = { name: c.seller.merchant.name, firstName: c.seller.ownerFirstName, area: c.seller.merchant.area, offers: c.seller.offers };
   const grounded = groundedPitch({ seller: sellerCtx, merchant: c.merchant, opp: c.opp, language: c.plan.language });
-  let pitch: StoredPitch = { text: grounded.text, highlights: grounded.highlights, why: grounded.why, provider: "template", angle: grounded.angle, problems: grounded.problems, contact: c.opp.contact, hypothesis: c.opp.hypothesis };
+  let pitch: StoredPitch = { text: speakAs(grounded.text, c.seller.persona.gender), highlights: grounded.highlights, why: grounded.why, provider: "template", angle: grounded.angle, problems: grounded.problems, contact: c.opp.contact, hypothesis: c.opp.hypothesis };
   // llm: false = instant grounded draft for the page; the AI draft is fetched right after (not stored, so it isn't skipped).
   if (opts.llm === false) return { lead: c.lead, merchant: c.merchant, opp: c.opp, pitch };
   if (c.opp.angle !== "INTRO") {
@@ -57,7 +58,8 @@ export async function getPitch(leadId: string, fresh = false, opts: { llm?: bool
 BUYER: ${c.merchant.ownerName}, ${c.merchant.name} (${c.merchant.category}), ${c.opp.distanceKm} km away.
 ANGLE: ${c.opp.angle}. HYPOTHESIS: ${c.opp.hypothesis}.
 EVIDENCE YOU MAY USE: ${JSON.stringify(evidence)}
-LANGUAGE: ${c.plan.language}${fresh ? `\nVARIANT: ${Date.now() % 997}` : ""}
+LANGUAGE: ${c.plan.language}
+SELLER GENDER: ${c.seller.persona.gender} (use matching Hindi verb forms for the seller: ${c.seller.persona.gender === "male" ? "sakta hoon, bhejta hoon, dunga" : "sakti hoon, bhejti hoon, dungi"})${fresh ? `\nVARIANT: ${Date.now() % 997}` : ""}
 WHY LINES (copy into why): ${JSON.stringify(grounded.why)}`,
       });
       const problems = [...validatePitch(result.data.text), ...unsupportedClaims(result.data.text, c.opp)];
@@ -99,7 +101,7 @@ export async function sendPitch(leadId: string, text: string, withVoice: boolean
   await db.vyaparLead.update({ where: { id: leadId }, data: { status: "PITCHED", dealId: deal.id } });
   // "Send on Telegram" → routed demo chat (text + Sarvam voice note when available).
   let voice: Buffer | null = null;
-  if (withVoice && isSarvamTtsConfigured()) voice = await sarvamTts(text.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, "")).catch(() => null);
+  if (withVoice && isSarvamTtsConfigured()) voice = await sarvamTts(text.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, ""), c.seller.persona.speaker).catch(() => null);
   const chat = await deliverToTelegram(deal.id, text, voice);
   if (chat) await db.vyaparMessage.updateMany({ where: { dealId: deal.id, direction: "out" }, data: { metaJson: JSON.stringify({ leadId, telegram: true, telegramChat: chat }) } });
   // Delivery is simulated in the prototype: never logged as a delivered message.

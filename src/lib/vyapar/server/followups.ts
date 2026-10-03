@@ -47,7 +47,7 @@ async function loadDeals() {
 function inputFor(deal: DealWithAll, seller: Awaited<ReturnType<typeof getSeller>>, sent: { at: Date; templateId: string }[]): FollowupInput {
   const m = viewMerchant(deal.merchant);
   return {
-    stage: deal.stage, objection: deal.objection, ownerFirst: firstName(deal.merchant.ownerName), sellerFirst: seller.ownerFirstName, sellerName: seller.merchant.name,
+    stage: deal.stage, objection: deal.objection, ownerFirst: firstName(deal.merchant.ownerName), sellerFirst: seller.ownerFirstName, sellerName: seller.merchant.name, sellerGender: seller.persona.gender,
     distanceKm: Math.round(haversineKm(seller.merchant, deal.merchant) * 10) / 10,
     // Call results are logged as inbound "call" messages; they count as the buyer speaking.
     messages: deal.messages.map((x) => ({ direction: x.direction === "in" ? "in" : "out", at: x.createdAt, text: x.text })),
@@ -59,6 +59,7 @@ function inputFor(deal: DealWithAll, seller: Awaited<ReturnType<typeof getSeller
 const Personal = z.object({ text: z.string() });
 const PERSONAL_SYSTEM = `You polish a follow-up message from a small Indian packaging supplier to a shop owner who went quiet.
 Rewrite the TEMPLATE in warm, natural Hinglish (Roman script), as a real person would text. You may reference what the buyer said before.
+Write in the seller's voice and gender: the template already uses the right Hindi verb forms (e.g. "bhejta/bhejti hoon"), keep them.
 Rules: keep every fact, price and offer exactly as in the template; add NO new prices, discounts, dates or claims; at most 50 words;
 exactly one question; no pressure ("last chance", "urgent"); never mention their payments, sales or transactions; no hashtags.`;
 
@@ -133,7 +134,7 @@ export async function runDueFollowups() {
     const author = f.autoApproved ? "Vyapar AI · auto follow-up" : "Vyapar AI · follow-up (approved)";
     if (f.channel === "voice") {
       // Voice note (Sarvam Bulbul) for leads who haven't been reading texts; the text rides along as the caption.
-      const wav = isSarvamTtsConfigured() ? await sarvamTts(f.text.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu, "")).catch(() => null) : null;
+      const wav = isSarvamTtsConfigured() ? await sarvamTts(f.text.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu, ""), seller.persona.speaker).catch(() => null) : null;
       const chat = await deliverToTelegram(f.dealId, f.text, wav, { voiceOnly: true });
       await db.vyaparMessage.create({ data: { dealId: f.dealId, direction: "out", kind: wav ? "voice" : "text", text: f.text, author, provider: wav ? "sarvam-tts" : f.provider, metaJson: JSON.stringify(chat ? { telegram: true, telegramChat: chat } : {}), createdAt: liveNow() } });
       await db.vyaparDeal.update({ where: { id: f.dealId }, data: { lastTouchAt: liveNow() } });
