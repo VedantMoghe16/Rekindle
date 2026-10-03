@@ -597,6 +597,8 @@ model FleetRun {
   goal       String
   huntId     String?
   callMode   String        @default("live")
+  /// When to contact each shop: quiet (fewest payments while open) | after_open | now
+  timing     String        @default("quiet")
   report     String?
   error      String?
   createdAt  DateTime
@@ -620,6 +622,10 @@ model FleetTarget {
   attemptId      String?
   outcome        String?
   result         String?
+  /// When the team will message and call this shop, and why (from its Paytm payment pattern).
+  scheduledFor   DateTime?
+  timingNote     String?
+  hoursJson      String?
   updatedAt      DateTime @updatedAt
 }
 

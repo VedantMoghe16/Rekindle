@@ -1,5 +1,14 @@
 # Server Agent Handoff
 
+## Latest cycle: Stop button and contact timing
+
+- **Stop:** `POST /api/vyapar/fleet/[id]/cancel` marks the run CANCELLED. The worker checks before every step and while waiting, so nothing new is sent or dialled. A ringing call finishes and is recorded.
+- **Timing** (`src/lib/vyapar/contact-timing.ts`, tested): business hours run from the first to the last hour with regular payments, and the quietest hour is the open hour with the fewest payments. Strategies: quiet (default), after_open, now.
+  - Demo merchants get a stable hourly pattern by shop type (labelled demo data). Real deployments would read Paytm's hourly aggregates.
+  - Each target gets `scheduledFor`, `timingNote` and `hoursJson`. The run waits per target (earliest first, one at a time) and then sends Telegram and calls.
+- **Resume:** a run is idempotent per step and resumed by `ensureWorker` when viewed (after a server restart). An orphaned live run from before this change was marked stopped rather than resumed, to avoid a surprise re-dial.
+- **UI:** "When to message & call" options, a Stop button, the current step, and per-shop "When:" plus an hourly payments chart.
+
 ## Latest cycle: smart Sarvam calls (context hook, mid-call tools, KB, states)
 
 - `src/lib/vyapar/agent-brain.ts` (pure, tested): quote from tiers, ≤25-word counter via choosePlays + known competitor price, objection/qty parsing, offer sheet, lessons, top plays.

@@ -3,13 +3,14 @@ import { Bot, ChevronRight } from "lucide-react";
 import { AppBar } from "@/components/paytm/ui";
 import { VyaparTabs } from "@/components/paytm/nav";
 import { FleetConsole } from "@/components/vyapar/fleet-console";
-import { getDemoContacts, getFleetRun } from "@/lib/vyapar/server/fleet";
+import { ensureWorker, getDemoContacts, getFleetRun } from "@/lib/vyapar/server/fleet";
 import { getOnboarding } from "@/lib/vyapar/server/onboarding";
 
 export const dynamic = "force-dynamic";
 
 export default async function FleetPage() {
   const [run, contacts, o] = await Promise.all([getFleetRun(), getDemoContacts(), getOnboarding()]);
+  if (run) ensureWorker(run);
   return <div className="page">
     <AppBar title="AI sales team" sub="Finds, pitches and calls for you" back="/vyapar" />
     <main className="scroll"><div className="pad">

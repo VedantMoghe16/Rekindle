@@ -2,7 +2,7 @@ import { z } from "zod";
 import { fail, ok } from "@/lib/api";
 import { startFleet } from "@/lib/vyapar/server/fleet";
 
-const Input = z.object({ callMode: z.enum(["live", "simulated"]).default("live") });
+const Input = z.object({ callMode: z.enum(["live", "simulated"]).default("live"), timing: z.enum(["quiet", "after_open", "now"]).default("quiet") });
 
 /** Starts the AI sales team run (runs in the background; poll GET /api/vyapar/fleet/[id]). Only one run at a time. */
 export async function POST(request: Request) {

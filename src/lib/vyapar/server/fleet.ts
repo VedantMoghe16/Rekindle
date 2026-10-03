@@ -7,6 +7,7 @@ import { getPitch, sendPitch } from "@/lib/vyapar/server/pitches";
 import { pollAgentCall, startAgentCall } from "@/lib/vyapar/server/conversation";
 import { getOnboarding } from "@/lib/vyapar/server/onboarding";
 import type { HuntLead } from "@/lib/vyapar/server/opportunities";
+import { hourLabel, nextSlot, paymentProfile, type TimingStrategy } from "@/lib/vyapar/contact-timing";
 
 /**
  * Autonomous AI sales team ("fleet"): one button runs
@@ -52,17 +53,50 @@ export async function rerank(candidates: HuntLead[], brief: { summary: string; p
   }
 }
 
-export async function startFleet(opts: { callMode: "live" | "simulated" }) {
+const workers = new Set<string>();
+
+export class FleetCancelled extends Error {}
+async function checkCancelled(runId: string) {
+  const r = await db.fleetRun.findUnique({ where: { id: runId }, select: { status: true } });
+  if (!r || r.status === "CANCELLED") throw new FleetCancelled("cancelled");
+}
+
+/** Runs (or resumes) a fleet run in the background. Safe to call twice: each step skips work already done. */
+function launch(runId: string) {
+  if (workers.has(runId)) return;
+  workers.add(runId);
+  void runFleet(runId)
+    .catch(async (error) => {
+      if (error instanceof FleetCancelled) return;
+      console.error("[vyapar] fleet run failed", error);
+      await db.fleetRun.update({ where: { id: runId }, data: { status: "FAILED", error: error instanceof Error ? error.message : String(error), finishedAt: liveNow() } });
+    })
+    .finally(() => workers.delete(runId));
+}
+
+export async function startFleet(opts: { callMode: "live" | "simulated"; timing?: TimingStrategy }) {
   const running = await db.fleetRun.findFirst({ where: { status: "RUNNING" }, orderBy: { createdAt: "desc" } });
-  if (running) return running.id;
+  if (running) { launch(running.id); return running.id; }
   const seller = await getSeller();
   const { brief } = await getOnboarding();
-  const run = await db.fleetRun.create({ data: { sellerId: seller.id, goal: brief.huntPrompt, callMode: opts.callMode, createdAt: liveNow() } });
-  void runFleet(run.id).catch(async (error) => {
-    console.error("[vyapar] fleet run failed", error);
-    await db.fleetRun.update({ where: { id: run.id }, data: { status: "FAILED", error: error instanceof Error ? error.message : String(error), finishedAt: liveNow() } });
-  });
+  const run = await db.fleetRun.create({ data: { sellerId: seller.id, goal: brief.huntPrompt, callMode: opts.callMode, timing: opts.timing ?? "quiet", createdAt: liveNow() } });
+  launch(run.id);
   return run.id;
+}
+
+/** Stop button: no new messages or calls start. A call already ringing finishes and is still recorded. */
+export async function cancelFleet(runId: string) {
+  const run = await db.fleetRun.findUnique({ where: { id: runId } });
+  if (!run || run.status !== "RUNNING") return run?.status ?? "NOT_FOUND";
+  await db.fleetRun.update({ where: { id: runId }, data: { status: "CANCELLED", step: "Stopped by you", finishedAt: liveNow() } });
+  await db.fleetTarget.updateMany({ where: { runId, telegramStatus: { in: ["PENDING", "SCHEDULED"] } }, data: { telegramStatus: "CANCELLED" } });
+  await db.fleetTarget.updateMany({ where: { runId, callStatus: { in: ["QUEUED", "SCHEDULED"] } }, data: { callStatus: "CANCELLED", result: "Stopped before contact." } });
+  return "CANCELLED";
+}
+
+/** Resume runs whose background worker died (e.g. a server restart) when someone looks at them. */
+export function ensureWorker(run: { id: string; status: string }) {
+  if (run.status === "RUNNING") launch(run.id);
 }
 
 const step = (runId: string, text: string) => db.fleetRun.update({ where: { id: runId }, data: { step: text } });
@@ -70,69 +104,85 @@ const step = (runId: string, text: string) => db.fleetRun.update({ where: { id: 
 async function runFleet(runId: string) {
   const run = await db.fleetRun.findUniqueOrThrow({ where: { id: runId } });
   const { brief } = await getOnboarding();
-  // Always run at least two targets (priority 1 then 2). A priority without a demo contact still gets a Telegram
-  // pitch (to the default demo chat) and a simulated call, clearly labelled.
   const contacts = await getDemoContacts();
   const n = Math.max(2, Math.min(3, contacts.filter((c) => c.phone || c.telegramChatId).length));
 
-  await step(runId, "Finding businesses near you");
-  const huntId = await createHunt(run.goal);
-  await db.fleetRun.update({ where: { id: runId }, data: { huntId } });
-  const hunt = await getHunt(huntId);
-  // New business only: skip anyone we already have a deal with (in talks, won or lost).
-  const known = new Set((await db.vyaparDeal.findMany({ select: { merchantId: true } })).map((d) => d.merchantId));
-  const reachable = (hunt?.shortlist ?? []).filter((l) => l.opp.action === "pitch" && !known.has(l.merchant.id)).slice(0, 8);
-  if (!reachable.length) throw new Error("No reachable businesses found. Check the onboarding answers.");
-
-  await step(runId, `Ranking the best ${n} of ${reachable.length} businesses to contact`);
-  const picked = await rerank(reachable, brief, n);
-  for (const [i, p] of picked.entries()) {
-    await db.fleetTarget.create({ data: { runId, priority: i + 1, merchantId: p.lead.merchant.id, leadId: p.lead.id, why: p.why, bestTime: p.bestTime } });
-  }
-  const targets = await db.fleetTarget.findMany({ where: { runId }, orderBy: { priority: "asc" } });
-
-  await step(runId, "Writing a personal pitch for each business");
-  for (const t of targets) {
-    const pitch = await getPitch(t.leadId!).catch(() => null);
-    await db.fleetTarget.update({ where: { id: t.id }, data: { pitch: pitch?.pitch.text ?? null } });
-  }
-
-  await step(runId, "Sending pitches on Telegram");
-  for (const t of await db.fleetTarget.findMany({ where: { runId }, orderBy: { priority: "asc" } })) {
-    const contact = contacts[t.priority - 1];
-    try {
-      const dealId = await sendPitch(t.leadId!, t.pitch ?? "", true, { chatId: contact?.telegramChatId ?? null, phone: contact?.phone ?? null });
-      const sent = await db.vyaparMessage.findFirst({ where: { dealId, direction: "out", metaJson: { contains: '"telegram":true' } } });
-      await db.fleetTarget.update({ where: { id: t.id }, data: { dealId, telegramStatus: sent ? "SENT" : "NOT_SENT" } });
-    } catch (error) {
-      await db.fleetTarget.update({ where: { id: t.id }, data: { telegramStatus: "FAILED", result: error instanceof Error ? error.message : "Couldn't send" } });
+  // 1–3. Find, re-rank, plan timing (only once per run).
+  if (!(await db.fleetTarget.count({ where: { runId } }))) {
+    await checkCancelled(runId);
+    await step(runId, "Finding businesses near you");
+    const huntId = run.huntId ?? (await createHunt(run.goal));
+    await db.fleetRun.update({ where: { id: runId }, data: { huntId } });
+    const hunt = await getHunt(huntId);
+    const known = new Set((await db.vyaparDeal.findMany({ select: { merchantId: true } })).map((d) => d.merchantId));
+    const reachable = (hunt?.shortlist ?? []).filter((l) => l.opp.action === "pitch" && !known.has(l.merchant.id)).slice(0, 8);
+    if (!reachable.length) throw new Error("No reachable new businesses found. Check the onboarding answers.");
+    await checkCancelled(runId);
+    await step(runId, `Ranking the best ${n} of ${reachable.length} businesses to contact`);
+    const picked = await rerank(reachable, brief, n);
+    const now = liveNow();
+    for (const [i, p] of picked.entries()) {
+      const profile = paymentProfile({ id: p.lead.merchant.id, category: p.lead.merchant.category, qrVolumeBand: p.lead.merchant.qrVolumeBand });
+      const slot = nextSlot((run.timing as TimingStrategy) || "quiet", profile, now);
+      await db.fleetTarget.create({ data: { runId, priority: i + 1, merchantId: p.lead.merchant.id, leadId: p.lead.id, why: p.why, bestTime: slot.hour != null ? hourLabel(slot.hour) : "now", scheduledFor: slot.at, timingNote: slot.note, hoursJson: JSON.stringify(profile), telegramStatus: "SCHEDULED", callStatus: "SCHEDULED" } });
     }
   }
 
-  // Calls: one at a time, in priority order. Each waits for its result before the next one starts.
-  for (const t of await db.fleetTarget.findMany({ where: { runId }, orderBy: { priority: "asc" } })) {
-    if (!t.dealId) { await db.fleetTarget.update({ where: { id: t.id }, data: { callStatus: "SKIPPED" } }); continue; }
+  // 4. Pitches for everyone up front (so they are ready at each shop's time).
+  const pending = await db.fleetTarget.findMany({ where: { runId, pitch: null }, orderBy: { priority: "asc" } });
+  if (pending.length) {
+    await checkCancelled(runId);
+    await step(runId, "Writing a personal pitch for each business");
+    for (const t of pending) {
+      const pitch = await getPitch(t.leadId!).catch(() => null);
+      await db.fleetTarget.update({ where: { id: t.id }, data: { pitch: pitch?.pitch.text ?? "" } });
+    }
+  }
+
+  // 5. At each shop's time: Telegram pitch, then the call. Strictly one at a time, earliest slot first.
+  const queue = await db.fleetTarget.findMany({ where: { runId }, orderBy: [{ scheduledFor: "asc" }, { priority: "asc" }] });
+  for (const t of queue) {
+    if (["DONE", "NO_ANSWER", "FAILED", "SKIPPED", "CANCELLED"].includes(t.callStatus)) continue;
     const merchant = await db.merchant.findUniqueOrThrow({ where: { id: t.merchantId } });
+    const contact = contacts.find((c) => c.priority === t.priority);
+    if (t.scheduledFor && t.scheduledFor.getTime() > liveNow().getTime()) {
+      await step(runId, `Waiting for ${merchant.name}'s best time: ${t.timingNote ?? t.bestTime}`);
+      while (t.scheduledFor.getTime() > liveNow().getTime()) { await checkCancelled(runId); await new Promise((r) => setTimeout(r, 5000)); }
+    }
+    await checkCancelled(runId);
+    let dealId = t.dealId;
+    if (t.telegramStatus !== "SENT") {
+      await step(runId, `Sending ${merchant.name} a pitch on Telegram`);
+      try {
+        dealId = await sendPitch(t.leadId!, t.pitch ?? "", true, { chatId: contact?.telegramChatId ?? null, phone: contact?.phone ?? null });
+        const sent = await db.vyaparMessage.findFirst({ where: { dealId, direction: "out", metaJson: { contains: '"telegram":true' } } });
+        await db.fleetTarget.update({ where: { id: t.id }, data: { dealId, telegramStatus: sent ? "SENT" : "NOT_SENT" } });
+      } catch (error) {
+        await db.fleetTarget.update({ where: { id: t.id }, data: { telegramStatus: "FAILED", callStatus: "SKIPPED", result: error instanceof Error ? error.message : "Couldn't send" } });
+        continue;
+      }
+    }
+    await checkCancelled(runId);
     await step(runId, `Calling priority ${t.priority}: ${merchant.name}`);
-    const contact = contacts[t.priority - 1];
     const live = run.callMode === "live" && Boolean(contact?.phone);
     await db.fleetTarget.update({ where: { id: t.id }, data: { callStatus: "CALLING" } });
     try {
-      const started = await startAgentCall(t.dealId, live ? { provider: "sarvam" } : { provider: "simulated", scenario: t.priority === 1 ? "sample" : "objection" });
-      await db.fleetTarget.update({ where: { id: t.id }, data: { attemptId: started.attemptId } });
-      if (live) await waitForCall(started.attemptId);
+      const attemptId = t.attemptId ?? (await startAgentCall(dealId!, live ? { provider: "sarvam" } : { provider: "simulated", scenario: t.priority === 1 ? "sample" : "objection" })).attemptId;
+      await db.fleetTarget.update({ where: { id: t.id }, data: { attemptId } });
+      if (live) await waitForCall(attemptId);
       await recordOutcome(t.id, live);
     } catch (error) {
       await db.fleetTarget.update({ where: { id: t.id }, data: { callStatus: "FAILED", result: `Call couldn't start: ${error instanceof Error ? error.message.slice(0, 160) : "error"}` } });
     }
   }
 
+  await checkCancelled(runId);
   await step(runId, "Writing your report");
   const report = await writeReport(runId);
   await db.fleetRun.update({ where: { id: runId }, data: { status: "DONE", step: "Done", report, finishedAt: liveNow() } });
   const final = await db.fleetTarget.findMany({ where: { runId }, orderBy: { priority: "asc" } });
   const names = await db.merchant.findMany({ where: { id: { in: final.map((t) => t.merchantId) } } });
-  remember([{ id: `fleet-${runId}`, runId, title: "AI sales team run", text: `AI sales team run on ${liveNow().toLocaleDateString("en-IN")}. Goal: ${run.goal}. ${final.map((t) => `${names.find((m) => m.id === t.merchantId)?.name}: ${t.result ?? "no result"} (picked because: ${t.why}).`).join(" ")} Summary: ${report}` }]);
+  remember([{ id: `fleet-${runId}`, runId, title: "AI sales team run", text: `AI sales team run on ${liveNow().toLocaleDateString("en-IN")}. Goal: ${run.goal}. Timing: ${run.timing}. ${final.map((t) => `${names.find((m) => m.id === t.merchantId)?.name}: ${t.result ?? "no result"} (picked because: ${t.why}; contacted ${t.timingNote ?? "now"}).`).join(" ")} Summary: ${report}` }]);
 }
 
 async function waitForCall(attemptId: string) {
