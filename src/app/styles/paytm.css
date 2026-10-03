@@ -611,3 +611,20 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .fu-rate small { color: var(--pt-muted); }
 .fu-rate i { height: 6px; border-radius: 3px; background: var(--pt-cyan); flex: none; }
 .fu-rate b { width: 34px; text-align: right; color: var(--pt-navy); }
+
+/* ===== Real map (Leaflet + OpenStreetMap) ===== */
+.lmap-wrap { position: relative; margin: 0; border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow-card); isolation: isolate; }
+.lmap { height: 300px; width: 100%; background: #e8eef3; }
+.lmap .leaflet-control-attribution { font-size: 9px; }
+.lmap-shop span { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--pt-navy); border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0, 46, 110, .4); font-size: 16px; }
+.lmap-pin span { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: var(--pt-navy); color: #fff; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(16, 24, 40, .3); font-size: 11px; font-weight: 700; }
+.lmap-pin span b { transform: rotate(45deg); line-height: 1; }
+.lmap-pin.hot span { background: var(--pt-green); }
+.lmap-pin.warm span { background: var(--pt-cyan); }
+.lmap-pin.pub span { background: #0e9384; }
+.lmap-pin.done span { background: var(--pt-navy); }
+.lmap-pin.out span { background: #98a2b3; width: 22px; height: 22px; font-size: 9px; }
+.lmap-pin.pulse span { box-shadow: 0 0 0 0 rgba(0, 185, 241, .6); animation: lmap-pulse 1.8s infinite; }
+@keyframes lmap-pulse { 70% { box-shadow: 0 0 0 12px rgba(0, 185, 241, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 185, 241, 0); } }
+.lmap-locate { position: absolute; z-index: 500; top: 10px; right: 10px; width: 36px; height: 36px; border-radius: 50%; background: #fff; color: #1a73e8; display: grid; place-items: center; box-shadow: var(--shadow-card); }
+.lmap-note { position: absolute; z-index: 500; left: 8px; right: 54px; top: 10px; background: rgba(255, 255, 255, .94); border-radius: 8px; padding: 5px 8px; font-size: 11px; color: #344054; box-shadow: var(--shadow-card); }

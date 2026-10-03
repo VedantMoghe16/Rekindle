@@ -1,5 +1,14 @@
 # Server Agent Handoff
 
+## Latest cycle: real map
+
+- The search results now use `LiveMap` (Leaflet 1.9.4 with OpenStreetMap standard tiles and attribution) instead of the drawn SVG radar; `radar-map.tsx` was removed.
+  - Shows the seller's shop, dashed radius rings at ⅓, ⅔ and full radius, and merchant pins at their real lat/lng with legend colours (green why-now, cyan Paytm, teal public, navy in talks, grey not a fit).
+  - Clicking a pin opens the pitch or chat.
+  - The browser's live location (`watchPosition`) shows as a blue dot with an accuracy circle. The locate button recentres on it, and a note says how far you are from the shop.
+- CARTO tiles now need an API key, so OSM tiles are used. For production traffic, switch to a keyed tile provider, as OSM's tile policy expects.
+- `package-lock.json` was edited by hand to add only leaflet, @types/leaflet and @types/geojson, because `npm install` drops the darwin entries on Linux.
+
 ## Latest cycle: navigation, intro, and smarter follow-ups
 
 - **Navigation:** `HomeNav` (the app bar) is at the bottom of every main Vyapar screen with "Vyapar AI" active. `VyaparTabs` became a top tab strip under the AppBar (Find · AI team · Deals · Memory). The back arrow was removed on the four tab roots.

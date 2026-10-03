@@ -3,7 +3,8 @@ import { Info, Sparkles } from "lucide-react";
 import { AppBar, ProviderTag } from "@/components/paytm/ui";
 import { HomeNav, VyaparTabs } from "@/components/paytm/nav";
 import { PlanSteps, RevealAfterSteps } from "@/components/vyapar/plan-steps";
-import { RadarMap, type Pin } from "@/components/vyapar/radar-map";
+import { LiveMap, type MapPin } from "@/components/vyapar/live-map";
+import { getSeller } from "@/lib/vyapar/server/context";
 import { OpportunityCard, type CardLead } from "@/components/vyapar/opportunity-card";
 import { ClarifyCard, PreferencePanel } from "@/components/vyapar/hunt-feedback";
 import { ShowMore } from "@/components/vyapar/show-more";
@@ -22,7 +23,7 @@ function card(l: HuntLead): CardLead {
 
 export default async function HuntPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ new?: string }> }) {
   const [{ id }, { new: fresh }] = await Promise.all([params, searchParams]);
-  const hunt = await getHunt(id);
+  const [hunt, seller] = await Promise.all([getHunt(id), getSeller()]);
   if (!hunt) notFound();
   const { plan } = hunt;
   const animate = fresh === "1";
@@ -35,10 +36,10 @@ export default async function HuntPage({ params, searchParams }: { params: Promi
     "Ordered by relevance, +10 for a fresh dated signal; confidence shown separately",
   ];
   const top = hunt.shortlist.slice(0, 15);
-  const pins: Pin[] = [
-    ...top.map((l, i) => ({ id: l.id, href: l.dealId ? `/vyapar/deals/${l.dealId}` : `/vyapar/leads/${l.id}`, label: `${l.merchant.name} · relevance ${l.opp.relevance}`, score: l.opp.relevance, x: l.pos.x, y: l.pos.y, state: (l.merchant.source === "osm" ? "pub" : l.opp.timing.status === "fresh" ? "hot" : "warm") as Pin["state"], pulse: i === 0 })),
-    ...hunt.inTalks.map((l) => ({ id: l.id, href: l.dealId ? `/vyapar/deals/${l.dealId}` : undefined, label: `${l.merchant.name}: in talks`, score: l.opp.relevance, x: l.pos.x, y: l.pos.y, state: "done" as const })),
-    ...hunt.excluded.filter((l) => l.opp.distanceKm <= plan.radiusKm * 1.25).slice(0, 8).map((l) => ({ id: l.id, label: `${l.merchant.name}: ${l.opp.excludedReason}`, score: null, x: l.pos.x, y: l.pos.y, state: "out" as const })),
+  const pins: MapPin[] = [
+    ...top.map((l, i) => ({ id: l.id, href: l.dealId ? `/vyapar/deals/${l.dealId}` : `/vyapar/leads/${l.id}`, label: `${l.merchant.name} · relevance ${l.opp.relevance} · ${l.opp.distanceKm} km`, score: l.opp.relevance, lat: l.merchant.lat, lng: l.merchant.lng, state: (l.merchant.source === "osm" ? "pub" : l.opp.timing.status === "fresh" ? "hot" : "warm") as MapPin["state"], pulse: i === 0 })),
+    ...hunt.inTalks.map((l) => ({ id: l.id, href: l.dealId ? `/vyapar/deals/${l.dealId}` : undefined, label: `${l.merchant.name}: in talks`, score: l.opp.relevance, lat: l.merchant.lat, lng: l.merchant.lng, state: "done" as const })),
+    ...hunt.excluded.filter((l) => l.opp.distanceKm <= plan.radiusKm * 1.25).slice(0, 8).map((l) => ({ id: l.id, label: `${l.merchant.name}: ${l.opp.excludedReason}`, score: null, lat: l.merchant.lat, lng: l.merchant.lng, state: "out" as const })),
   ];
   const reasons = [...new Map(hunt.excluded.map((l) => [l.opp.excludedReason?.replace(/^[\d.]+ (km|m) away, /, "").replace(/\(.+\)/, "").trim(), l])).values()].slice(0, 6);
 
@@ -61,7 +62,7 @@ export default async function HuntPage({ params, searchParams }: { params: Promi
       </div>
       <RevealAfterSteps count={steps.length} animate={animate}>
         <div className="map-wrap" style={{ marginTop: 12 }}>
-          <RadarMap pins={pins} radiusKm={plan.radiusKm} />
+          <LiveMap seller={{ lat: seller.merchant.lat, lng: seller.merchant.lng, name: seller.merchant.name }} pins={pins} radiusKm={plan.radiusKm} />
           <div className="legend"><span><i className="lg hot" />Paytm · why now</span><span><i className="lg warm" />Paytm</span><span><i className="lg pub" />Public map</span><span><i className="lg done" />In talks</span><span><i className="lg out" />Not a fit</span></div>
         </div>
         <div className="pad">
