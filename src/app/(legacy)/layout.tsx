@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import "./globals.css";
-import "./styles/leads.css";
-import "./styles/pipeline.css";
-import "./styles/marketing.css";
-import "./styles/shell.css";
+import "../globals.css";
+import "../styles/leads.css";
+import "../styles/pipeline.css";
+import "../styles/marketing.css";
+import "../styles/shell.css";
 import { Sidebar } from "@/components/shell/sidebar";
 import { Header } from "@/components/shell/header";
 import { Toasts } from "@/components/shell/toasts";

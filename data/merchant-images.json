@@ -1,0 +1,107 @@
+{
+  "Bakery": {
+    "src": "/merchants/bakery.jpg",
+    "title": "Coconut Balls National Bakery Ooty Aug25 A7CR 07120.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Coconut_Balls_National_Bakery_Ooty_Aug25_A7CR_07120.jpg",
+    "license": "CC BY-SA 4.0",
+    "artist": "Timothy A. Gonsalves"
+  },
+  "Sweet shop": {
+    "src": "/merchants/sweet-shop.jpg",
+    "title": "Display of Indian Sweets Mithai in Kolkata, West Bengal.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Display_of_Indian_Sweets_Mithai_in_Kolkata,_West_Bengal.jpg",
+    "license": "CC BY 2.0",
+    "artist": "Dipanker Dutta"
+  },
+  "Cafe": {
+    "src": "/merchants/cafe.jpg",
+    "title": "Ammana Kai Ruchi Restaurant, Hunsur.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Ammana_Kai_Ruchi_Restaurant,_Hunsur.jpg",
+    "license": "CC BY-SA 4.0",
+    "artist": "Prof tpms"
+  },
+  "Restaurant": {
+    "src": "/merchants/restaurant.jpg",
+    "title": "Paradise restaurant Hyderabad 3986.JPG",
+    "page": "https://commons.wikimedia.org/wiki/File:Paradise_restaurant_Hyderabad_3986.JPG",
+    "license": "CC BY-SA 3.0",
+    "artist": "Rameshng"
+  },
+  "Fast food": {
+    "src": "/merchants/fast-food.jpg",
+    "title": "Vada Pav.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Vada_Pav.jpg",
+    "license": "CC BY 3.0",
+    "artist": "Deepeshmd"
+  },
+  "Cloud kitchen": {
+    "src": "/merchants/cloud-kitchen.jpg",
+    "title": "Kitchen of Agasi, Lajpat Nagar, Delhi (2025-10-04).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Kitchen_of_Agasi,_Lajpat_Nagar,_Delhi_(2025-10-04).jpg",
+    "license": "CC BY-SA 4.0",
+    "artist": "Contrapunctus-1"
+  },
+  "Grocery": {
+    "src": "/merchants/grocery.jpg",
+    "title": "Convenience Store Shelf, Tokyo 2014.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Convenience_Store_Shelf,_Tokyo_2014.jpg",
+    "license": "CC BY-SA 4.0",
+    "artist": "Martin Falbisoner"
+  },
+  "Pharmacy": {
+    "src": "/merchants/pharmacy.jpg",
+    "title": "India - Varanasi pharmacy - 0835.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:India_-_Varanasi_pharmacy_-_0835.jpg",
+    "license": "CC BY-SA 3.0",
+    "artist": "Jorge Royan"
+  },
+  "Dairy": {
+    "src": "/merchants/dairy.jpg",
+    "title": "Karnataka's Nandini Good Life Milk reaches Kashmir! (14577353995).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Karnataka%27s_Nandini_Good_Life_Milk_reaches_Kashmir!_(14577353995).jpg",
+    "license": "CC BY 2.0",
+    "artist": "Mike Prince from Bangalore, India"
+  },
+  "Florist": {
+    "src": "/merchants/florist.jpg",
+    "title": "Flowers shop (6617499583).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Flowers_shop_(6617499583).jpg",
+    "license": "CC BY 2.0",
+    "artist": "{ pranav } from Hyderabad, India"
+  },
+  "Clothing": {
+    "src": "/merchants/clothing.jpg",
+    "title": "Garment Stalls - Mayapur - Nadia 2017-08-15 2223.JPG",
+    "page": "https://commons.wikimedia.org/wiki/File:Garment_Stalls_-_Mayapur_-_Nadia_2017-08-15_2223.JPG",
+    "license": "CC BY 3.0",
+    "artist": "Biswarup Ganguly"
+  },
+  "Salon": {
+    "src": "/merchants/salon.jpg",
+    "title": "A Barber Shop in Koovery.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:A_Barber_Shop_in_Koovery.jpg",
+    "license": "CC BY 3.0",
+    "artist": "Vaikoovery"
+  },
+  "Electronics": {
+    "src": "/merchants/electronics.jpg",
+    "title": "MumbaiIndiaiPhoneCellphoneShots2011-9.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:MumbaiIndiaiPhoneCellphoneShots2011-9.jpg",
+    "license": "CC BY-SA 3.0",
+    "artist": "Victorgrigas"
+  },
+  "Ice cream": {
+    "src": "/merchants/ice-cream.jpg",
+    "title": "Metro - Ice-cream Parlour - 40th International Kolkata Book Fair - Milan Mela Complex - Kolkata 2016-02-02 0670.JPG",
+    "page": "https://commons.wikimedia.org/wiki/File:Metro_-_Ice-cream_Parlour_-_40th_International_Kolkata_Book_Fair_-_Milan_Mela_Complex_-_Kolkata_2016-02-02_0670.JPG",
+    "license": "CC BY 3.0",
+    "artist": "Biswarup Ganguly"
+  },
+  "Packaging": {
+    "src": "/merchants/packaging.jpg",
+    "title": "White paper bag on white and black background.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:White_paper_bag_on_white_and_black_background.jpg",
+    "license": "CC BY-SA 2.0",
+    "artist": "Jeffrey Beall from Denver, Colorado, USA"
+  }
+}

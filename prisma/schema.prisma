@@ -322,3 +322,198 @@ model Outcome {
   isSeeded         Boolean  @default(false)
   occurredAt       DateTime @default(now())
 }
+
+// ===== Vyapar AI (Paytm for Business merchant-to-merchant sales) =====
+// DECISION: a separate merchant domain rather than overloading the SaaS Account/Deal models,
+// so the legacy Rekindle screens keep working while Vyapar AI becomes the product.
+
+/// A Paytm merchant from onboarding data (KYC geo, MCC, GSTIN, QR volume) plus public web enrichment.
+model Merchant {
+  id            String          @id
+  mid           String?         @unique
+  name          String
+  ownerName     String
+  category      String
+  mcc           String
+  area          String
+  city          String
+  lat           Float
+  lng           Float
+  phoneMasked   String?
+  gstinMasked   String?
+  qrVolumeBand  String
+  monthlyTxns   Int?
+  rating        Float?
+  reviewCount   Int?
+  language      String          @default("hinglish")
+  profileJson   String          @default("{}")
+  signalsJson   String          @default("[]")
+  isDemo        Boolean         @default(true)
+  /// "demo" = fictional Paytm merchant fixture; "osm" = real public listing from OpenStreetMap (ODbL).
+  source        String          @default("demo")
+  osmId         String?         @unique
+  street        String?
+  cuisine       String?
+  openingHours  String?
+  website       String?
+  /// National or regional chain: buys centrally, excluded by the eligibility gate.
+  brand         String?
+  /// "verified" = opted-in business contact (demo fixture); "unknown" = no permitted contact route.
+  contactStatus String          @default("unknown")
+  contactRole   String?
+  /// "verified" only for demo Paytm merchants; public listings are "unknown".
+  paytmStatus   String          @default("unknown")
+  observedAt    String?
+  createdAt     DateTime        @default(now())
+  seller        VyaparSeller?
+  leads         VyaparLead[]
+  deals         VyaparDeal[]
+  memories      VyaparMemory[]
+}
+
+/// The merchant using Vyapar AI to sell, with what they sell and the offers the AI may use.
+model VyaparSeller {
+  id             String     @id
+  merchantId     String     @unique
+  merchant       Merchant   @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  ownerFirstName String
+  product        String
+  productCategory String
+  unitPriceInr   Float
+  offersJson     String
+  autopilot      Boolean    @default(true)
+  updatedAt      DateTime   @updatedAt
+}
+
+/// One "find me buyers" request compiled into a plan and run against the merchant graph.
+model VyaparHunt {
+  id         String       @id @default(cuid())
+  prompt     String
+  planJson   String
+  provenance String       @default("rules")
+  scanned    Int          @default(0)
+  createdAt  DateTime     @default(now())
+  leads      VyaparLead[]
+}
+
+model VyaparLead {
+  id          String      @id @default(cuid())
+  huntId      String
+  hunt        VyaparHunt  @relation(fields: [huntId], references: [id], onDelete: Cascade)
+  merchantId  String
+  merchant    Merchant    @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  fitScore    Int
+  distanceKm  Float
+  reasonsJson String
+  status      String      @default("SUGGESTED")
+  excluded    String?
+  pitchJson   String?
+  dealId      String?
+  /// Snapshot of the opportunity at search time (never rewritten by later feedback).
+  opportunityJson String?
+  position    Int?
+  rankerVersion String?
+  createdAt   DateTime    @default(now())
+
+  @@unique([huntId, merchantId])
+}
+
+model VyaparDeal {
+  id          String          @id @default(cuid())
+  merchantId  String
+  merchant    Merchant        @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  stage       String          @default("PITCHED")
+  valueInr    Int
+  objection   String?
+  nextStep    String?
+  autopilot   Boolean         @default(true)
+  lastTouchAt DateTime
+  createdAt   DateTime        @default(now())
+  messages    VyaparMessage[]
+  memories    VyaparMemory[]
+  actions     VyaparAction[]
+}
+
+model VyaparMessage {
+  id         String     @id @default(cuid())
+  dealId     String
+  deal       VyaparDeal @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  direction  String
+  kind       String     @default("text")
+  text       String
+  author     String
+  provider   String?
+  metaJson   String     @default("{}")
+  createdAt  DateTime
+}
+
+model VyaparMemory {
+  id         String     @id @default(cuid())
+  dealId     String
+  deal       VyaparDeal @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  merchantId String
+  merchant   Merchant   @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  kind       String
+  category   String?
+  summary    String
+  quote      String?
+  verified   Boolean    @default(false)
+  resolved   Boolean    @default(false)
+  createdAt  DateTime
+}
+
+model VyaparAction {
+  id          String     @id @default(cuid())
+  dealId      String
+  deal        VyaparDeal @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  type        String
+  status      String
+  summary     String
+  payloadJson String
+  ref         String?
+  provider    String     @default("simulated")
+  createdAt   DateTime
+}
+
+model VyaparCampaign {
+  id          String   @id @default(cuid())
+  objection   String
+  headline    String
+  assetsJson  String
+  audience    Int
+  status      String   @default("draft")
+  provider    String   @default("rules")
+  createdAt   DateTime @default(now())
+}
+
+/// Explicit seller feedback that personalises ranking (skip reasons, saves, clarifications). Undo sets active=false.
+model VyaparPreference {
+  id         String   @id @default(cuid())
+  sellerId   String
+  kind       String
+  reason     String?
+  merchantId String?
+  category   String?
+  value      String?
+  label      String
+  active     Boolean  @default(true)
+  huntId     String?
+  createdAt  DateTime @default(now())
+  undoneAt   DateTime?
+}
+
+/// Decision and outcome log for a future learned ranker. provenance: simulated | demo | live.
+model VyaparEvent {
+  id            String   @id @default(cuid())
+  sellerId      String
+  type          String
+  huntId        String?
+  leadId        String?
+  merchantId    String?
+  dealId        String?
+  position      Int?
+  rankerVersion String?
+  provenance    String   @default("simulated")
+  metaJson      String   @default("{}")
+  createdAt     DateTime @default(now())
+}

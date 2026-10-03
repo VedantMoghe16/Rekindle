@@ -156,7 +156,7 @@ export function CaptureWorkspace({ initialAccountId }: { initialAccountId?: stri
         {saved ? <div className="saved-box">
           <strong>{saved.alreadySaved ? "Already saved" : "Saved"} · lane {LANE_LABEL[saved.lane] ?? saved.lane}</strong>
           {saved.laneChanges[0] && <div className="meta">Moved to {LANE_LABEL[saved.laneChanges[0].toLane]} · {saved.laneChanges[0].reason}</div>}
-          <div className="card-actions"><Link className="button primary" href={`/accounts/${saved.accountId}`}>Open account</Link><Link className="button" href="/">Back to Today</Link></div>
+          <div className="card-actions"><Link className="button primary" href={`/accounts/${saved.accountId}`}>Open account</Link><Link className="button" href="/today">Back to Today</Link></div>
         </div> : result.alreadySaved ? <div className="card-actions"><Link className="button" href={`/accounts/${accountId}`}>Open account</Link></div>
           : <button className="button primary" onClick={save} disabled={Boolean(status)}>{status || "Looks right, save"}</button>}
       </> : <p className="subtitle">The extracted blocker and verbatim evidence will appear here for review.</p>}

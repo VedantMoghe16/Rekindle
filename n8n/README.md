@@ -87,3 +87,17 @@ Valid `type` values: `view`, `click`, `like`, `comment`, `reply`. Valid `platfor
 ```json
 { "accountDomain": "finvarapay.example", "accountId": "account-finvara", "type": "FUNDING", "title": "Finvara Pay raises ₹180 Cr Series B", "sourceUrl": "https://news.google.com/…", "occurredAt": "2026-09-24T05:30:00.000Z", "dedupeKey": "news:finvarapay.example:…" }
 ```
+
+
+## Vyapar AI (Paytm for Business)
+
+`vyapar.json` is the single webhook (`POST /webhook/vyapar`) behind Vyapar AI. Rekindle posts `{ event, ...payload, callbackUrl }` with the `x-rekindle-secret` header:
+
+| `event` | Sent when | Payload |
+|---|---|---|
+| `action.requested` | A buyer asks for a sample, a visit or confirms an order (Autopilot or approved reply) | `type` (`SAMPLE_DISPATCH` · `MEETING` · `PAYMENT_LINK` · `FOLLOW_UP`), `dealId`, `merchant { name, owner, area, phone }`, `valueInr`, `lines[]` |
+| `campaign.launch` | Rahul approves a campaign on **Campaigns** | `objection`, `headline`, `assets { inapp, whatsapp, instagram }`, `audience` |
+
+The workflow writes one ops message (Slack incoming webhook or a WhatsApp group bot at `$env.VYAPAR_OPS_WEBHOOK_URL`), responds `{ ref, status: "queued" }`, then calls back `POST /api/vyapar/webhooks/n8n` with `{ event: "action.completed", ref, status, note }`. Status `delivered` moves the deal to *Sample sent*, and `paid` moves it to *Order won*.
+
+Set `N8N_VYAPAR_WEBHOOK_URL=https://your-n8n.example.com/webhook/vyapar` in `.env`. Without it, every action is created as **Simulated** and labelled that way in the chat.

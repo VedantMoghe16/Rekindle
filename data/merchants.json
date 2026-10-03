@@ -1,0 +1,1255 @@
+[
+  {
+    "id": "m-ecopack-solutions",
+    "mid": "PYTMIND041907",
+    "name": "EcoPack Solutions",
+    "ownerName": "Rahul Agrawal",
+    "category": "Packaging",
+    "mcc": "5113",
+    "area": "Chakala, Andheri East",
+    "city": "Mumbai",
+    "lat": 19.115,
+    "lng": 72.856,
+    "phoneMasked": "+91 97••• ••113",
+    "gstinMasked": "27AAC••••3Z1",
+    "qrVolumeBand": "Medium",
+    "monthlyTxns": 1117,
+    "rating": 4.6,
+    "reviewCount": 84,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Google",
+          "rating": 4.6,
+          "reviews": 84
+        }
+      ],
+      "instagram": null,
+      "highlights": [
+        "Manufacturer of paper bags and biodegradable food boxes"
+      ],
+      "currentPackaging": null
+    },
+    "signals": [],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-karan-s-cafe-and-bakery",
+    "mid": "PYTMIND041944",
+    "name": "Karan's Cafe & Bakery",
+    "ownerName": "Karan Mehta",
+    "category": "Bakery",
+    "mcc": "5462",
+    "area": "MIDC Andheri East",
+    "city": "Mumbai",
+    "lat": 19.12949,
+    "lng": 72.86887,
+    "phoneMasked": "+91 94••• ••126",
+    "gstinMasked": "27AAD••••6Z2",
+    "qrVolumeBand": "High",
+    "monthlyTxns": 2434,
+    "rating": 4.5,
+    "reviewCount": 1240,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Zomato",
+          "rating": 4.5,
+          "reviews": 1240
+        }
+      ],
+      "instagram": "@karanscafe.indore",
+      "highlights": [
+        "Reviews mention pastries 38 times",
+        "Customers ask for takeaway boxes"
+      ],
+      "currentPackaging": "plastic carry bags"
+    },
+    "signals": [
+      {
+        "type": "NEW_OUTLET",
+        "title": "Second outlet announced on Instagram",
+        "date": "2026-09-12",
+        "source": "Instagram"
+      }
+    ],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-sweet-nest-bakers",
+    "mid": "PYTMIND041981",
+    "name": "Sweet Nest Bakers",
+    "ownerName": "Pooja Jain",
+    "category": "Bakery",
+    "mcc": "5462",
+    "area": "Azad Nagar",
+    "city": "Mumbai",
+    "lat": 19.12221,
+    "lng": 72.84279,
+    "phoneMasked": "+91 91••• ••139",
+    "gstinMasked": "27AAE••••9Z3",
+    "qrVolumeBand": "Medium",
+    "monthlyTxns": 1151,
+    "rating": 4.1,
+    "reviewCount": 540,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Zomato",
+          "rating": 4.1,
+          "reviews": 540
+        }
+      ],
+      "instagram": "@sweetnest.bakes",
+      "highlights": [
+        "Posts daily cake reels on Instagram"
+      ],
+      "currentPackaging": null
+    },
+    "signals": [
+      {
+        "type": "FESTIVE_SEASON",
+        "title": "Diwali gift-box pre-orders open",
+        "date": "2026-09-28",
+        "source": "Instagram"
+      }
+    ],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-crust-and-crumb",
+    "mid": "PYTMIND042018",
+    "name": "Crust & Crumb",
+    "ownerName": "Aman Gupta",
+    "category": "Bakery",
+    "mcc": "5462",
+    "area": "Versova",
+    "city": "Mumbai",
+    "lat": 19.0999,
+    "lng": 72.8121,
+    "phoneMasked": "+91 98••• ••152",
+    "gstinMasked": "27AAF••••2Z4",
+    "qrVolumeBand": "Low",
+    "monthlyTxns": 448,
+    "rating": 3.9,
+    "reviewCount": 220,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Zomato",
+          "rating": 3.9,
+          "reviews": 220
+        }
+      ],
+      "instagram": null,
+      "highlights": [
+        "New on Zomato this month"
+      ],
+      "currentPackaging": null
+    },
+    "signals": [
+      {
+        "type": "NEW_LISTING",
+        "title": "Listed on Zomato",
+        "date": "2026-09-02",
+        "source": "Zomato"
+      }
+    ],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-mama-s-oven",
+    "mid": "PYTMIND042055",
+    "name": "Mama's Oven",
+    "ownerName": "Sneha Kulkarni",
+    "category": "Bakery",
+    "mcc": "5462",
+    "area": "Saki Naka",
+    "city": "Mumbai",
+    "lat": 19.10149,
+    "lng": 72.88077,
+    "phoneMasked": "+91 95••• ••165",
+    "gstinMasked": "27AAG••••5Z5",
+    "qrVolumeBand": "Medium",
+    "monthlyTxns": 1185,
+    "rating": 4.3,
+    "reviewCount": 610,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Zomato",
+          "rating": 4.3,
+          "reviews": 610
+        }
+      ],
+      "instagram": null,
+      "highlights": [
+        "Known for custom birthday cakes"
+      ],
+      "currentPackaging": "plain cardboard boxes"
+    },
+    "signals": [],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-bake-studio",
+    "mid": "PYTMIND042092",
+    "name": "Bake Studio",
+    "ownerName": "Rohit Bansal",
+    "category": "Bakery",
+    "mcc": "5462",
+    "area": "Vile Parle East",
+    "city": "Mumbai",
+    "lat": 19.05405,
+    "lng": 72.83252,
+    "phoneMasked": "+91 92••• ••178",
+    "gstinMasked": "27AAH••••8Z6",
+    "qrVolumeBand": "High",
+    "monthlyTxns": 2502,
+    "rating": 4.4,
+    "reviewCount": 980,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Zomato",
+          "rating": 4.4,
+          "reviews": 980
+        }
+      ],
+      "instagram": null,
+      "highlights": [
+        "Large walk-in bakery"
+      ],
+      "currentPackaging": null
+    },
+    "signals": [],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-daily-bread-co",
+    "mid": "PYTMIND042129",
+    "name": "Daily Bread Co.",
+    "ownerName": "Vikas Soni",
+    "category": "Bakery",
+    "mcc": "5462",
+    "area": "Vile Parle East",
+    "city": "Mumbai",
+    "lat": 19.09105,
+    "lng": 72.86047,
+    "phoneMasked": "+91 99••• ••191",
+    "gstinMasked": "27AAJ••••1Z7",
+    "qrVolumeBand": "Medium",
+    "monthlyTxns": 1219,
+    "rating": 4,
+    "reviewCount": 330,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Zomato",
+          "rating": 4,
+          "reviews": 330
+        }
+      ],
+      "instagram": null,
+      "highlights": [],
+      "currentPackaging": null
+    },
+    "signals": [
+      {
+        "type": "TXN_SPIKE",
+        "title": "QR receipts up 24% vs its own last month (aggregated)",
+        "date": "2026-10-01",
+        "source": "Paytm",
+        "private": true
+      }
+    ],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-royal-cake-point",
+    "mid": "PYTMIND042166",
+    "name": "Royal Cake Point",
+    "ownerName": "Sameer Khan",
+    "category": "Bakery",
+    "mcc": "5462",
+    "area": "Marol",
+    "city": "Mumbai",
+    "lat": 19.12157,
+    "lng": 72.89544,
+    "phoneMasked": "+91 96••• ••204",
+    "gstinMasked": "27AAK••••4Z8",
+    "qrVolumeBand": "Medium",
+    "monthlyTxns": 1236,
+    "rating": 4.2,
+    "reviewCount": 450,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Zomato",
+          "rating": 4.2,
+          "reviews": 450
+        }
+      ],
+      "instagram": null,
+      "highlights": [],
+      "currentPackaging": null
+    },
+    "signals": [],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-biryani-box-cloud-kitchen",
+    "mid": "PYTMIND042203",
+    "name": "Biryani Box Cloud Kitchen",
+    "ownerName": "Imran Shaikh",
+    "category": "Cloud kitchen",
+    "mcc": "5812",
+    "area": "Juhu",
+    "city": "Mumbai",
+    "lat": 19.09531,
+    "lng": 72.83117,
+    "phoneMasked": "+91 93••• ••217",
+    "gstinMasked": "27AAL••••7Z0",
+    "qrVolumeBand": "High",
+    "monthlyTxns": 2553,
+    "rating": 4.2,
+    "reviewCount": 860,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Swiggy",
+          "rating": 4.2,
+          "reviews": 860
+        }
+      ],
+      "instagram": null,
+      "highlights": [
+        "120+ delivery orders a day"
+      ],
+      "currentPackaging": "plastic containers"
+    },
+    "signals": [
+      {
+        "type": "TXN_SPIKE",
+        "title": "QR receipts up 38% vs its own last month (aggregated)",
+        "date": "2026-10-01",
+        "source": "Paytm",
+        "private": true
+      }
+    ],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-tiffin-tales",
+    "mid": "PYTMIND042240",
+    "name": "Tiffin Tales",
+    "ownerName": "Ritu Verma",
+    "category": "Cloud kitchen",
+    "mcc": "5812",
+    "area": "Saki Naka",
+    "city": "Mumbai",
+    "lat": 19.07911,
+    "lng": 72.87793,
+    "phoneMasked": "+91 90••• ••230",
+    "gstinMasked": "27AAB••••0Z1",
+    "qrVolumeBand": "Medium",
+    "monthlyTxns": 1270,
+    "rating": 4.3,
+    "reviewCount": 310,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Swiggy",
+          "rating": 4.3,
+          "reviews": 310
+        }
+      ],
+      "instagram": null,
+      "highlights": [],
+      "currentPackaging": null
+    },
+    "signals": [
+      {
+        "type": "MENU_EXPANSION",
+        "title": "Added a party-orders menu",
+        "date": "2026-09-20",
+        "source": "Zomato"
+      }
+    ],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-wok-express-kitchen",
+    "mid": "PYTMIND042277",
+    "name": "Wok Express Kitchen",
+    "ownerName": "Ankit Jain",
+    "category": "Cloud kitchen",
+    "mcc": "5812",
+    "area": "Jogeshwari East",
+    "city": "Mumbai",
+    "lat": 19.13629,
+    "lng": 72.85997,
+    "phoneMasked": "+91 97••• ••243",
+    "gstinMasked": "27AAC••••3Z2",
+    "qrVolumeBand": "High",
+    "monthlyTxns": 2587,
+    "rating": 4,
+    "reviewCount": 720,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Swiggy",
+          "rating": 4,
+          "reviews": 720
+        }
+      ],
+      "instagram": null,
+      "highlights": [],
+      "currentPackaging": "foil containers"
+    },
+    "signals": [],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-ghar-ka-khana",
+    "mid": "PYTMIND042314",
+    "name": "Ghar Ka Khana",
+    "ownerName": "Sunita Patel",
+    "category": "Cloud kitchen",
+    "mcc": "5812",
+    "area": "Vile Parle East",
+    "city": "Mumbai",
+    "lat": 19.10484,
+    "lng": 72.85209,
+    "phoneMasked": "+91 94••• ••256",
+    "gstinMasked": "27AAD••••6Z3",
+    "qrVolumeBand": "Low",
+    "monthlyTxns": 584,
+    "rating": 4.6,
+    "reviewCount": 190,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Swiggy",
+          "rating": 4.6,
+          "reviews": 190
+        }
+      ],
+      "instagram": null,
+      "highlights": [
+        "Home-style thalis, 4.6 rating"
+      ],
+      "currentPackaging": null
+    },
+    "signals": [],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-pizza-dabba",
+    "mid": "PYTMIND042351",
+    "name": "Pizza Dabba",
+    "ownerName": "Harsh Malviya",
+    "category": "Cloud kitchen",
+    "mcc": "5812",
+    "area": "Marol",
+    "city": "Mumbai",
+    "lat": 19.13212,
+    "lng": 72.88738,
+    "phoneMasked": "+91 91••• ••269",
+    "gstinMasked": "27AAE••••9Z4",
+    "qrVolumeBand": "High",
+    "monthlyTxns": 2650,
+    "rating": 3.8,
+    "reviewCount": 410,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Swiggy",
+          "rating": 3.8,
+          "reviews": 410
+        }
+      ],
+      "instagram": null,
+      "highlights": [
+        "90+ delivery orders a day"
+      ],
+      "currentPackaging": null
+    },
+    "signals": [],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-bowl-theory",
+    "mid": "PYTMIND042388",
+    "name": "Bowl Theory",
+    "ownerName": "Neha Arora",
+    "category": "Cloud kitchen",
+    "mcc": "5812",
+    "area": "Versova",
+    "city": "Mumbai",
+    "lat": 19.115,
+    "lng": 72.8026,
+    "phoneMasked": "+91 98••• ••282",
+    "gstinMasked": "27AAF••••2Z5",
+    "qrVolumeBand": "High",
+    "monthlyTxns": 2638,
+    "rating": 4.4,
+    "reviewCount": 530,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Swiggy",
+          "rating": 4.4,
+          "reviews": 530
+        }
+      ],
+      "instagram": null,
+      "highlights": [],
+      "currentPackaging": null
+    },
+    "signals": [],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-chai-sutta-corner",
+    "mid": "PYTMIND042425",
+    "name": "Chai Sutta Corner",
+    "ownerName": "Deepak Yadav",
+    "category": "Cafe",
+    "mcc": "5814",
+    "area": "Chakala",
+    "city": "Mumbai",
+    "lat": 19.115,
+    "lng": 72.86363,
+    "phoneMasked": "+91 95••• ••295",
+    "gstinMasked": "27AAG••••5Z6",
+    "qrVolumeBand": "High",
+    "monthlyTxns": 2655,
+    "rating": 4.1,
+    "reviewCount": 1500,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Zomato",
+          "rating": 4.1,
+          "reviews": 1500
+        }
+      ],
+      "instagram": null,
+      "highlights": [],
+      "currentPackaging": "paper cups, plastic bags"
+    },
+    "signals": [],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-brew-lane-cafe",
+    "mid": "PYTMIND042462",
+    "name": "Brew Lane Cafe",
+    "ownerName": "Aditi Sharma",
+    "category": "Cafe",
+    "mcc": "5814",
+    "area": "Lokhandwala",
+    "city": "Mumbai",
+    "lat": 19.13763,
+    "lng": 72.84217,
+    "phoneMasked": "+91 92••• ••308",
+    "gstinMasked": "27AAH••••8Z7",
+    "qrVolumeBand": "Medium",
+    "monthlyTxns": 1372,
+    "rating": 4.5,
+    "reviewCount": 680,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Zomato",
+          "rating": 4.5,
+          "reviews": 680
+        }
+      ],
+      "instagram": "@brewlane.indore",
+      "highlights": [],
+      "currentPackaging": null
+    },
+    "signals": [
+      {
+        "type": "RATING_JUMP",
+        "title": "Rating rose from 4.2 to 4.5",
+        "date": "2026-09-25",
+        "source": "Zomato"
+      }
+    ],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-shake-it-up",
+    "mid": "PYTMIND042499",
+    "name": "Shake It Up",
+    "ownerName": "Kunal Mehra",
+    "category": "Cafe",
+    "mcc": "5814",
+    "area": "Vile Parle East",
+    "city": "Mumbai",
+    "lat": 19.08306,
+    "lng": 72.85004,
+    "phoneMasked": "+91 99••• ••321",
+    "gstinMasked": "27AAJ••••1Z8",
+    "qrVolumeBand": "Medium",
+    "monthlyTxns": 1389,
+    "rating": 4,
+    "reviewCount": 290,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Zomato",
+          "rating": 4,
+          "reviews": 290
+        }
+      ],
+      "instagram": null,
+      "highlights": [],
+      "currentPackaging": null
+    },
+    "signals": [],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-sharma-sweets",
+    "mid": "PYTMIND042536",
+    "name": "Sharma Sweets",
+    "ownerName": "Manoj Sharma",
+    "category": "Sweet shop",
+    "mcc": "5441",
+    "area": "Andheri West",
+    "city": "Mumbai",
+    "lat": 19.11156,
+    "lng": 72.83534,
+    "phoneMasked": "+91 96••• ••334",
+    "gstinMasked": "27AAK••••4Z0",
+    "qrVolumeBand": "High",
+    "monthlyTxns": 2706,
+    "rating": 4.3,
+    "reviewCount": 2100,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Zomato",
+          "rating": 4.3,
+          "reviews": 2100
+        }
+      ],
+      "instagram": null,
+      "highlights": [
+        "Busy Diwali counter every year"
+      ],
+      "currentPackaging": null
+    },
+    "signals": [
+      {
+        "type": "TXN_SPIKE",
+        "title": "Festive QR receipts up 2.3x vs its own last month (aggregated)",
+        "date": "2026-10-02",
+        "source": "Paytm",
+        "private": true
+      }
+    ],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-gupta-mishthan-bhandar",
+    "mid": "PYTMIND042573",
+    "name": "Gupta Mishthan Bhandar",
+    "ownerName": "Ramesh Gupta",
+    "category": "Sweet shop",
+    "mcc": "5441",
+    "area": "Marol",
+    "city": "Mumbai",
+    "lat": 19.10984,
+    "lng": 72.88699,
+    "phoneMasked": "+91 93••• ••347",
+    "gstinMasked": "27AAL••••7Z1",
+    "qrVolumeBand": "High",
+    "monthlyTxns": 2723,
+    "rating": 4.4,
+    "reviewCount": 1800,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Zomato",
+          "rating": 4.4,
+          "reviews": 1800
+        }
+      ],
+      "instagram": null,
+      "highlights": [],
+      "currentPackaging": null
+    },
+    "signals": [
+      {
+        "type": "FESTIVE_SEASON",
+        "title": "Diwali gift boxes listed",
+        "date": "2026-09-30",
+        "source": "Instagram"
+      }
+    ],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-mithai-mahal-sweets",
+    "mid": "PYTMIND042610",
+    "name": "Mithai Mahal Sweets",
+    "ownerName": "Vinod Agrawal",
+    "category": "Sweet shop",
+    "mcc": "5441",
+    "area": "Juhu",
+    "city": "Mumbai",
+    "lat": 19.08067,
+    "lng": 72.83503,
+    "phoneMasked": "+91 90••• ••360",
+    "gstinMasked": "27AAB••••0Z2",
+    "qrVolumeBand": "High",
+    "monthlyTxns": 2740,
+    "rating": 4.6,
+    "reviewCount": 5200,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Zomato",
+          "rating": 4.6,
+          "reviews": 5200
+        }
+      ],
+      "instagram": null,
+      "highlights": [],
+      "currentPackaging": null
+    },
+    "signals": [],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-shree-restaurant",
+    "mid": "PYTMIND042647",
+    "name": "Shree Restaurant",
+    "ownerName": "Arvind Joshi",
+    "category": "Restaurant",
+    "mcc": "5812",
+    "area": "JB Nagar",
+    "city": "Mumbai",
+    "lat": 19.13108,
+    "lng": 72.8622,
+    "phoneMasked": "+91 97••• ••373",
+    "gstinMasked": "27AAC••••3Z3",
+    "qrVolumeBand": "Medium",
+    "monthlyTxns": 1457,
+    "rating": 4,
+    "reviewCount": 640,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Zomato",
+          "rating": 4,
+          "reviews": 640
+        }
+      ],
+      "instagram": null,
+      "highlights": [],
+      "currentPackaging": null
+    },
+    "signals": [],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-the-grill-house",
+    "mid": "PYTMIND042684",
+    "name": "The Grill House",
+    "ownerName": "Varun Chouhan",
+    "category": "Restaurant",
+    "mcc": "5812",
+    "area": "Four Bungalows",
+    "city": "Mumbai",
+    "lat": 19.11985,
+    "lng": 72.8269,
+    "phoneMasked": "+91 94••• ••386",
+    "gstinMasked": "27AAD••••6Z4",
+    "qrVolumeBand": "High",
+    "monthlyTxns": 2774,
+    "rating": 4.2,
+    "reviewCount": 900,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Zomato",
+          "rating": 4.2,
+          "reviews": 900
+        }
+      ],
+      "instagram": null,
+      "highlights": [],
+      "currentPackaging": null
+    },
+    "signals": [],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-indori-zaika",
+    "mid": "PYTMIND042721",
+    "name": "Indori Zaika",
+    "ownerName": "Faiz Ali",
+    "category": "Restaurant",
+    "mcc": "5812",
+    "area": "Saki Naka",
+    "city": "Mumbai",
+    "lat": 19.09775,
+    "lng": 72.87132,
+    "phoneMasked": "+91 91••• ••399",
+    "gstinMasked": "27AAE••••9Z5",
+    "qrVolumeBand": "Medium",
+    "monthlyTxns": 1491,
+    "rating": 4.1,
+    "reviewCount": 470,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Zomato",
+          "rating": 4.1,
+          "reviews": 470
+        }
+      ],
+      "instagram": null,
+      "highlights": [],
+      "currentPackaging": null
+    },
+    "signals": [],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-shree-krishna-dairy",
+    "mid": "PYTMIND042758",
+    "name": "Shree Krishna Dairy",
+    "ownerName": "Lokesh Rathore",
+    "category": "Dairy",
+    "mcc": "5451",
+    "area": "MIDC Andheri East",
+    "city": "Mumbai",
+    "lat": 19.12311,
+    "lng": 72.86623,
+    "phoneMasked": "+91 98••• ••412",
+    "gstinMasked": "27AAF••••2Z6",
+    "qrVolumeBand": "Medium",
+    "monthlyTxns": 1508,
+    "rating": null,
+    "reviewCount": null,
+    "language": "hinglish",
+    "profile": {
+      "sources": [],
+      "instagram": null,
+      "highlights": [],
+      "currentPackaging": null
+    },
+    "signals": [],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-jain-kirana-store",
+    "mid": "PYTMIND042795",
+    "name": "Jain Kirana Store",
+    "ownerName": "Sanjay Jain",
+    "category": "Grocery",
+    "mcc": "5411",
+    "area": "Vile Parle East",
+    "city": "Mumbai",
+    "lat": 19.10689,
+    "lng": 72.856,
+    "phoneMasked": "+91 95••• ••425",
+    "gstinMasked": "27AAG••••5Z7",
+    "qrVolumeBand": "High",
+    "monthlyTxns": 2825,
+    "rating": null,
+    "reviewCount": null,
+    "language": "hinglish",
+    "profile": {
+      "sources": [],
+      "instagram": null,
+      "highlights": [],
+      "currentPackaging": null
+    },
+    "signals": [],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-fresh-mart-superstore",
+    "mid": "PYTMIND042832",
+    "name": "Fresh Mart Superstore",
+    "ownerName": "Prakash Mehta",
+    "category": "Grocery",
+    "mcc": "5411",
+    "area": "Lokhandwala",
+    "city": "Mumbai",
+    "lat": 19.12761,
+    "lng": 72.83288,
+    "phoneMasked": "+91 92••• ••438",
+    "gstinMasked": "27AAH••••8Z8",
+    "qrVolumeBand": "High",
+    "monthlyTxns": 2842,
+    "rating": 4,
+    "reviewCount": 320,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Google",
+          "rating": 4,
+          "reviews": 320
+        }
+      ],
+      "instagram": null,
+      "highlights": [],
+      "currentPackaging": null
+    },
+    "signals": [],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-sharma-hardware",
+    "mid": "PYTMIND042869",
+    "name": "Sharma Hardware",
+    "ownerName": "Rakesh Sharma",
+    "category": "Hardware",
+    "mcc": "5251",
+    "area": "Marol",
+    "city": "Mumbai",
+    "lat": 19.12024,
+    "lng": 72.87124,
+    "phoneMasked": "+91 99••• ••451",
+    "gstinMasked": "27AAJ••••1Z0",
+    "qrVolumeBand": "Medium",
+    "monthlyTxns": 1559,
+    "rating": 4.2,
+    "reviewCount": 90,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Google",
+          "rating": 4.2,
+          "reviews": 90
+        }
+      ],
+      "instagram": null,
+      "highlights": [],
+      "currentPackaging": null
+    },
+    "signals": [],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-glow-salon",
+    "mid": "PYTMIND042906",
+    "name": "Glow Salon",
+    "ownerName": "Kavita Rao",
+    "category": "Salon",
+    "mcc": "7230",
+    "area": "Azad Nagar",
+    "city": "Mumbai",
+    "lat": 19.12358,
+    "lng": 72.85076,
+    "phoneMasked": "+91 96••• ••464",
+    "gstinMasked": null,
+    "qrVolumeBand": "Medium",
+    "monthlyTxns": 1576,
+    "rating": 4.5,
+    "reviewCount": 260,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Google",
+          "rating": 4.5,
+          "reviews": 260
+        }
+      ],
+      "instagram": null,
+      "highlights": [],
+      "currentPackaging": null
+    },
+    "signals": [],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-om-medicos",
+    "mid": "PYTMIND042943",
+    "name": "Om Medicos",
+    "ownerName": "Dinesh Tiwari",
+    "category": "Pharmacy",
+    "mcc": "5912",
+    "area": "Chakala",
+    "city": "Mumbai",
+    "lat": 19.11185,
+    "lng": 72.85022,
+    "phoneMasked": "+91 93••• ••477",
+    "gstinMasked": "27AAL••••7Z2",
+    "qrVolumeBand": "High",
+    "monthlyTxns": 2893,
+    "rating": null,
+    "reviewCount": null,
+    "language": "hinglish",
+    "profile": {
+      "sources": [],
+      "instagram": null,
+      "highlights": [],
+      "currentPackaging": null
+    },
+    "signals": [],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-phone-ghar-electronics",
+    "mid": "PYTMIND042980",
+    "name": "Phone Ghar Electronics",
+    "ownerName": "Ajay Kumar",
+    "category": "Electronics",
+    "mcc": "5732",
+    "area": "Marol",
+    "city": "Mumbai",
+    "lat": 19.10884,
+    "lng": 72.87392,
+    "phoneMasked": "+91 90••• ••490",
+    "gstinMasked": "27AAB••••0Z3",
+    "qrVolumeBand": "Medium",
+    "monthlyTxns": 1610,
+    "rating": 3.9,
+    "reviewCount": 150,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Google",
+          "rating": 3.9,
+          "reviews": 150
+        }
+      ],
+      "instagram": null,
+      "highlights": [],
+      "currentPackaging": null
+    },
+    "signals": [],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-fashion-point",
+    "mid": "PYTMIND043017",
+    "name": "Fashion Point",
+    "ownerName": "Ritika Bhatia",
+    "category": "Clothing",
+    "mcc": "5651",
+    "area": "Jogeshwari East",
+    "city": "Mumbai",
+    "lat": 19.14463,
+    "lng": 72.86741,
+    "phoneMasked": "+91 97••• ••503",
+    "gstinMasked": "27AAC••••3Z4",
+    "qrVolumeBand": "Medium",
+    "monthlyTxns": 1627,
+    "rating": 4.1,
+    "reviewCount": 120,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Google",
+          "rating": 4.1,
+          "reviews": 120
+        }
+      ],
+      "instagram": null,
+      "highlights": [],
+      "currentPackaging": null
+    },
+    "signals": [],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  },
+  {
+    "id": "m-phool-wala-florist",
+    "mid": "PYTMIND043054",
+    "name": "Phool Wala Florist",
+    "ownerName": "Gopal Mali",
+    "category": "Florist",
+    "mcc": "5992",
+    "area": "Irla",
+    "city": "Mumbai",
+    "lat": 19.09994,
+    "lng": 72.83701,
+    "phoneMasked": "+91 94••• ••516",
+    "gstinMasked": "27AAD••••6Z5",
+    "qrVolumeBand": "Low",
+    "monthlyTxns": 924,
+    "rating": 4.4,
+    "reviewCount": 80,
+    "language": "hinglish",
+    "profile": {
+      "sources": [
+        {
+          "source": "Google",
+          "rating": 4.4,
+          "reviews": 80
+        }
+      ],
+      "instagram": null,
+      "highlights": [],
+      "currentPackaging": null
+    },
+    "signals": [],
+    "source": "demo",
+    "paytmStatus": "verified",
+    "contactStatus": "verified",
+    "contactRole": "Owner · opted in to Vyapar (demo)",
+    "observedAt": "2026-10-01"
+  }
+]

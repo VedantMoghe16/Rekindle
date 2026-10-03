@@ -1,0 +1,1121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Vyapar AI Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@500;600&display=swap" rel="stylesheet" />
+<style>
+/* ===== Design tokens (port these into src/app/globals.css later) ===== */
+:root {
+  --pt-cyan: #00b9f1;        /* Paytm process cyan: primary actions, highlights */
+  --pt-cyan-600: #0098d1;
+  --pt-cyan-50: #e8f7fd;     /* chip / tile wash */
+  --pt-cyan-100: #d3f0fb;
+  --pt-navy: #002e6e;        /* midnight blue: text, icons, headers */
+  --pt-navy-700: #0a3d82;
+  --pt-ink: #101828;
+  --pt-muted: #667085;
+  --pt-line: #edeff0;
+  --pt-bg: #f5f7fa;          /* in-app page background */
+  --pt-stage: #dcf0fb;       /* marketing stage background (reference image) */
+  --pt-card: #ffffff;
+  --pt-gold: #f5b82e;        /* "New" / cashback ribbons */
+  --pt-green: #12b76a;
+  --pt-green-50: #e7f8ef;
+  --pt-red: #ec184a;
+  --pt-amber: #f79009;
+  --pt-amber-50: #fff4e5;
+  --wa-bg: #efe7de;          /* WhatsApp-like thread */
+  --wa-out: #d9fdd3;
+  --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 22px;
+  --shadow-card: 0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.08);
+  --shadow-phone: 0 30px 60px -20px rgba(0,46,110,.35), 0 0 0 10px #12161d, 0 0 0 12px #2a303a;
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: var(--font); color: var(--pt-ink); background: var(--pt-stage);
+  -webkit-font-smoothing: antialiased; font-size: 14px; line-height: 1.4;
+}
+button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+svg.i { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.hi { font-family: "Noto Sans Devanagari", var(--font); }
+
+/* ===== Stage layout ===== */
+.stage { min-height: 100%; display: grid; grid-template-columns: 1fr auto 1fr; gap: 48px; align-items: center; padding: 32px 40px; position: relative; overflow: hidden; }
+.stage::before, .stage::after { content: "✦"; position: absolute; color: var(--pt-navy); font-size: 26px; opacity: .8; }
+.stage::before { left: calc(50% - 250px); top: 18%; } .stage::after { right: calc(50% - 250px); top: 82%; font-size: 20px; color: var(--pt-cyan); }
+.brand-lockup { display: inline-flex; flex-direction: column; align-items: center; line-height: 1; }
+.wordmark { font-weight: 800; letter-spacing: -.04em; font-size: 46px; }
+.wordmark .pay { color: var(--pt-navy); } .wordmark .tm { color: var(--pt-cyan); }
+.brand-lockup .for { display: flex; align-items: center; gap: 8px; color: var(--pt-navy); font-size: 13px; font-weight: 600; margin: 4px 0 2px; }
+.brand-lockup .for::before, .brand-lockup .for::after { content: ""; width: 28px; height: 3px; background: var(--pt-cyan); border-radius: 2px; }
+.brand-lockup .biz { color: var(--pt-navy); font-weight: 800; font-size: 30px; letter-spacing: -.02em; }
+
+.side { max-width: 380px; }
+.side.left { justify-self: end; }
+.side.right { justify-self: start; }
+.pill { display: inline-block; background: var(--pt-cyan); color: #fff; font-weight: 700; font-size: 20px; padding: 8px 22px; border-radius: 999px; margin: 24px 0 10px; }
+.side h1 { color: var(--pt-navy); font-size: 30px; line-height: 1.15; font-weight: 800; letter-spacing: -.02em; }
+.side p.lede { color: var(--pt-navy-700); margin-top: 12px; font-size: 15px; }
+.flow { margin-top: 22px; display: grid; gap: 6px; }
+.flow button { display: flex; align-items: center; gap: 12px; text-align: left; padding: 8px 12px; border-radius: 14px; background: rgba(255,255,255,.55); border: 1px solid rgba(0,46,110,.08); transition: .15s; }
+.flow button:hover { background: #fff; }
+.flow button.on { background: #fff; border-color: var(--pt-cyan); box-shadow: 0 6px 18px -8px rgba(0,185,241,.6); }
+.flow .num { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--pt-cyan-50); color: var(--pt-navy); font-weight: 700; font-size: 12px; flex: none; }
+.flow button.on .num { background: var(--pt-cyan); color: #fff; }
+.flow b { display: block; color: var(--pt-navy); font-size: 14px; }
+.flow small { color: var(--pt-muted); font-size: 12px; }
+
+.feature-orbs { display: grid; gap: 22px; }
+.orb { display: flex; align-items: center; gap: 14px; }
+.orb .ring { width: 78px; height: 78px; border-radius: 50%; background: #fff; border: 3px solid var(--pt-cyan); display: grid; place-items: center; color: var(--pt-navy); flex: none; box-shadow: 0 0 0 6px rgba(255,255,255,.6); }
+.orb .ring svg.i { width: 36px; height: 36px; stroke-width: 1.5; }
+.orb b { color: var(--pt-navy); font-size: 16px; display: block; }
+.orb small { color: var(--pt-navy-700); font-size: 13px; }
+.agent-log { margin-top: 26px; background: rgba(255,255,255,.7); border-radius: var(--r-lg); padding: 14px 16px; border: 1px solid rgba(0,46,110,.08); }
+.agent-log h4 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--pt-muted); margin-bottom: 8px; }
+.agent-log ol { list-style: none; display: grid; gap: 8px; max-height: 210px; overflow: auto; }
+.agent-log li { font-size: 12.5px; color: var(--pt-navy); display: flex; gap: 8px; align-items: flex-start; }
+.tag { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px; color: #fff; flex: none; line-height: 1.3; }
+.agent-log li .tag { margin-top: 1px; }
+.tag.claude { background: #c96442; } .tag.sarvam { background: #6b4eff; } .tag.cognee { background: #0f9d76; } .tag.n8n { background: #ea4b71; } .tag.paytm { background: var(--pt-cyan); }
+
+/* ===== Phone ===== */
+.phone { width: 390px; height: min(844px, calc(100vh - 64px)); min-height: 640px; background: var(--pt-bg); border-radius: 46px; box-shadow: var(--shadow-phone); overflow: hidden; position: relative; display: flex; flex-direction: column; }
+.statusbar { height: 44px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 26px 0 30px; font-weight: 600; font-size: 14px; background: #fff; position: relative; z-index: 3; }
+.statusbar .notch { position: absolute; left: 50%; top: 8px; transform: translateX(-50%); width: 112px; height: 28px; background: #0b0d12; border-radius: 20px; }
+.statusbar .sys { display: flex; gap: 5px; align-items: center; }
+.statusbar .sys svg { width: 17px; height: 12px; }
+.screens { flex: 1; position: relative; overflow: hidden; }
+.screen { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--pt-bg); opacity: 0; pointer-events: none; transform: translateX(18px); transition: opacity .22s ease, transform .22s ease; }
+.screen.active { opacity: 1; pointer-events: auto; transform: none; }
+.scroll { flex: 1; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
+.scroll::-webkit-scrollbar { display: none; }
+
+/* App bars */
+.appbar { flex: none; height: 56px; background: #fff; display: flex; align-items: center; gap: 12px; padding: 0 16px; border-bottom: 1px solid var(--pt-line); color: var(--pt-navy); }
+.appbar .mini-wordmark { display: flex; flex-direction: column; line-height: .95; }
+.appbar .mini-wordmark .wordmark { font-size: 21px; }
+.appbar .mini-wordmark .biz { font-size: 12px; font-weight: 800; color: var(--pt-navy); letter-spacing: -.01em; }
+.appbar .mini-wordmark .for { display: flex; align-items: center; justify-content: center; gap: 3px; font-size: 7px; color: var(--pt-navy); font-weight: 600; margin: 1px 0; }
+.appbar .mini-wordmark .for::before, .appbar .mini-wordmark .for::after { content: ""; width: 12px; height: 1.5px; background: var(--pt-cyan); }
+.appbar h2 { font-size: 17px; font-weight: 700; flex: 1; color: var(--pt-navy); }
+.appbar .sub { font-size: 11.5px; color: var(--pt-muted); font-weight: 500; }
+.appbar .spacer { flex: 1; }
+.icon-btn { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px; color: var(--pt-navy); }
+.icon-btn:hover { background: var(--pt-cyan-50); }
+.ai-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: var(--pt-cyan-600); background: var(--pt-cyan-50); padding: 3px 8px; border-radius: 999px; }
+.ai-chip svg.i { width: 13px; height: 13px; }
+
+/* Bottom nav */
+.bottomnav { flex: none; height: 66px; background: #fff; border-top: 1px solid var(--pt-line); display: grid; grid-template-columns: repeat(5, 1fr); align-items: center; padding-bottom: 6px; }
+.bottomnav button { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10.5px; color: var(--pt-muted); font-weight: 500; }
+.bottomnav button.on { color: var(--pt-navy); font-weight: 700; }
+.bottomnav button.on svg.i { color: var(--pt-cyan); }
+.bottomnav .scan { width: 52px; height: 52px; border-radius: 50%; background: var(--pt-navy); color: #fff; display: grid; place-items: center; margin-top: -26px; box-shadow: 0 6px 14px -4px rgba(0,46,110,.5); border: 4px solid #fff; }
+.home-indicator { position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); width: 130px; height: 5px; border-radius: 3px; background: #0b0d12; opacity: .85; z-index: 5; }
+
+/* ===== Home ===== */
+.quick-chips { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px 14px 4px; background: #fff; }
+.qchip { display: flex; align-items: center; justify-content: center; gap: 8px; height: 40px; border-radius: 10px; background: var(--pt-cyan-50); color: var(--pt-cyan-600); font-size: 12.5px; font-weight: 600; border: 1px solid var(--pt-cyan-100); }
+.qchip svg.i { width: 18px; height: 18px; color: var(--pt-navy); }
+.collect-card { margin: 12px 14px 0; background: linear-gradient(135deg, var(--pt-navy) 0%, #0a4a9e 100%); color: #fff; border-radius: var(--r-lg); padding: 14px 16px; position: relative; overflow: hidden; }
+.collect-card::after { content: ""; position: absolute; right: -40px; top: -40px; width: 140px; height: 140px; border-radius: 50%; background: rgba(0,185,241,.25); }
+.collect-card small { opacity: .8; font-size: 12px; }
+.collect-card .amt { font-size: 26px; font-weight: 800; letter-spacing: -.02em; margin: 2px 0 8px; }
+.collect-card .row { display: flex; gap: 14px; font-size: 11.5px; opacity: .92; }
+.collect-card .row span { display: flex; align-items: center; gap: 4px; }
+.collect-card .row svg.i { width: 14px; height: 14px; }
+
+.vyapar-banner { margin: 12px 14px 0; border-radius: var(--r-lg); background: linear-gradient(120deg, #00b9f1 0%, #20d0ff 55%, #7be2ff 100%); color: var(--pt-navy); padding: 14px 14px 14px 16px; display: flex; gap: 12px; align-items: center; position: relative; overflow: hidden; text-align: left; width: calc(100% - 28px); }
+.vyapar-banner .bolt { width: 46px; height: 46px; border-radius: 14px; background: #fff; display: grid; place-items: center; color: var(--pt-cyan-600); flex: none; box-shadow: 0 6px 14px -6px rgba(0,46,110,.4); }
+.vyapar-banner b { display: block; font-size: 15px; font-weight: 800; color: #fff; text-shadow: 0 1px 0 rgba(0,46,110,.15); }
+.vyapar-banner span { font-size: 12px; color: #00315f; font-weight: 500; }
+.vyapar-banner .cta { margin-left: auto; background: var(--pt-navy); color: #fff; font-size: 12px; font-weight: 700; padding: 7px 12px; border-radius: 999px; flex: none; }
+.vyapar-banner .new { position: absolute; top: 8px; right: 10px; font-size: 9px; font-weight: 800; background: var(--pt-gold); color: #fff; padding: 2px 6px; border-radius: 5px; letter-spacing: .04em; display: none; }
+
+.section { background: #fff; margin-top: 12px; padding: 16px 14px 12px; }
+.section-h { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.section-h h3 { font-size: 15px; font-weight: 700; color: var(--pt-ink); }
+.section-h a, .link { font-size: 12.5px; color: var(--pt-cyan-600); font-weight: 600; text-decoration: none; cursor: pointer; }
+.grid-tiles { display: grid; grid-template-columns: repeat(3, 1fr); row-gap: 22px; }
+.tile { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; font-size: 11.5px; color: var(--pt-ink); font-weight: 500; position: relative; padding-top: 6px; }
+.tile .ic { width: 44px; height: 44px; display: grid; place-items: center; color: var(--pt-navy); position: relative; }
+.tile .ic svg.i { width: 28px; height: 28px; stroke-width: 1.5; }
+.tile .ic .dot { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: var(--pt-cyan); right: 6px; top: 6px; }
+.tile .ribbon { position: absolute; top: -10px; font-size: 9px; font-weight: 700; color: #fff; background: var(--pt-gold); padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
+.tile.ai .ic { background: linear-gradient(140deg, var(--pt-cyan) 0%, var(--pt-navy) 100%); color: #fff; border-radius: 14px; }
+.tile.ai .ic svg.i { width: 24px; height: 24px; }
+.tile.ai .ribbon { background: var(--pt-red); }
+.tile:hover .ic { transform: translateY(-1px); }
+.see-less { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 11.5px; }
+.see-less .ic { width: 36px; height: 36px; border-radius: 50%; background: var(--pt-cyan-50); display: grid; place-items: center; color: var(--pt-navy); margin: 4px 0; }
+.empty-pay { display: flex; gap: 14px; align-items: center; padding: 16px 6px 6px; }
+.empty-pay .coin { width: 54px; height: 54px; border-radius: 50%; background: var(--pt-green-50); display: grid; place-items: center; color: var(--pt-green); flex: none; box-shadow: 0 0 0 6px #f3fbf6; }
+.empty-pay p { font-size: 12.5px; color: var(--pt-ink); }
+.empty-pay p span { color: var(--pt-muted); display: block; }
+.past { display: flex; justify-content: center; gap: 6px; color: var(--pt-cyan-600); font-size: 12.5px; font-weight: 600; padding: 14px 0 6px; align-items: center; }
+.past svg.i { width: 16px; height: 16px; }
+
+/* ===== Generic in-app components ===== */
+.card { background: #fff; border-radius: var(--r-md); box-shadow: var(--shadow-card); padding: 14px; }
+.pad { padding: 14px; display: grid; gap: 12px; }
+.muted { color: var(--pt-muted); }
+.small { font-size: 12px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 40px; padding: 0 16px; border-radius: 10px; font-weight: 700; font-size: 13.5px; }
+.btn svg.i { width: 18px; height: 18px; }
+.btn-primary { background: var(--pt-cyan); color: #fff; }
+.btn-primary:hover { background: var(--pt-cyan-600); }
+.btn-navy { background: var(--pt-navy); color: #fff; }
+.btn-ghost { background: var(--pt-cyan-50); color: var(--pt-navy); }
+.btn-block { width: 100%; }
+.badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 700; padding: 3px 7px; border-radius: 6px; }
+.badge svg.i { width: 12px; height: 12px; }
+.b-cyan { background: var(--pt-cyan-50); color: var(--pt-cyan-600); }
+.b-green { background: var(--pt-green-50); color: #067647; }
+.b-amber { background: var(--pt-amber-50); color: #b54708; }
+.b-red { background: #fde8ee; color: #c01048; }
+.b-navy { background: #e6ecf5; color: var(--pt-navy); }
+.b-demo { background: #f2f4f7; color: #475467; }
+
+/* ===== Vyapar AI prompt screen ===== */
+.hero-ai { background: linear-gradient(180deg, #fff 0%, var(--pt-bg) 100%); padding: 18px 16px 6px; }
+.hero-ai .greet { font-size: 13px; color: var(--pt-muted); }
+.hero-ai h3 { font-size: 21px; color: var(--pt-navy); font-weight: 800; letter-spacing: -.02em; margin: 2px 0 12px; line-height: 1.2; }
+.hero-ai h3 em { font-style: normal; color: var(--pt-cyan-600); }
+.prompt-box { background: #fff; border-radius: var(--r-lg); border: 1.5px solid var(--pt-cyan); box-shadow: 0 8px 22px -12px rgba(0,185,241,.55); padding: 12px; }
+.prompt-box textarea { width: 100%; border: 0; resize: none; font: inherit; font-size: 14.5px; color: var(--pt-ink); min-height: 66px; outline: none; background: transparent; }
+.prompt-box .tools { display: flex; align-items: center; gap: 8px; }
+.prompt-box .lang { display: flex; background: var(--pt-bg); border-radius: 8px; padding: 2px; font-size: 11px; font-weight: 700; }
+.prompt-box .lang span { padding: 4px 8px; border-radius: 6px; color: var(--pt-muted); cursor: pointer; }
+.prompt-box .lang span.on { background: #fff; color: var(--pt-navy); box-shadow: var(--shadow-card); }
+.prompt-box .mic { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--pt-cyan-50); color: var(--pt-navy); }
+.prompt-box .go { margin-left: auto; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--pt-cyan); color: #fff; }
+.suggests { display: flex; gap: 8px; overflow-x: auto; padding: 12px 16px 4px; scrollbar-width: none; }
+.suggests button { flex: none; font-size: 12px; background: #fff; border: 1px solid var(--pt-line); padding: 7px 11px; border-radius: 999px; color: var(--pt-navy); font-weight: 500; }
+.plan { display: none; }
+.plan.show { display: grid; gap: 10px; animation: rise .35s ease; }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.plan-grid div { background: var(--pt-bg); border-radius: 10px; padding: 8px 10px; }
+.plan-grid small { display: block; font-size: 10.5px; color: var(--pt-muted); text-transform: uppercase; letter-spacing: .05em; }
+.plan-grid b { font-size: 13px; color: var(--pt-navy); }
+.steps { display: grid; gap: 8px; margin-top: 10px; }
+.step { display: flex; gap: 10px; align-items: center; font-size: 12.5px; color: var(--pt-muted); }
+.step .st { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--pt-line); display: grid; place-items: center; flex: none; }
+.step.done { color: var(--pt-ink); }
+.step.done .st { background: var(--pt-green); border-color: var(--pt-green); color: #fff; }
+.step.run .st { border-color: var(--pt-cyan); border-top-color: transparent; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.step .st svg.i { width: 12px; height: 12px; stroke-width: 3; }
+.stats-mini { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stats-mini div { background: #fff; border-radius: 12px; padding: 10px; box-shadow: var(--shadow-card); }
+.stats-mini b { font-size: 18px; color: var(--pt-navy); display: block; }
+.stats-mini small { font-size: 11px; color: var(--pt-muted); }
+
+/* ===== Leads map ===== */
+.map-wrap { background: #fff; padding: 12px 14px 8px; }
+.map { position: relative; height: 230px; border-radius: 14px; overflow: hidden; background:
+  radial-gradient(circle at 50% 50%, rgba(0,185,241,.06) 0 30%, transparent 30%),
+  linear-gradient(0deg, transparent 49.5%, rgba(0,46,110,.05) 49.5% 50.5%, transparent 50.5%),
+  linear-gradient(90deg, transparent 49.5%, rgba(0,46,110,.05) 49.5% 50.5%, transparent 50.5%),
+  #f2f8fc; }
+.map svg.roads { position: absolute; inset: 0; width: 100%; height: 100%; }
+.map .ring { position: absolute; left: 50%; top: 50%; border: 1.5px dashed rgba(0,185,241,.55); border-radius: 50%; transform: translate(-50%, -50%); }
+.map .ring span { position: absolute; top: -9px; left: 50%; transform: translateX(-50%); font-size: 9.5px; font-weight: 700; color: var(--pt-cyan-600); background: #f2f8fc; padding: 0 4px; }
+.map .me { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 34px; height: 34px; border-radius: 50%; background: var(--pt-navy); color: #fff; display: grid; place-items: center; box-shadow: 0 0 0 6px rgba(0,46,110,.15); z-index: 2; }
+.map .me svg.i { width: 18px; height: 18px; }
+.pin { position: absolute; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; z-index: 2; cursor: pointer; }
+.pin .head { min-width: 26px; height: 26px; padding: 0 6px; border-radius: 13px; display: grid; place-items: center; font-size: 10.5px; font-weight: 800; color: #fff; background: var(--pt-cyan); box-shadow: 0 3px 8px -2px rgba(0,46,110,.4); border: 2px solid #fff; }
+.pin.hot .head { background: var(--pt-green); }
+.pin.out .head { background: #98a2b3; }
+.pin::after { content: ""; width: 2px; height: 7px; background: #fff; }
+.pin.pulse .head { animation: pulse 1.6s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(18,183,106,.55); } 70% { box-shadow: 0 0 0 10px rgba(18,183,106,0); } 100% { box-shadow: 0 0 0 0 rgba(18,183,106,0); } }
+.filters { display: flex; gap: 6px; overflow-x: auto; padding: 10px 0 2px; scrollbar-width: none; }
+.filters span { flex: none; font-size: 11.5px; font-weight: 600; padding: 6px 10px; border-radius: 999px; background: var(--pt-bg); color: var(--pt-navy); display: flex; align-items: center; gap: 4px; }
+.filters span.on { background: var(--pt-navy); color: #fff; }
+.filters svg.i { width: 13px; height: 13px; }
+.lead { background: #fff; border-radius: var(--r-md); box-shadow: var(--shadow-card); padding: 12px; display: grid; gap: 8px; }
+.lead.top { outline: 2px solid var(--pt-green); }
+.lead .row1 { display: flex; gap: 10px; align-items: flex-start; }
+.avatar { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; font-weight: 800; color: #fff; flex: none; font-size: 15px; }
+.lead h4 { font-size: 14px; color: var(--pt-ink); font-weight: 700; display: flex; align-items: center; gap: 4px; }
+.lead h4 svg.i { width: 14px; height: 14px; color: var(--pt-cyan); }
+.lead .meta { font-size: 11.5px; color: var(--pt-muted); display: flex; flex-wrap: wrap; gap: 4px 8px; margin-top: 2px; }
+.lead .meta .star { color: #b54708; font-weight: 700; }
+.score { margin-left: auto; text-align: center; flex: none; }
+.score b { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; font-size: 14px; color: var(--pt-navy); background: conic-gradient(var(--pt-green) calc(var(--v) * 1%), var(--pt-line) 0); position: relative; }
+.score b::before { content: ""; position: absolute; inset: 4px; background: #fff; border-radius: 50%; }
+.score b span { position: relative; }
+.score small { font-size: 9.5px; color: var(--pt-muted); font-weight: 600; }
+.why { font-size: 12px; color: var(--pt-ink); background: var(--pt-bg); border-radius: 8px; padding: 8px 10px; display: grid; gap: 4px; }
+.why div { display: flex; gap: 6px; align-items: flex-start; }
+.why svg.i { width: 14px; height: 14px; color: var(--pt-green); margin-top: 1px; }
+.why .src { color: var(--pt-muted); font-size: 10.5px; margin-left: auto; white-space: nowrap; }
+.lead .actions { display: flex; gap: 8px; }
+.lead .actions .btn { height: 34px; font-size: 12.5px; flex: 1; }
+.excluded { font-size: 11.5px; color: var(--pt-muted); background: #fff; border: 1px dashed #d0d5dd; border-radius: 10px; padding: 10px 12px; display: grid; gap: 4px; }
+
+/* ===== Pitch composer ===== */
+.target-strip { background: #fff; padding: 12px 14px; display: flex; gap: 10px; align-items: center; border-bottom: 1px solid var(--pt-line); }
+.target-strip b { font-size: 14px; display: block; }
+.target-strip small { font-size: 11.5px; color: var(--pt-muted); }
+.seg { display: flex; background: var(--pt-bg); border-radius: 10px; padding: 3px; }
+.seg span { flex: 1; text-align: center; font-size: 12px; font-weight: 600; padding: 7px 0; border-radius: 8px; color: var(--pt-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.seg span.on { background: #fff; color: var(--pt-navy); box-shadow: var(--shadow-card); }
+.seg svg.i { width: 15px; height: 15px; }
+.draft { font-size: 14px; line-height: 1.5; color: var(--pt-ink); white-space: pre-line; }
+.draft mark { background: #fff3c4; padding: 0 2px; border-radius: 3px; }
+.voice { display: flex; align-items: center; gap: 10px; background: var(--pt-bg); border-radius: 12px; padding: 10px; }
+.voice .play { width: 38px; height: 38px; border-radius: 50%; background: var(--pt-navy); color: #fff; display: grid; place-items: center; flex: none; }
+.voice .play svg.i { width: 16px; height: 16px; fill: #fff; stroke: none; }
+.wave { flex: 1; display: flex; align-items: center; gap: 2px; height: 28px; }
+.wave i { flex: 1; background: #98a2b3; border-radius: 2px; }
+.wave.playing i { background: var(--pt-cyan); animation: wv 1s ease-in-out infinite alternate; }
+@keyframes wv { from { transform: scaleY(.5); } to { transform: scaleY(1.1); } }
+.voice small { font-size: 11px; color: var(--pt-muted); white-space: nowrap; }
+.evidence { display: grid; gap: 6px; }
+.evidence div { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; }
+.evidence .chip { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 5px; flex: none; }
+.sticky-cta { flex: none; background: #fff; border-top: 1px solid var(--pt-line); padding: 10px 14px 16px; display: flex; gap: 8px; }
+
+/* ===== WhatsApp-like thread ===== */
+.wa-head { flex: none; height: 58px; background: #075e54; color: #fff; display: flex; align-items: center; gap: 10px; padding: 0 10px; }
+.wa-head .avatar { width: 36px; height: 36px; border-radius: 50%; font-size: 13px; }
+.wa-head b { font-size: 15px; display: block; }
+.wa-head small { font-size: 11px; opacity: .85; }
+.wa-head .icon-btn { color: #fff; }
+.wa-head .icon-btn:hover { background: rgba(255,255,255,.1); }
+.thread { flex: 1; overflow-y: auto; background: var(--wa-bg); background-image: radial-gradient(rgba(0,0,0,.035) 1px, transparent 1px); background-size: 14px 14px; padding: 12px 10px 16px; display: flex; flex-direction: column; gap: 6px; scrollbar-width: none; }
+.thread::-webkit-scrollbar { display: none; }
+.daychip { align-self: center; font-size: 11px; background: #fff; color: #54656f; padding: 4px 10px; border-radius: 8px; box-shadow: var(--shadow-card); margin: 4px 0; }
+.bubble { max-width: 82%; padding: 7px 9px 18px; border-radius: 10px; font-size: 13.5px; line-height: 1.4; position: relative; box-shadow: 0 1px .5px rgba(11,20,26,.13); animation: pop .25s ease; white-space: pre-line; }
+@keyframes pop { from { opacity: 0; transform: translateY(6px) scale(.98); } to { opacity: 1; transform: none; } }
+.bubble.out { align-self: flex-end; background: var(--wa-out); border-top-right-radius: 3px; }
+.bubble.in { align-self: flex-start; background: #fff; border-top-left-radius: 3px; }
+.bubble .t { position: absolute; right: 8px; bottom: 4px; font-size: 10px; color: #667781; display: flex; gap: 3px; align-items: center; }
+.bubble .t svg.i { width: 14px; height: 14px; color: #53bdeb; stroke-width: 2.2; }
+.bubble .via { display: block; font-size: 10px; color: #0b8f72; font-weight: 700; margin-bottom: 2px; }
+.bubble.voice-b { min-width: 230px; }
+.bubble.voice-b .voice { background: transparent; padding: 0; }
+.bubble.voice-b .play { background: #00a884; }
+.sys-card { align-self: center; width: 94%; background: #fff; border-radius: 12px; padding: 10px 12px; font-size: 12px; box-shadow: var(--shadow-card); border-left: 4px solid var(--pt-cyan); animation: pop .3s ease; display: grid; gap: 6px; }
+.sys-card.mem { border-left-color: #0f9d76; }
+.sys-card.act { border-left-color: #ea4b71; }
+.sys-card.stage { border-left-color: var(--pt-green); }
+.sys-card .h { display: flex; align-items: center; gap: 6px; font-weight: 700; color: var(--pt-navy); font-size: 12px; }
+.sys-card .h svg.i { width: 15px; height: 15px; }
+.sys-card .h .tag { margin-left: auto; }
+.sys-card q { font-style: italic; color: #344054; }
+.counter-box { display: grid; gap: 8px; }
+.counter-box .opt { border: 1px solid var(--pt-line); border-radius: 10px; padding: 8px 10px; font-size: 12px; }
+.counter-box .opt.on { border-color: var(--pt-cyan); background: var(--pt-cyan-50); }
+.counter-box .opt b { color: var(--pt-navy); }
+.wa-compose { flex: none; display: flex; gap: 8px; padding: 8px 8px 16px; background: var(--wa-bg); align-items: center; }
+.wa-compose .field { flex: 1; height: 42px; border-radius: 21px; background: #fff; display: flex; align-items: center; padding: 0 14px; font-size: 13px; color: #8696a0; gap: 8px; }
+.wa-compose .send { width: 42px; height: 42px; border-radius: 50%; background: #00a884; color: #fff; display: grid; place-items: center; }
+.autopilot { flex: none; background: #fff; display: flex; align-items: center; gap: 10px; padding: 8px 14px; border-bottom: 1px solid var(--pt-line); font-size: 12px; }
+.autopilot b { color: var(--pt-navy); }
+.switch { width: 38px; height: 22px; border-radius: 11px; background: var(--pt-cyan); position: relative; flex: none; cursor: pointer; transition: .2s; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 19px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: .2s; }
+.switch.off { background: #d0d5dd; } .switch.off::after { left: 3px; }
+.play-demo { margin-left: auto; }
+.typing { align-self: flex-start; background: #fff; border-radius: 10px; padding: 10px 12px; display: flex; gap: 4px; box-shadow: 0 1px .5px rgba(11,20,26,.13); }
+.typing i { width: 6px; height: 6px; border-radius: 50%; background: #8696a0; animation: bl 1s infinite; }
+.typing i:nth-child(2) { animation-delay: .15s; } .typing i:nth-child(3) { animation-delay: .3s; }
+@keyframes bl { 0%, 100% { opacity: .3; } 50% { opacity: 1; } }
+
+/* ===== Deals ===== */
+.kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.kpi { background: #fff; border-radius: 12px; padding: 12px; box-shadow: var(--shadow-card); }
+.kpi small { font-size: 11px; color: var(--pt-muted); display: block; }
+.kpi b { font-size: 20px; color: var(--pt-navy); letter-spacing: -.02em; }
+.kpi .delta { font-size: 11px; color: #067647; font-weight: 700; }
+.funnel { display: grid; gap: 6px; }
+.funnel .fr { display: grid; grid-template-columns: minmax(96px, max-content) 1fr 34px; align-items: center; gap: 8px; font-size: 12px; }
+.funnel .bar { height: 10px; border-radius: 5px; background: var(--pt-cyan-50); overflow: hidden; }
+.funnel .bar i { display: block; height: 100%; background: var(--pt-cyan); border-radius: 5px; }
+.funnel .fr b { text-align: right; color: var(--pt-navy); }
+.revive { background: linear-gradient(135deg, #fff 0%, #f0fbff 100%); border: 1px solid var(--pt-cyan-100); border-radius: var(--r-md); padding: 12px; display: grid; gap: 8px; }
+.revive .h { display: flex; gap: 8px; align-items: center; }
+.revive .h b { font-size: 13.5px; }
+.revive .arrow { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; font-size: 11.5px; }
+.revive .arrow div { background: #fff; border-radius: 8px; padding: 6px 8px; border: 1px solid var(--pt-line); }
+.revive .arrow svg.i { width: 16px; height: 16px; color: var(--pt-cyan); }
+.deal-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--pt-line); }
+.deal-row:last-child { border-bottom: 0; }
+.deal-row .avatar { width: 36px; height: 36px; border-radius: 10px; font-size: 13px; }
+.deal-row b { font-size: 13px; display: block; }
+.deal-row small { font-size: 11px; color: var(--pt-muted); }
+.deal-row .right { margin-left: auto; text-align: right; }
+.deal-row .right b { font-size: 12.5px; color: var(--pt-navy); }
+
+/* ===== Memory ===== */
+.profile-head { background: linear-gradient(180deg, var(--pt-navy) 0%, #0a4a9e 100%); color: #fff; padding: 16px 16px 46px; }
+.profile-head .row { display: flex; gap: 12px; align-items: center; }
+.profile-head .avatar { width: 52px; height: 52px; border-radius: 16px; font-size: 18px; border: 2px solid rgba(255,255,255,.4); }
+.profile-head h3 { font-size: 17px; }
+.profile-head small { opacity: .85; font-size: 12px; }
+.profile-head .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+.profile-head .chips span { font-size: 10.5px; font-weight: 600; background: rgba(255,255,255,.14); padding: 4px 8px; border-radius: 6px; }
+.lift { margin-top: -34px; }
+.stage-track { display: flex; align-items: center; gap: 0; }
+.stage-track .s { flex: 1; text-align: center; font-size: 9.5px; color: var(--pt-muted); font-weight: 600; position: relative; padding-top: 18px; }
+.stage-track .s::before { content: ""; position: absolute; top: 4px; left: 50%; transform: translateX(-50%); width: 12px; height: 12px; border-radius: 50%; background: var(--pt-line); z-index: 1; }
+.stage-track .s::after { content: ""; position: absolute; top: 9px; left: 50%; width: 100%; height: 2px; background: var(--pt-line); }
+.stage-track .s:last-child::after { display: none; }
+.stage-track .s.done { color: var(--pt-navy); }
+.stage-track .s.done::before { background: var(--pt-green); }
+.stage-track .s.done::after { background: var(--pt-green); }
+.stage-track .s.now::before { background: var(--pt-cyan); box-shadow: 0 0 0 4px var(--pt-cyan-100); }
+.mem-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--pt-line); font-size: 12.5px; }
+.mem-item:last-child { border-bottom: 0; }
+.mem-item .dotc { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; flex: none; }
+.mem-item .dotc svg.i { width: 16px; height: 16px; }
+.mem-item q { display: block; font-style: italic; color: #344054; margin-top: 3px; }
+.mem-item .when { font-size: 10.5px; color: var(--pt-muted); margin-top: 3px; }
+.ask { display: flex; gap: 8px; align-items: center; background: var(--pt-bg); border-radius: 12px; padding: 6px 6px 6px 12px; }
+.ask input { flex: 1; border: 0; background: transparent; font: inherit; font-size: 13px; outline: none; }
+.answer { font-size: 12.5px; background: #f0fdf7; border: 1px solid #c6f0dc; border-radius: 10px; padding: 10px; display: none; }
+.answer.show { display: block; animation: rise .3s ease; }
+.graph { height: 150px; position: relative; }
+.graph svg { width: 100%; height: 100%; }
+
+/* ===== Campaigns ===== */
+.obj-bars { display: grid; gap: 8px; }
+.obj-bars .ob { display: grid; grid-template-columns: 1fr 34px; gap: 6px; font-size: 12px; }
+.obj-bars .ob .lbl { display: flex; justify-content: space-between; margin-bottom: 3px; }
+.obj-bars .track { height: 8px; background: var(--pt-bg); border-radius: 4px; overflow: hidden; }
+.obj-bars .track i { display: block; height: 100%; background: var(--pt-navy); border-radius: 4px; }
+.obj-bars .ob:first-child .track i { background: var(--pt-cyan); }
+.obj-bars .ob b { text-align: right; color: var(--pt-navy); align-self: end; }
+.inapp-offer { border-radius: 14px; overflow: hidden; border: 1px solid var(--pt-line); }
+.inapp-offer .top { background: linear-gradient(120deg, #fff6df 0%, #ffe9b3 100%); padding: 12px; display: flex; gap: 10px; align-items: center; }
+.inapp-offer .top .bx { width: 46px; height: 46px; border-radius: 12px; background: #fff; display: grid; place-items: center; color: #b54708; flex: none; }
+.inapp-offer .top b { font-size: 14px; color: #7a2e0e; display: block; }
+.inapp-offer .top small { font-size: 11.5px; color: #93370d; }
+.inapp-offer .bot { padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--pt-muted); background: #fff; }
+.channel-tabs { display: flex; gap: 6px; }
+.channel-tabs span { font-size: 11.5px; font-weight: 600; padding: 6px 10px; border-radius: 8px; background: var(--pt-bg); color: var(--pt-muted); cursor: pointer; }
+.channel-tabs span.on { background: var(--pt-navy); color: #fff; }
+.asset { display: none; } .asset.on { display: grid; gap: 10px; animation: rise .25s ease; }
+.ig { border: 1px solid var(--pt-line); border-radius: 12px; overflow: hidden; }
+.ig .img { aspect-ratio: 1 / 1; background: linear-gradient(150deg, #e9f7ee 0%, #c9efd8 100%); display: grid; place-items: center; text-align: center; padding: 20px; color: #05603a; }
+.ig .img b { font-size: 22px; line-height: 1.15; display: block; letter-spacing: -.02em; }
+.ig .img small { font-size: 12px; display: block; margin-top: 6px; }
+.ig .cap { padding: 8px 10px; font-size: 12px; }
+
+/* Toast */
+.toast { position: absolute; left: 50%; bottom: 84px; transform: translate(-50%, 20px); background: var(--pt-navy); color: #fff; font-size: 12.5px; font-weight: 600; padding: 10px 14px; border-radius: 12px; opacity: 0; transition: .25s; z-index: 10; display: flex; gap: 8px; align-items: center; white-space: nowrap; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast svg.i { width: 16px; height: 16px; color: var(--pt-cyan); }
+
+@media (max-width: 1180px) {
+  .stage { grid-template-columns: 1fr; justify-items: center; gap: 24px; padding: 20px 16px; }
+  .side.left, .side.right { justify-self: center; max-width: 420px; }
+  .side.right { order: 3; }
+  .stage::before, .stage::after { display: none; }
+}
+@media (max-width: 440px) {
+  .phone { width: 100%; border-radius: 0; box-shadow: none; height: 100vh; }
+  .side { display: none; }
+  .stage { padding: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== Icon sprite (lucide-style line icons) ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="megaphone" viewBox="0 0 24 24"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12"/></symbol>
+    <symbol id="music" viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></symbol>
+    <symbol id="soundbox" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="3"/><circle cx="12" cy="14" r="3.2"/><path d="M9 7h6"/></symbol>
+    <symbol id="request" viewBox="0 0 24 24"><rect x="4" y="3" width="13" height="17" rx="2"/><path d="M8 8h5M8 12h3"/><path d="M14 17l2.5 2.5L21 15"/><path d="M10.5 15.5c0 1-.8 1.5-1.8 1.5"/></symbol>
+    <symbol id="photoqr" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></symbol>
+    <symbol id="cardm" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><rect x="8" y="5" width="8" height="5" rx="1"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01M16 17h.01"/></symbol>
+    <symbol id="gauge" viewBox="0 0 24 24"><path d="M4.9 19a9 9 0 1 1 14.2 0"/><path d="M12 13l4-4"/><circle cx="12" cy="13" r="1.4"/></symbol>
+    <symbol id="store" viewBox="0 0 24 24"><path d="M4 9l1.5-5h13L20 9"/><path d="M4 9a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0A2.7 2.7 0 0 0 20 9"/><path d="M5 11v9h14v-9M10 20v-5h4v5"/></symbol>
+    <symbol id="khata" viewBox="0 0 24 24"><path d="M3 5a2 2 0 0 1 2-2h5a2 2 0 0 1 2 2v15a2 2 0 0 0-2-2H3z"/><path d="M21 5a2 2 0 0 0-2-2h-5a2 2 0 0 0-2 2v15a2 2 0 0 1 2-2h7z"/></symbol>
+    <symbol id="analytics" viewBox="0 0 24 24"><path d="M4 20h16"/><path d="M6 16v-3M10 16V9M14 16v-5M18 16V6"/><path d="M5 10l4-4 4 3 6-5"/></symbol>
+    <symbol id="calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></symbol>
+    <symbol id="gst" viewBox="0 0 24 24"><path d="M6 2h9l4 4v16H6z"/><path d="M15 2v4h4"/><path d="M9 11h7M9 15h7M9 19h4"/></symbol>
+    <symbol id="reports" viewBox="0 0 24 24"><rect x="5" y="4" width="12" height="16" rx="1.5"/><path d="M9 4V2.5M13 4V2.5"/><path d="M8 9h6M8 12h6M8 15h4"/><path d="M17 8h2v14H9v-2"/></symbol>
+    <symbol id="chev-up" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></symbol>
+    <symbol id="chev-r" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+    <symbol id="back" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+    <symbol id="rupee" viewBox="0 0 24 24"><path d="M7 4h11M7 9h11M14 20L7 13h3a4 4 0 0 0 0-8"/></symbol>
+    <symbol id="home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></symbol>
+    <symbol id="list" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></symbol>
+    <symbol id="scan" viewBox="0 0 24 24"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M4 12h16"/></symbol>
+    <symbol id="briefcase" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/></symbol>
+    <symbol id="user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+    <symbol id="spark" viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></symbol>
+    <symbol id="pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.3-7-12a7 7 0 0 1 14 0c0 5.7-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></symbol>
+    <symbol id="send" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></symbol>
+    <symbol id="mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></symbol>
+    <symbol id="play" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></symbol>
+    <symbol id="pause" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></symbol>
+    <symbol id="star" viewBox="0 0 24 24"><path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></symbol>
+    <symbol id="check" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></symbol>
+    <symbol id="dcheck" viewBox="0 0 24 24"><path d="M2 12l5 5 9-10M12 16l1 1 9-10"/></symbol>
+    <symbol id="verified" viewBox="0 0 24 24"><path d="M12 2l2.4 2.1 3.2-.3.9 3.1 2.8 1.6-1 3 1 3-2.8 1.6-.9 3.1-3.2-.3L12 22l-2.4-2.1-3.2.3-.9-3.1-2.8-1.6 1-3-1-3 2.8-1.6.9-3.1 3.2.3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></symbol>
+    <symbol id="brain" viewBox="0 0 24 24"><path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 3 3 3 3 0 0 0 3-3V7a3 3 0 0 0-3-3z"/><path d="M15 4a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-3 3 3 3 0 0 1-3-3"/></symbol>
+    <symbol id="flow" viewBox="0 0 24 24"><rect x="3" y="3" width="6" height="6" rx="1.5"/><rect x="15" y="15" width="6" height="6" rx="1.5"/><rect x="15" y="3" width="6" height="6" rx="1.5"/><path d="M9 6h6M18 9v6M6 9v6a3 3 0 0 0 3 3h6"/></symbol>
+    <symbol id="truck" viewBox="0 0 24 24"><path d="M3 6h11v10H3zM14 9h4l3 3v4h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></symbol>
+    <symbol id="chat" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.8 7L3 21l2-6A8 8 0 1 1 21 12z"/></symbol>
+    <symbol id="target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
+    <symbol id="filter" viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></symbol>
+    <symbol id="phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></symbol>
+    <symbol id="video" viewBox="0 0 24 24"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M16 10l6-3v10l-6-3"/></symbol>
+    <symbol id="more" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></symbol>
+    <symbol id="bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></symbol>
+    <symbol id="handshake" viewBox="0 0 24 24"><path d="M11 17l2 2a1.4 1.4 0 0 0 2-2"/><path d="M14 14l2.5 2.5a1.4 1.4 0 0 0 2-2L15 11"/><path d="M2 12l4-4 4 1 3-2 3 1 6 5"/><path d="M5 15l3 3a1.4 1.4 0 0 0 2-2"/><path d="M8 13l3 3"/></symbol>
+    <symbol id="bank" viewBox="0 0 24 24"><path d="M3 10l9-6 9 6M5 10v8M9 10v8M15 10v8M19 10v8M3 21h18"/></symbol>
+    <symbol id="percent" viewBox="0 0 24 24"><path d="M12 2l2.2 1.6 2.7-.2.9 2.6 2.4 1.3-.6 2.7 1.4 2.3-2 1.9-.1 2.7-2.6.6-1.4 2.3-2.6-.9-2.6.9-1.4-2.3-2.6-.6-.1-2.7-2-1.9L3.8 10l-.6-2.7 2.4-1.3.9-2.6 2.7.2z"/><path d="M9 15l6-6"/><circle cx="9.5" cy="9.5" r=".8"/><circle cx="14.5" cy="14.5" r=".8"/></symbol>
+    <symbol id="monitor" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4M6 9h6M6 12h4"/><circle cx="17" cy="11" r="2.5"/></symbol>
+    <symbol id="box" viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></symbol>
+    <symbol id="clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></symbol>
+    <symbol id="insta" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8"/></symbol>
+    <symbol id="refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></symbol>
+    <symbol id="alert" viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v4M12 17h.01"/></symbol>
+    <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5"/></symbol>
+  </defs>
+</svg>
+
+<div class="stage">
+
+  <!-- ===== Left: brand + flow navigator ===== -->
+  <aside class="side left">
+    <div class="brand-lockup" aria-label="Paytm for Business">
+      <div class="wordmark"><span class="pay">pay</span><span class="tm">tm</span></div>
+      <div class="for">for</div>
+      <div class="biz">Business</div>
+    </div>
+    <div><span class="pill">Vyapar AI</span></div>
+    <h1>Your own AI sales team, inside Paytm for Business</h1>
+    <p class="lede">Finds nearby Paytm merchants who need what you sell, pitches them on WhatsApp in Hinglish, remembers every objection, and books the sample. You just approve.</p>
+    <nav class="flow" id="flow">
+      <button data-go="home"><span class="num">1</span><span><b>Paytm for Business home</b><small>The new Vyapar AI tile and banner</small></span></button>
+      <button data-go="ai"><span class="num">2</span><span><b>Tell Vyapar AI what to sell</b><small>A plain Hinglish prompt becomes a plan</small></span></button>
+      <button data-go="leads"><span class="num">3</span><span><b>Nearby buyers, ranked</b><small>Geo, category, QR volume and web data</small></span></button>
+      <button data-go="pitch"><span class="num">4</span><span><b>Hinglish pitch + voice note</b><small>Sarvam writes it and speaks it</small></span></button>
+      <button data-go="chat"><span class="num">5</span><span><b>Objection → counter → sample</b><small>Cognee remembers, n8n delivers</small></span></button>
+      <button data-go="deals"><span class="num">6</span><span><b>Deals & revive alerts</b><small>Your pipeline at a glance</small></span></button>
+      <button data-go="memory"><span class="num">7</span><span><b>Merchant memory</b><small>Every promise and objection, cited</small></span></button>
+      <button data-go="campaigns"><span class="num">8</span><span><b>Campaigns from objections</b><small>Broadcast, Instagram, in-app offer</small></span></button>
+    </nav>
+  </aside>
+
+  <!-- ===== Phone ===== -->
+  <div class="phone" id="phone">
+    <div class="statusbar">
+      <span>9:41</span><span class="notch"></span>
+      <span class="sys">
+        <svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#111"/><rect x="5" y="5" width="3" height="7" rx="1" fill="#111"/><rect x="10" y="2" width="3" height="10" rx="1" fill="#111"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#111"/></svg>
+        <svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3" fill="none" stroke="#111" opacity=".4"/><rect x="2" y="2" width="17" height="8" rx="2" fill="#111"/><rect x="23.5" y="4" width="2" height="4" rx="1" fill="#111" opacity=".4"/></svg>
+      </span>
+    </div>
+
+    <div class="screens">
+
+      <!-- ========== 1. HOME ========== -->
+      <section class="screen active" data-screen="home">
+        <header class="appbar">
+          <button class="icon-btn" aria-label="Menu"><svg class="i"><use href="#menu"/></svg></button>
+          <div class="mini-wordmark"><div class="wordmark"><span class="pay">pay</span><span class="tm">tm</span></div><div class="for">for</div><div class="biz">Business</div></div>
+          <span class="spacer"></span>
+          <button class="icon-btn" aria-label="Announcements"><svg class="i"><use href="#megaphone"/></svg></button>
+        </header>
+        <div class="scroll">
+          <div class="quick-chips">
+            <button class="qchip"><svg class="i"><use href="#music"/></svg>Entertainment+</button>
+            <button class="qchip"><svg class="i"><use href="#soundbox"/></svg>Buy Free Soundbox!</button>
+          </div>
+
+          <div class="collect-card">
+            <small>Today's collection · EcoPack Solutions</small>
+            <div class="amt">₹18,420</div>
+            <div class="row"><span><svg class="i"><use href="#check"/></svg>46 payments</span><span><svg class="i"><use href="#bank"/></svg>Settles 7 PM to HDFC ••21</span></div>
+          </div>
+
+          <button class="vyapar-banner" data-go="ai">
+            <span class="bolt"><svg class="i"><use href="#spark"/></svg></span>
+            <span><b>Vyapar AI: find buyers near you</b><span>12 bakeries & cloud kitchens within 5 km need packaging</span></span>
+            <span class="cta">Try now</span>
+          </button>
+
+          <div class="section">
+            <div class="section-h"><h3>Grow Your Business</h3></div>
+            <div class="grid-tiles">
+              <button class="tile ai" data-go="ai"><span class="ribbon">AI · New</span><span class="ic"><svg class="i"><use href="#spark"/></svg></span>Vyapar AI</button>
+              <button class="tile"><span class="ic"><svg class="i"><use href="#request"/></svg></span>Request Payment</button>
+              <button class="tile"><span class="ribbon">New</span><span class="ic"><svg class="i"><use href="#photoqr"/></svg></span>Photo QR</button>
+              <button class="tile"><span class="ribbon">100% Cashback</span><span class="ic"><svg class="i"><use href="#soundbox"/></svg></span>Get Soundbox</button>
+              <button class="tile"><span class="ribbon">Upto 100% Cashback</span><span class="ic"><svg class="i"><use href="#cardm"/></svg></span>Card Machine</button>
+              <button class="tile"><span class="ic"><svg class="i"><use href="#gauge"/></svg></span>FREE Credit Score</button>
+              <button class="tile" data-go="deals"><span class="ic"><svg class="i"><use href="#handshake"/></svg><span class="dot"></span></span>My Deals</button>
+              <button class="tile"><span class="ic"><svg class="i"><use href="#store"/></svg></span>QR Store</button>
+              <button class="tile"><span class="ic"><svg class="i"><use href="#khata"/></svg></span>Khata Entry</button>
+              <button class="tile"><span class="ic"><svg class="i"><use href="#analytics"/></svg></span>Analytics</button>
+              <button class="tile" data-go="campaigns"><span class="ic"><svg class="i"><use href="#megaphone"/></svg></span>Campaigns</button>
+              <button class="tile"><span class="ic"><svg class="i"><use href="#calendar"/></svg></span>Attendance</button>
+              <button class="tile"><span class="ic"><svg class="i"><use href="#gst"/></svg></span>GST Invoices</button>
+              <button class="tile"><span class="ic"><svg class="i"><use href="#reports"/></svg></span>Reports</button>
+              <div class="see-less"><span class="ic"><svg class="i"><use href="#chev-up"/></svg></span>See Less</div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-h"><h3>Vyapar AI today</h3><a data-go="deals">View deals</a></div>
+            <div class="stats-mini">
+              <div><b>3</b><small>New replies</small></div>
+              <div><b>1</b><small>Sample to send</small></div>
+              <div><b>₹42k</b><small>In pipeline</small></div>
+            </div>
+          </div>
+
+          <div class="section" style="margin-bottom:12px">
+            <div class="empty-pay">
+              <span class="coin"><svg class="i"><use href="#rupee"/></svg></span>
+              <p>You don't have any refunds pending today.<span>All settlements are on time.</span></p>
+            </div>
+            <div class="past"><svg class="i"><use href="#calendar"/></svg>View Past Payments</div>
+          </div>
+        </div>
+        <nav class="bottomnav">
+          <button class="on"><svg class="i"><use href="#home"/></svg>Home</button>
+          <button><svg class="i"><use href="#list"/></svg>Payments</button>
+          <button><span class="scan"><svg class="i"><use href="#scan"/></svg></span></button>
+          <button data-go="ai"><svg class="i"><use href="#spark"/></svg>Vyapar AI</button>
+          <button><svg class="i"><use href="#user"/></svg>Profile</button>
+        </nav>
+      </section>
+
+      <!-- ========== 2. VYAPAR AI PROMPT ========== -->
+      <section class="screen" data-screen="ai">
+        <header class="appbar">
+          <button class="icon-btn" data-go="home" aria-label="Back"><svg class="i"><use href="#back"/></svg></button>
+          <div style="flex:1"><h2>Vyapar AI</h2><div class="sub">Your AI sales teammate</div></div>
+          <span class="ai-chip"><svg class="i"><use href="#spark"/></svg>Beta</span>
+        </header>
+        <div class="scroll">
+          <div class="hero-ai">
+            <div class="greet">Namaste Rahul 👋</div>
+            <h3>Kya bechna hai, aur <em>kisko?</em></h3>
+            <div class="prompt-box">
+              <textarea id="promptText">Find me cloud kitchens and bakeries within a 5km radius and pitch my ₹5 paper bags.</textarea>
+              <div class="tools">
+                <div class="lang"><span class="on">Hinglish</span><span>EN</span><span class="hi">हिं</span></div>
+                <button class="mic" aria-label="Speak"><svg class="i"><use href="#mic"/></svg></button>
+                <button class="go" id="runPlan" aria-label="Run"><svg class="i"><use href="#send"/></svg></button>
+              </div>
+            </div>
+          </div>
+          <div class="suggests">
+            <button>Sweet shops for Diwali gift boxes</button>
+            <button>Cafes that opened this month</button>
+            <button>Restaurants on Zomato 4★+</button>
+          </div>
+          <div class="pad">
+            <div class="plan" id="plan">
+              <div class="card">
+                <div style="display:flex;align-items:center;gap:8px"><span class="ai-chip"><svg class="i"><use href="#spark"/></svg>Plan</span><b style="color:var(--pt-navy);font-size:14px">Here's how I'll find your buyers</b></div>
+                <div class="plan-grid">
+                  <div><small>Buyer types</small><b>Bakery, Cloud kitchen</b></div>
+                  <div><small>Radius</small><b>5 km from Vijay Nagar</b></div>
+                  <div><small>Product</small><b>Paper bags · ₹5/pc</b></div>
+                  <div><small>Pitch in</small><b>Hinglish · WhatsApp</b></div>
+                </div>
+                <div class="steps" id="steps">
+                  <div class="step"><span class="st"><svg class="i"><use href="#check"/></svg></span>Searching 2,140 Paytm merchants near you</div>
+                  <div class="step"><span class="st"><svg class="i"><use href="#check"/></svg></span>Filtering by category (MCC 5462, 5812)</div>
+                  <div class="step"><span class="st"><svg class="i"><use href="#check"/></svg></span>Checking web ratings & Instagram</div>
+                  <div class="step"><span class="st"><svg class="i"><use href="#check"/></svg></span>Ranking by fit and buying signals</div>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-block" data-go="leads" id="seeLeads" style="display:none">See 12 matching buyers <svg class="i"><use href="#chev-r"/></svg></button>
+            </div>
+            <div class="card" id="aiIntro">
+              <b style="color:var(--pt-navy)">What Vyapar AI does for you</b>
+              <div class="evidence" style="margin-top:10px">
+                <div><span class="chip b-cyan">FIND</span>Nearby Paytm merchants who need your product</div>
+                <div><span class="chip b-cyan">PITCH</span>WhatsApp message + voice note in Hinglish</div>
+                <div><span class="chip b-cyan">REMEMBER</span>Every reply, objection and promise</div>
+                <div><span class="chip b-cyan">ACT</span>Books samples & meetings automatically</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== 3. LEADS ========== -->
+      <section class="screen" data-screen="leads">
+        <header class="appbar">
+          <button class="icon-btn" data-go="ai" aria-label="Back"><svg class="i"><use href="#back"/></svg></button>
+          <div style="flex:1"><h2>12 buyers near you</h2><div class="sub">Paper bags · within 5 km</div></div>
+          <button class="icon-btn" aria-label="Filter"><svg class="i"><use href="#filter"/></svg></button>
+        </header>
+        <div class="scroll">
+          <div class="map-wrap">
+            <div class="map" id="map">
+              <svg class="roads" viewBox="0 0 360 230" preserveAspectRatio="none">
+                <path d="M0 160 C 90 140, 150 120, 360 70" stroke="#fff" stroke-width="10" fill="none"/>
+                <path d="M120 0 C 140 80, 170 150, 150 230" stroke="#fff" stroke-width="8" fill="none"/>
+                <path d="M0 40 L 360 200" stroke="#fff" stroke-width="5" fill="none"/>
+                <path d="M260 0 L 300 230" stroke="#fff" stroke-width="4" fill="none"/>
+              </svg>
+              <div class="ring" style="width:80px;height:80px"><span>1 km</span></div>
+              <div class="ring" style="width:150px;height:150px"><span>3 km</span></div>
+              <div class="ring" style="width:218px;height:218px"><span>5 km</span></div>
+              <div class="me" title="EcoPack Solutions"><svg class="i"><use href="#box"/></svg></div>
+            </div>
+            <div class="filters">
+              <span class="on">All 12</span><span>Bakery 7</span><span>Cloud kitchen 5</span><span><svg class="i"><use href="#bolt"/></svg>Buying signals 6</span>
+            </div>
+          </div>
+          <div class="pad" id="leadList"></div>
+        </div>
+      </section>
+
+      <!-- ========== 4. PITCH ========== -->
+      <section class="screen" data-screen="pitch">
+        <header class="appbar">
+          <button class="icon-btn" data-go="leads" aria-label="Back"><svg class="i"><use href="#back"/></svg></button>
+          <div style="flex:1"><h2>Pitch Karan's Cafe</h2><div class="sub">Drafted by Vyapar AI · review before sending</div></div>
+        </header>
+        <div class="target-strip">
+          <span class="avatar" style="background:#f79009">KC</span>
+          <div style="flex:1"><b>Karan's Cafe & Bakery</b><small>Karan Mehta · Bakery · 2.1 km · Hinglish</small></div>
+          <span class="badge b-green">Fit 94</span>
+        </div>
+        <div class="scroll">
+          <div class="pad">
+            <div class="seg" id="pitchSeg">
+              <span class="on" data-ch="wa"><svg class="i"><use href="#chat"/></svg>WhatsApp</span>
+              <span data-ch="voice"><svg class="i"><use href="#mic"/></svg>Voice note</span>
+              <span data-ch="call"><svg class="i"><use href="#phone"/></svg>AI call</span>
+            </div>
+            <div class="card">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                <span class="badge b-navy">Hinglish · 58 words</span>
+                <span class="small muted">Written by Sarvam-M</span>
+              </div>
+              <div class="draft">Namaste Karan ji! 🙏
+Main Rahul, <mark>EcoPack Solutions</mark> se, aapke cafe se bas <mark>2 km door</mark> Vijay Nagar mein.
+
+Aapke <mark>4.5★ reviews</mark> mein log aapke pastries ki tareef karte hain. Unke liye hamare <mark>eco-friendly pastry boxes aur paper bags ₹5 se</mark> shuru hote hain, same-day delivery ke saath.
+
+Kya main kal ek <mark>free sample pack</mark> bhijwa doon?</div>
+            </div>
+            <div class="voice" id="pitchVoice">
+              <button class="play" id="playVoice" aria-label="Play voice note"><svg class="i"><use href="#play"/></svg></button>
+              <div class="wave" id="wave"></div>
+              <small>0:21 · Bulbul voice</small>
+            </div>
+            <div class="card">
+              <b style="font-size:13px;color:var(--pt-navy)">Why this pitch</b>
+              <div class="evidence" style="margin-top:8px">
+                <div><span class="chip b-cyan">PAYTM</span>Bakery (MCC 5462), 2.1 km away, high QR volume</div>
+                <div><span class="chip b-amber">WEB</span>4.5★ from 1.2k reviews, "pastries" mentioned 38×</div>
+                <div><span class="chip b-green">SIGNAL</span>Opened a 2nd outlet 3 weeks ago</div>
+                <div><span class="chip b-navy">OFFER</span>Free sample pack (your policy: up to 20/week)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="sticky-cta">
+          <button class="btn btn-ghost" style="flex:1"><svg class="i"><use href="#refresh"/></svg>Rewrite</button>
+          <button class="btn btn-primary" style="flex:2" data-go="chat" id="sendPitch"><svg class="i"><use href="#send"/></svg>Send on WhatsApp</button>
+        </div>
+      </section>
+
+      <!-- ========== 5. CHAT ========== -->
+      <section class="screen" data-screen="chat">
+        <header class="wa-head">
+          <button class="icon-btn" data-go="pitch" aria-label="Back"><svg class="i"><use href="#back"/></svg></button>
+          <span class="avatar" style="background:#f79009">KC</span>
+          <div style="flex:1"><b>Karan's Cafe & Bakery</b><small id="waStatus">via Vyapar AI · Paytm verified</small></div>
+          <button class="icon-btn" aria-label="Video"><svg class="i"><use href="#video"/></svg></button>
+          <button class="icon-btn" data-go="memory" aria-label="Memory"><svg class="i"><use href="#brain"/></svg></button>
+        </header>
+        <div class="autopilot">
+          <svg class="i" style="width:18px;height:18px;color:var(--pt-cyan)"><use href="#spark"/></svg>
+          <span><b>Autopilot</b> · AI handles replies, you approve deals</span>
+          <span class="switch" id="autoSwitch"></span>
+        </div>
+        <div class="thread" id="thread"></div>
+        <div class="wa-compose">
+          <div class="field">Type a message <span style="margin-left:auto"><button class="btn btn-navy" id="playDemo" style="height:28px;padding:0 10px;font-size:11px"><svg class="i" style="width:12px;height:12px;fill:#fff;stroke:none"><use href="#play"/></svg>Play demo</button></span></div>
+          <button class="send" aria-label="Voice"><svg class="i"><use href="#mic"/></svg></button>
+        </div>
+      </section>
+
+      <!-- ========== 6. DEALS ========== -->
+      <section class="screen" data-screen="deals">
+        <header class="appbar">
+          <button class="icon-btn" data-go="home" aria-label="Back"><svg class="i"><use href="#back"/></svg></button>
+          <div style="flex:1"><h2>My Deals</h2><div class="sub">Vyapar AI · this month</div></div>
+          <span class="ai-chip"><svg class="i"><use href="#spark"/></svg>Auto</span>
+        </header>
+        <div class="scroll">
+          <div class="pad">
+            <div class="kpis">
+              <div class="kpi"><small>Pipeline value</small><b>₹42,600</b><div class="delta">▲ ₹8,400 this week</div></div>
+              <div class="kpi"><small>Orders won</small><b>₹14,200</b><div class="delta">▲ 3 new buyers</div></div>
+              <div class="kpi"><small>Reply rate</small><b>38%</b><div class="delta">▲ vs 9% cold calls</div></div>
+              <div class="kpi"><small>Time saved</small><b>11 hrs</b><div class="delta">No door-to-door</div></div>
+            </div>
+            <div class="card">
+              <div class="section-h" style="margin-bottom:10px"><h3 style="font-size:14px">Pipeline</h3><span class="small muted">47 merchants</span></div>
+              <div class="funnel">
+                <div class="fr"><span>Pitched</span><span class="bar"><i style="width:100%"></i></span><b>47</b></div>
+                <div class="fr"><span>Replied</span><span class="bar"><i style="width:38%"></i></span><b>18</b></div>
+                <div class="fr"><span>Objection</span><span class="bar"><i style="width:21%"></i></span><b>10</b></div>
+                <div class="fr"><span>Sample sent</span><span class="bar"><i style="width:17%"></i></span><b>8</b></div>
+                <div class="fr"><span>Order won</span><span class="bar"><i style="width:8%"></i></span><b>4</b></div>
+              </div>
+            </div>
+            <div class="revive">
+              <div class="h"><span class="badge b-green"><svg class="i"><use href="#refresh"/></svg>Revive now</span><b>Sharma Sweets is worth another try</b></div>
+              <div class="arrow">
+                <div><span class="muted small">They said (12 Sep)</span><br><i>"Bhai ₹5 bahut hai, bulk mein sasta do"</i></div>
+                <svg class="i"><use href="#chev-r"/></svg>
+                <div><span class="muted small">What changed</span><br>You launched the <b>₹4.20 bulk tier</b>, and Diwali orders are up 2.3×</div>
+              </div>
+              <button class="btn btn-primary btn-block" style="height:36px">Send Diwali bulk offer</button>
+            </div>
+            <div class="card">
+              <div class="section-h" style="margin-bottom:4px"><h3 style="font-size:14px">Needs you today</h3></div>
+              <div class="deal-row" data-go="chat"><span class="avatar" style="background:#f79009">KC</span><div><b>Karan's Cafe & Bakery</b><small>Sample requested · dispatch tomorrow 11 AM</small></div><div class="right"><b>₹6,000</b><br><span class="badge b-green">Sample</span></div></div>
+              <div class="deal-row"><span class="avatar" style="background:#7a5af8">BB</span><div><b>Biryani Box Kitchen</b><small>Asked for 60-day credit</small></div><div class="right"><b>₹9,500</b><br><span class="badge b-amber">Objection</span></div></div>
+              <div class="deal-row"><span class="avatar" style="background:#12b76a">TT</span><div><b>Tiffin Tales</b><small>Meeting Thu 4 PM · Google Meet</small></div><div class="right"><b>₹4,800</b><br><span class="badge b-cyan">Meeting</span></div></div>
+              <div class="deal-row"><span class="avatar" style="background:#98a2b3">CC</span><div><b>Crust & Crumb</b><small>No reply for 9 days</small></div><div class="right"><b>₹3,200</b><br><span class="badge b-demo">Going cold</span></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== 7. MEMORY ========== -->
+      <section class="screen" data-screen="memory">
+        <header class="appbar">
+          <button class="icon-btn" data-go="chat" aria-label="Back"><svg class="i"><use href="#back"/></svg></button>
+          <div style="flex:1"><h2>Merchant memory</h2><div class="sub">Powered by Cognee knowledge graph</div></div>
+        </header>
+        <div class="scroll">
+          <div class="profile-head">
+            <div class="row">
+              <span class="avatar" style="background:#f79009">KC</span>
+              <div><h3>Karan's Cafe & Bakery</h3><small>Karan Mehta · Owner · Vijay Nagar, Indore</small></div>
+            </div>
+            <div class="chips"><span>Paytm verified</span><span>MCC 5462 Bakery</span><span>GSTIN ••••4Z1</span><span>QR volume: High</span><span>4.5★ online</span></div>
+          </div>
+          <div class="pad lift">
+            <div class="card">
+              <div class="stage-track">
+                <div class="s done">Found</div><div class="s done">Pitched</div><div class="s done">Objection</div><div class="s now">Sample</div><div class="s">Order</div>
+              </div>
+            </div>
+            <div class="card">
+              <b style="font-size:13px;color:var(--pt-navy)">What Vyapar AI remembers</b>
+              <div class="mem-item"><span class="dotc b-red"><svg class="i"><use href="#alert"/></svg></span><div><b>Objection: price too high</b><q>Bhaiya rate zyada hai, ₹3 mein milega?</q><div class="when">Today 10:42 · WhatsApp · quote verified ✓</div></div></div>
+              <div class="mem-item"><span class="dotc b-green"><svg class="i"><use href="#check"/></svg></span><div><b>Resolved with: bulk tier ₹4.20 at 1,000+ pcs</b><div class="when">Today 10:43 · counter sent by Autopilot</div></div></div>
+              <div class="mem-item"><span class="dotc b-cyan"><svg class="i"><use href="#box"/></svg></span><div><b>Commitment (us): free sample pack tomorrow 11 AM</b><div class="when">n8n task #VY-2291 · warehouse notified</div></div></div>
+              <div class="mem-item"><span class="dotc b-navy"><svg class="i"><use href="#clock"/></svg></span><div><b>Timing: monthly packaging order around the 5th</b><q>Har mahine 5 tareekh ko stock lete hain</q><div class="when">Today 10:46</div></div></div>
+            </div>
+            <div class="card">
+              <b style="font-size:13px;color:var(--pt-navy)">Knowledge graph</b>
+              <div class="graph">
+                <svg viewBox="0 0 320 150">
+                  <g stroke="#cfd8e3" stroke-width="1.5">
+                    <line x1="160" y1="75" x2="60" y2="30"/><line x1="160" y1="75" x2="60" y2="120"/><line x1="160" y1="75" x2="265" y2="30"/><line x1="160" y1="75" x2="265" y2="120"/><line x1="60" y1="30" x2="20" y2="75"/><line x1="265" y1="120" x2="305" y2="75"/>
+                  </g>
+                  <g font-family="Inter" font-size="9" font-weight="600" text-anchor="middle">
+                    <circle cx="160" cy="75" r="22" fill="#002e6e"/><text x="160" y="78" fill="#fff">Karan's</text>
+                    <circle cx="60" cy="30" r="16" fill="#fde8ee"/><text x="60" y="33" fill="#c01048">Price</text>
+                    <circle cx="20" cy="75" r="14" fill="#e7f8ef"/><text x="20" y="78" fill="#067647">₹4.20</text>
+                    <circle cx="60" cy="120" r="16" fill="#e8f7fd"/><text x="60" y="123" fill="#0098d1">Bakery</text>
+                    <circle cx="265" cy="30" r="16" fill="#fff4e5"/><text x="265" y="33" fill="#b54708">Sample</text>
+                    <circle cx="265" cy="120" r="16" fill="#e6ecf5"/><text x="265" y="123" fill="#002e6e">5th/mo</text>
+                    <circle cx="305" cy="75" r="12" fill="#f2f4f7"/><text x="305" y="78" fill="#475467">Reorder</text>
+                  </g>
+                </svg>
+              </div>
+            </div>
+            <div class="card" style="display:grid;gap:8px">
+              <b style="font-size:13px;color:var(--pt-navy)">Ask about your buyers</b>
+              <div class="ask"><input id="askInput" value="Which bakeries said price is too high?" /><button class="btn btn-primary" id="askBtn" style="height:34px;padding:0 12px"><svg class="i"><use href="#search"/></svg></button></div>
+              <div class="answer" id="answer"><b>4 bakeries raised price.</b> Karan's Cafe and Sweet Nest accepted the ₹4.20 bulk tier. Sharma Sweets and Crust & Crumb haven't seen it yet, so it's worth reviving both. <span class="muted small">Sources: 4 WhatsApp threads</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== 8. CAMPAIGNS ========== -->
+      <section class="screen" data-screen="campaigns">
+        <header class="appbar">
+          <button class="icon-btn" data-go="home" aria-label="Back"><svg class="i"><use href="#back"/></svg></button>
+          <div style="flex:1"><h2>Campaigns</h2><div class="sub">Built from what buyers actually said</div></div>
+        </header>
+        <div class="scroll">
+          <div class="pad">
+            <div class="card">
+              <div class="section-h" style="margin-bottom:10px"><h3 style="font-size:14px">Top objections · 18 replies</h3><span class="badge b-cyan">This month</span></div>
+              <div class="obj-bars">
+                <div class="ob"><div><div class="lbl"><span>Price too high</span></div><div class="track"><i style="width:44%"></i></div></div><b>8</b></div>
+                <div class="ob"><div><div class="lbl"><span>Already have a supplier</span></div><div class="track"><i style="width:22%"></i></div></div><b>4</b></div>
+                <div class="ob"><div><div class="lbl"><span>Want credit terms</span></div><div class="track"><i style="width:17%"></i></div></div><b>3</b></div>
+                <div class="ob"><div><div class="lbl"><span>Quality doubt / want sample</span></div><div class="track"><i style="width:17%"></i></div></div><b>3</b></div>
+              </div>
+            </div>
+            <div class="card" style="display:grid;gap:10px">
+              <div style="display:flex;align-items:center;gap:8px"><span class="ai-chip"><svg class="i"><use href="#spark"/></svg>Suggested</span><b style="font-size:13.5px;color:var(--pt-navy)">Answer "price too high" before they say it</b></div>
+              <div class="channel-tabs" id="chTabs"><span class="on" data-a="inapp">Paytm in-app</span><span data-a="wa">WhatsApp</span><span data-a="ig">Instagram</span></div>
+              <div class="asset on" data-asset="inapp">
+                <div class="inapp-offer">
+                  <div class="top"><span class="bx"><svg class="i"><use href="#box"/></svg></span><div><b>Bulk paper bags at ₹4.20/pc</b><small>EcoPack · 2 km away · free sample for Paytm merchants</small></div></div>
+                  <div class="bot"><span>Shows in Paytm for Business to 34 bakeries & cafes</span><span class="link">Preview</span></div>
+                </div>
+              </div>
+              <div class="asset" data-asset="wa">
+                <div class="bubble out" style="max-width:100%;align-self:stretch">Diwali special 🪔 Paytm merchants ke liye EcoPack ke paper bags ab sirf <b>₹4.20</b> (1,000+ pcs). Free sample, same-day delivery Vijay Nagar mein. Reply "SAMPLE" 📦<span class="t">Broadcast · 34</span></div>
+              </div>
+              <div class="asset" data-asset="ig">
+                <div class="ig"><div class="img"><div><b>Plastic hatao.<br>Profit badhao.</b><small>Paper bags from ₹4.20 · Indore</small></div></div><div class="cap"><b>ecopack.indore</b> Bakeries in Vijay Nagar switched this month 🌱 #Indore #EcoFriendly</div></div>
+              </div>
+              <button class="btn btn-primary btn-block" id="launchCamp"><svg class="i"><use href="#flow"/></svg>Approve & launch via n8n</button>
+            </div>
+            <div class="card">
+              <div class="section-h" style="margin-bottom:8px"><h3 style="font-size:14px">What's working</h3><span class="small muted">Growth loop</span></div>
+              <div class="funnel">
+                <div class="fr"><span>Price → bulk tier</span><span class="bar"><i style="width:62%"></i></span><b>62%</b></div>
+                <div class="fr"><span>Supplier → sample</span><span class="bar"><i style="width:41%"></i></span><b>41%</b></div>
+                <div class="fr"><span>Credit → Paytm Postpaid</span><span class="bar"><i style="width:35%"></i></span><b>35%</b></div>
+              </div>
+              <p class="small muted" style="margin-top:8px">Sample rate by objection → counter-offer</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+    <div class="toast" id="toast"><svg class="i"><use href="#check"/></svg><span></span></div>
+    <span class="home-indicator"></span>
+  </div>
+
+  <!-- ===== Right: feature orbs + live agent log ===== -->
+  <aside class="side right">
+    <div class="feature-orbs">
+      <div class="orb"><span class="ring"><svg class="i"><use href="#target"/></svg></span><span><b>Find buyers nearby</b><small>Paytm geo + category + web enrichment</small></span></div>
+      <div class="orb"><span class="ring"><svg class="i"><use href="#chat"/></svg></span><span><b>Pitch in Hinglish</b><small>Sarvam text and voice notes on WhatsApp</small></span></div>
+      <div class="orb"><span class="ring"><svg class="i"><use href="#brain"/></svg></span><span><b>Remember objections</b><small>Cognee memory graph per merchant</small></span></div>
+      <div class="orb"><span class="ring"><svg class="i"><use href="#truck"/></svg></span><span><b>Close the loop</b><small>n8n books samples & meetings</small></span></div>
+    </div>
+    <div class="agent-log">
+      <h4>Agent activity</h4>
+      <ol id="log"></ol>
+    </div>
+  </aside>
+</div>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const icon = (id, style = "") => `<svg class="i" style="${style}"><use href="#${id}"/></svg>`;
+
+/* ---------- Agent log (right rail) ---------- */
+const LOGS = {
+  home: [["paytm", "Merchant profile loaded: EcoPack Solutions, packaging, Vijay Nagar"], ["claude", "Found 12 likely buyers within 5 km for the home banner"]],
+  ai: [["claude", "Prompt compiled into plan: Bakery + Cloud kitchen, 5 km, ₹5 paper bags"], ["paytm", "Merchant graph queried: 2,140 merchants, 31 in category"]],
+  leads: [["paytm", "Distance, MCC and QR volume band scored"], ["claude", "Web enrichment: Zomato ratings and Instagram for 12 leads"], ["claude", "Ranked by fit × timing; 2 decoys excluded"]],
+  pitch: [["sarvam", "Hinglish pitch drafted (Sarvam-M), 58 words"], ["sarvam", "Voice note synthesised (Bulbul, hi-IN, 0:21)"]],
+  chat: [["sarvam", "WhatsApp thread opened with Karan's Cafe"]],
+  deals: [["claude", "Revive match: PRICE_TOO_HIGH × OFFER_LAUNCHED (score 92)"]],
+  memory: [["cognee", "Graph: Karan's → Price objection → ₹4.20 tier → Sample"]],
+  campaigns: [["claude", "Objections aggregated across 18 replies"], ["claude", "3 assets drafted: in-app offer, broadcast, Instagram"]],
+};
+function log(tag, text) {
+  const li = document.createElement("li");
+  li.innerHTML = `<span class="tag ${tag}">${tag === "claude" ? "Claude" : tag === "sarvam" ? "Sarvam" : tag === "cognee" ? "Cognee" : tag === "n8n" ? "n8n" : "Paytm"}</span><span>${text}</span>`;
+  const ol = $("#log"); ol.prepend(li);
+  while (ol.children.length > 14) ol.lastChild.remove();
+}
+
+/* ---------- Navigation ---------- */
+const seen = new Set();
+function go(name) {
+  $$(".screen").forEach(s => s.classList.toggle("active", s.dataset.screen === name));
+  $$("#flow button").forEach(b => b.classList.toggle("on", b.dataset.go === name));
+  if (!seen.has(name)) { seen.add(name); (LOGS[name] || []).forEach(([t, x]) => log(t, x)); }
+  if (name === "chat" && !$("#thread").children.length) seedThread();
+}
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-go]");
+  if (t) { e.preventDefault(); go(t.dataset.go); }
+});
+
+function toast(msg) {
+  const t = $("#toast"); $("span", t).textContent = msg; t.classList.add("show");
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+/* ---------- 2. Plan run ---------- */
+$("#runPlan").addEventListener("click", () => {
+  $("#aiIntro").style.display = "none";
+  $("#plan").classList.add("show");
+  const steps = $$("#steps .step");
+  steps.forEach(s => s.className = "step");
+  steps.forEach((s, i) => {
+    setTimeout(() => { s.classList.add("run"); }, i * 650);
+    setTimeout(() => { s.classList.remove("run"); s.classList.add("done"); if (i === steps.length - 1) $("#seeLeads").style.display = "flex"; }, i * 650 + 600);
+  });
+});
+
+/* ---------- 3. Leads ---------- */
+const LEADS = [
+  { n: "Karan's Cafe & Bakery", o: "Karan Mehta", c: "Bakery", d: 2.1, r: 4.5, rv: "1.2k", q: "High", s: 94, col: "#f79009", x: 66, y: 34, why: [["New 2nd outlet opened 3 weeks ago", "Paytm"], ["Reviews mention pastries 38×", "Zomato"], ["Uses plastic bags today", "Instagram"]] },
+  { n: "Biryani Box Cloud Kitchen", o: "Imran Shaikh", c: "Cloud kitchen", d: 3.4, r: 4.2, rv: "860", q: "High", s: 89, col: "#7a5af8", x: 27, y: 68, why: [["Payments up 38% this month", "Paytm"], ["120+ delivery orders/day", "Swiggy"]] },
+  { n: "Sweet Nest Bakers", o: "Pooja Jain", c: "Bakery", d: 1.6, r: 4.1, rv: "540", q: "Medium", s: 86, col: "#ec184a", x: 40, y: 38, why: [["Diwali gift-box season starting", "Seasonal"], ["Posts daily on Instagram", "Instagram"]] },
+  { n: "Tiffin Tales", o: "Ritu Verma", c: "Cloud kitchen", d: 4.6, r: 4.3, rv: "310", q: "Medium", s: 81, col: "#12b76a", x: 80, y: 74, why: [["Added a 'party orders' menu", "Zomato"]] },
+  { n: "Crust & Crumb", o: "Aman Gupta", c: "Bakery", d: 4.9, r: 3.9, rv: "220", q: "Low", s: 77, col: "#0098d1", x: 18, y: 26, why: [["Recently listed on Zomato", "Zomato"]] },
+];
+function renderLeads() {
+  const map = $("#map");
+  LEADS.forEach((l, i) => {
+    const p = document.createElement("div");
+    p.className = "pin" + (i === 0 ? " hot pulse" : l.s >= 85 ? " hot" : "");
+    p.style.left = l.x + "%"; p.style.top = l.y + "%";
+    p.innerHTML = `<span class="head">${l.s}</span>`;
+    p.title = l.n; p.onclick = () => go("pitch");
+    map.appendChild(p);
+  });
+  [{ x: 92, y: 12, t: "Bake Studio · 7.2 km" }, { x: 55, y: 88, t: "Sharma Hardware · wrong category" }].forEach(o => {
+    const p = document.createElement("div"); p.className = "pin out"; p.style.left = o.x + "%"; p.style.top = o.y + "%";
+    p.innerHTML = `<span class="head">–</span>`; p.title = o.t; map.appendChild(p);
+  });
+  $("#leadList").innerHTML = LEADS.map((l, i) => `
+    <div class="lead ${i === 0 ? "top" : ""}">
+      <div class="row1">
+        <span class="avatar" style="background:${l.col}">${l.n.split(" ").slice(0, 2).map(w => w[0]).join("")}</span>
+        <div style="min-width:0">
+          <h4>${l.n} ${icon("verified")}</h4>
+          <div class="meta"><span>${l.c}</span><span>· ${l.d} km</span><span class="star">★ ${l.r}</span><span>(${l.rv})</span><span>· QR ${l.q}</span></div>
+          ${i === 0 ? `<span class="badge b-green" style="margin-top:6px">${icon("bolt")}Best match: new outlet</span>` : ""}
+        </div>
+        <div class="score"><b style="--v:${l.s}"><span>${l.s}</span></b><small>FIT</small></div>
+      </div>
+      <div class="why">${l.why.map(([w, s]) => `<div>${icon("check")}<span>${w}</span><span class="src">${s}</span></div>`).join("")}</div>
+      <div class="actions"><button class="btn btn-ghost">${icon("brain")}Profile</button><button class="btn btn-primary" data-go="pitch">${icon("send")}Pitch</button></div>
+    </div>`).join("") + `
+    <button class="btn btn-ghost btn-block">Show 7 more buyers</button>
+    <div class="excluded"><b style="color:var(--pt-ink)">Skipped 2 merchants</b><span>Bake Studio: 7.2 km, outside your 5 km radius</span><span>Sharma Hardware: hardware store, doesn't buy food packaging</span></div>
+    <span class="badge b-demo" style="justify-self:center">Demo data: fictional merchants</span>`;
+}
+renderLeads();
+
+/* ---------- 4. Pitch ---------- */
+const wave = $("#wave");
+for (let i = 0; i < 38; i++) { const b = document.createElement("i"); b.style.height = (20 + Math.abs(Math.sin(i * 1.7)) * 80) + "%"; b.style.animationDelay = (i % 7) * 0.08 + "s"; wave.appendChild(b); }
+$("#playVoice").addEventListener("click", function () {
+  const playing = wave.classList.toggle("playing");
+  this.innerHTML = icon(playing ? "pause" : "play");
+  if (playing) setTimeout(() => { wave.classList.remove("playing"); this.innerHTML = icon("play"); }, 4000);
+});
+$$("#pitchSeg span").forEach(s => s.addEventListener("click", () => { $$("#pitchSeg span").forEach(x => x.classList.toggle("on", x === s)); }));
+$("#sendPitch").addEventListener("click", () => { log("sarvam", "Pitch + voice note sent to Karan on WhatsApp"); });
+
+/* ---------- 5. Chat thread ---------- */
+const now = () => "10:4" + Math.min(9, $("#thread").children.length % 10);
+function addBubble(dir, html, opts = {}) {
+  const b = document.createElement("div");
+  b.className = `bubble ${dir}${opts.voice ? " voice-b" : ""}`;
+  b.innerHTML = (opts.via ? `<span class="via">${opts.via}</span>` : "") + html + `<span class="t">${opts.time || now()}${dir === "out" ? icon("dcheck") : ""}</span>`;
+  $("#thread").appendChild(b); b.scrollIntoView({ behavior: "smooth", block: "end" });
+}
+function addCard(kind, head, tag, body) {
+  const c = document.createElement("div");
+  c.className = `sys-card ${kind}`;
+  c.innerHTML = `<div class="h">${head}<span class="tag ${tag}">${tag === "cognee" ? "Cognee" : tag === "n8n" ? "n8n" : tag === "sarvam" ? "Sarvam" : "Claude"}</span></div>${body}`;
+  $("#thread").appendChild(c); c.scrollIntoView({ behavior: "smooth", block: "end" });
+}
+function typing(ms) {
+  return new Promise(res => {
+    const t = document.createElement("div"); t.className = "typing"; t.innerHTML = "<i></i><i></i><i></i>";
+    $("#thread").appendChild(t); t.scrollIntoView({ behavior: "smooth", block: "end" });
+    setTimeout(() => { t.remove(); res(); }, ms);
+  });
+}
+const wait = ms => new Promise(r => setTimeout(r, ms));
+function seedThread() {
+  $("#thread").innerHTML = `<span class="daychip">Today</span><span class="daychip" style="font-size:10px;background:#fff8c5">🔒 Business message via Paytm Vyapar AI</span>`;
+  addBubble("out", `Namaste Karan ji! 🙏 Main Rahul, EcoPack Solutions se, aapke cafe se bas 2 km door. Aapke pastries ke liye eco-friendly boxes aur paper bags ₹5 se. Kya kal free sample bhijwa doon?`, { via: "Vyapar AI · drafted by Sarvam", time: "10:38" });
+  addBubble("out", `<div class="voice"><button class="play">${icon("play")}</button><div class="wave">${Array.from({ length: 26 }, (_, i) => `<i style="height:${20 + Math.abs(Math.sin(i * 1.3)) * 80}%"></i>`).join("")}</div><small>0:21</small></div>`, { voice: true, time: "10:38" });
+}
+let demoRunning = false;
+async function playDemo() {
+  if (demoRunning) return; demoRunning = true;
+  seedThread();
+  $("#waStatus").textContent = "typing…";
+  await typing(1300);
+  $("#waStatus").textContent = "online";
+  addBubble("in", "Bhaiya rate zyada hai, ₹3 mein milega? Abhi wale supplier se ₹3.50 mein aata hai.", { time: "10:42" });
+  log("sarvam", "Reply understood (Hinglish): price objection");
+  await wait(900);
+  addCard("mem", `${icon("brain")}Objection saved to memory`, "cognee", `<q>Bhaiya rate zyada hai, ₹3 mein milega?</q><div><span class="badge b-red">PRICE_TOO_HIGH</span> <span class="badge b-amber">HAS_SUPPLIER @ ₹3.50</span></div>`);
+  log("cognee", "Objection PRICE_TOO_HIGH linked to Karan's Cafe");
+  await wait(1100);
+  addCard("", `${icon("spark")}Counter-offer chosen`, "claude", `<div class="counter-box">
+      <div class="opt on"><b>✓ Bulk tier ₹4.20 at 1,000+ pcs + free sample</b><br><span class="muted">Won 62% of price objections for bakeries</span></div>
+      <div class="opt"><b>Quality angle:</b> grease-proof, no leaks <span class="muted">· 28%</span></div>
+    </div>`);
+  log("claude", "Counter play: bulk tier + sample (62% historic win rate)");
+  await wait(1200);
+  addBubble("out", "Samajh sakta hoon Karan ji 🙏 ₹3.50 wale bags aksar grease mein phat jaate hain. Hamara grease-proof paper hai. 1,000+ pcs pe rate ₹4.20 ho jaayega, aur pehle free sample bhejte hain. Quality khud dekh lijiye?", { via: "Autopilot · Sarvam" });
+  log("sarvam", "Counter sent in Hinglish");
+  $("#waStatus").textContent = "typing…";
+  await typing(1500);
+  $("#waStatus").textContent = "online";
+  addBubble("in", "Theek hai, pehle sample bhejo. Kal 11 baje tak cafe pe koi hoga. Har mahine 5 tareekh ko stock lete hain.");
+  await wait(800);
+  addCard("stage", `${icon("check")}Deal stage → Sample requested`, "cognee", `<div class="muted">Timing remembered: reorders on the 5th of every month</div>`);
+  log("cognee", "Stage SAMPLE_REQUESTED; timing: monthly on the 5th");
+  await wait(1000);
+  addCard("act", `${icon("flow")}Sample dispatch scheduled`, "n8n", `<div style="display:grid;gap:4px">
+      <div style="display:flex;gap:6px;align-items:center">${icon("truck", "width:14px;height:14px")}Warehouse task #VY-2291 · 25 bags + 10 pastry boxes</div>
+      <div style="display:flex;gap:6px;align-items:center">${icon("clock", "width:14px;height:14px")}Delivery tomorrow, 11:00 AM · Vijay Nagar</div>
+      <div style="display:flex;gap:6px;align-items:center">${icon("calendar", "width:14px;height:14px")}Follow-up reminder set for the 4th</div>
+    </div>`);
+  log("n8n", "Webhook vyapar-action: SAMPLE_DISPATCH → warehouse + calendar");
+  await wait(700);
+  addBubble("out", "Done Karan ji ✅ Sample kal 11 baje pahunch jaayega. Main 4 tareekh ko yaad dila dunga 🙂", { via: "Autopilot" });
+  toast("Sample booked for Karan's Cafe");
+  demoRunning = false;
+}
+$("#playDemo").addEventListener("click", playDemo);
+$("#autoSwitch").addEventListener("click", function () { this.classList.toggle("off"); toast(this.classList.contains("off") ? "Autopilot off: AI will ask before replying" : "Autopilot on"); });
+
+/* ---------- 7. Memory ask ---------- */
+$("#askBtn").addEventListener("click", () => { $("#answer").classList.add("show"); log("cognee", "Graph search: bakeries × PRICE_TOO_HIGH → 4 results"); });
+
+/* ---------- 8. Campaigns ---------- */
+$$("#chTabs span").forEach(s => s.addEventListener("click", () => {
+  $$("#chTabs span").forEach(x => x.classList.toggle("on", x === s));
+  $$(".asset").forEach(a => a.classList.toggle("on", a.dataset.asset === s.dataset.a));
+}));
+$("#launchCamp").addEventListener("click", () => { log("n8n", "Campaign published: in-app offer, broadcast and Instagram"); toast("Campaign launched to 34 merchants"); });
+
+/* ---------- Boot ---------- */
+const start = location.hash.slice(1);
+go(LOGS[start] ? start : "home");
+if (location.search.includes("play") && start === "chat") playDemo();
+window.addEventListener("hashchange", () => { const h = location.hash.slice(1); if (LOGS[h]) go(h); });
+</script>
+</body>
+</html>

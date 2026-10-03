@@ -1,3 +1,47 @@
+# Vyapar AI for Paytm for Business (current product, supersedes conflicting SaaS sections)
+
+> **Decision (2026-10-03, product owner):** the hackathon build is reframed for Paytm. Rekindle's engines (structured LLM calls with cache and offline fallback, Sarvam, Cognee, n8n, objection memory, revive matching, campaigns-from-objections, growth loop) now power **Vyapar AI**, an AI sales teammate inside the **Paytm for Business** app that lets merchants sell to *other Paytm merchants* nearby. Where the sections below describe B2B SaaS behaviour (CloudKavach, stall categories, job-board signals), this section wins. The legacy screens stay available under `/today`, `/accounts`, `/discover` and so on for reference.
+
+## V1. Why Paytm
+Paytm for Business already holds every merchant's KYC location, business category (MCC), GSTIN and QR payment volume. Merchants use it to collect money, not to grow. Vyapar AI turns that passive QR network into an active B2B marketplace: a packaging maker finds bakeries, a dairy finds sweet shops, a bakery finds cafes. There is zero acquisition cost because both sides are already Paytm merchants.
+
+## V2. Personas
+- **Seller: Rahul Agrawal, EcoPack Solutions (Vijay Nagar, Indore).** Makes paper bags (₹5) and biodegradable food boxes. Has no sales team.
+- **Buyer: Karan Mehta, Karan's Cafe & Bakery (2.1 km away).** Paytm QR merchant, 4.5★ on Zomato, just opened a second outlet, uses plastic bags. Replies in Hinglish.
+
+## V3. The loop (each step names its sponsor and its fallback)
+1. **Ask:** Rahul types or speaks *"Find me cloud kitchens and bakeries within 5km and pitch my ₹5 paper bags."* Claude compiles a plan (categories, radius, product, price, language); without a key, the deterministic `parsePrompt` does it.
+2. **Find:** rank Paytm merchants by relevance (category affinity), proximity (haversine), capacity (QR volume), timing (fresh signals: new outlet, payments rising, festive demand) and evidence (web ratings and profile). Out-of-radius and wrong-category merchants are listed as skipped, each with a reason. Merchants already in a deal are marked *In talks* and never pitched twice.
+3. **Pitch:** a Hinglish WhatsApp message is personalised from distance, signal, rating and current packaging. Sarvam writes it when configured, then Claude, then a template. Rahul approves every first message. A voice note is spoken by Sarvam Bulbul, or by the device's hi-IN voice, which is labelled as such.
+4. **Remember:** every buyer reply is understood (intent, objection, verbatim quote, prices, timing) by Claude, falling back to Hinglish rules. Memories are stored with *quote verified* and pushed to Cognee when configured.
+5. **Counter:** Autopilot answers objections with the play that historically wins most (e.g. price → bulk tier ₹4.20 at 1,000+ pcs + free sample, 62%). With Autopilot off, the AI suggests and Rahul sends.
+6. **Act:** a sample request, visit or order creates an action (sample dispatch, meeting, Paytm payment link, follow-up) through the n8n `vyapar` webhook. It is simulated and labelled when n8n is absent. n8n calls back `action.completed`.
+7. **Revive:** an old "no" resurfaces when its reason stops being true. For example, "₹5 is too much" plus a newly launched ₹4.20 tier gives a revive card with a one-tap offer.
+8. **Market:** objections are aggregated into a Paytm in-app offer banner, a WhatsApp broadcast and an Instagram post, approved and launched via n8n.
+9. **Learn:** the growth loop shows the sample/order rate per objection × counter-play, and Autopilot uses the best play first.
+
+## V4. Taxonomies
+- **Objections:** PRICE_TOO_HIGH, HAS_SUPPLIER, BULK_ONLY_MOQ, QUALITY_DOUBT, CREDIT_TERMS, DELIVERY_RELIABILITY, NOT_NOW, OWNER_UNAVAILABLE, NOT_INTERESTED, OTHER.
+- **Stages:** PITCHED → REPLIED → OBJECTION → SAMPLE_REQUESTED → SAMPLE_SENT / MEETING_BOOKED → ORDER_WON (or LOST).
+- **Merchant signals:** NEW_OUTLET, TXN_SPIKE, FESTIVE_SEASON, RATING_JUMP, MENU_EXPANSION, NEW_LISTING. Signals older than 45 days don't count.
+
+## V5. Screens (mobile app; phone frame on desktop)
+`/` Paytm for Business home (Vyapar AI tile and banner, live counts) · `/vyapar` prompt hub · `/vyapar/hunts/[id]` plan, radar map and ranked leads · `/vyapar/leads/[id]` pitch composer · `/vyapar/deals` KPIs, revive cards, pipeline, Ask · `/vyapar/deals/[id]` WhatsApp-style thread with Autopilot · `/vyapar/merchants/[id]` merchant memory and graph · `/vyapar/campaigns` · `/vyapar/business` the offers the AI may use. Tiles outside Vyapar AI (Soundbox, Khata and others) show a "not in this prototype" toast.
+
+## V6. Honesty rules (carry over §0.5)
+Merchants are fictional and badged *Demo data*. Every AI artifact shows its provider (Claude, Sarvam, Cognee, n8n, Rules, Template, Simulated, Local). Nothing is sent to a real WhatsApp number. The buyer side is typed or simulated in the demo ("Reply as Karan (demo)").
+
+## V8. Lead engine and data (T120–T123, implements VYAPAR_LEAD_ENGINE_BRIEF.md cycles 1–2 and part of 3–4)
+- **Data:** demo Paytm merchants (fictional, *Demo data*) plus real public listings around Andheri from OpenStreetMap (ODbL, attributed). Public listings carry only map facts. Their Paytm status, contact and timing are shown as *Unknown*, and the action is a visit or introduction, never a WhatsApp message. Profile photos are openly licensed category images labelled *Representative photo*.
+- **Ranking (rules-v2, not ML):** hard gates first (UNKNOWN ≠ PASS), then relevance (category/SKU fit, distance within delivery, capacity, buyer-stated need, saved). The ordering is relevance + 10 for a fresh, dated signal. Confidence is shown separately and comes from source quality. Private Paytm aggregates are seller-only and never appear in a pitch.
+- **Personalisation:** only explicit seller feedback (skip reasons, saves, one capacity clarification). Every change is explained and undoable, and past hunt snapshots are never rewritten.
+- **Golden-path addition:** on Rahul's hunt, answer "Can you supply 1,000+ pcs a month?" and the list re-ranks. Skip a lead with a reason, then Undo. Open a public bakery to see the visit/intro script.
+
+## V7. Golden demo path (3 minutes)
+Home → Vyapar AI → run Rahul's prompt (animated plan, Karan ranked #1) → Pitch Karan (Hinglish draft + voice note) → Send → *Reply as Karan*: "Bhaiya rate zyada hai, ₹3 mein milega? Abhi wale supplier se ₹3.50…" → objection saved, counter (₹4.20 bulk tier) sent by Autopilot → "Theek hai, pehle sample bhejo… Har mahine 5 tareekh ko stock lete hain" → stage *Sample requested*, n8n sample dispatch, restock timing remembered → My Deals: revive Sharma Sweets → Campaigns: launch the price-objection offer. Reset at any time with **Demo → Reset demo data**.
+
+---
+
 # Rekindle — Product Spec (Hackathon Build)
 
 > **Rekindle** is an AI revenue teammate for B2B sales teams. It remembers *why* every deal stalled, watches for the moment that reason stops being true, warms cold accounts with marketing built from their real objections, and tells sales exactly who to contact today, with the evidence and a ready-to-send message.

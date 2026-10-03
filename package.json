@@ -12,11 +12,11 @@
     "seed": "tsx prisma/seed.ts",
     "boards:check": "tsx scripts/check-boards.ts",
     "demo:reset": "prisma db push && tsx scripts/reset-demo.ts",
-    "demo:warm": "tsx scripts/warm-cache.ts"
+    "demo:warm": "tsx scripts/warm-cache.ts",
+    "vyapar:seed": "prisma db push && tsx scripts/seed-vyapar.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",
-    "@next/swc-darwin-arm64": "^16.3.8",
     "@prisma/client": "6.12.0",
     "clsx": "2.1.1",
     "date-fns": "4.1.0",
@@ -37,5 +37,8 @@
     "tsx": "4.20.6",
     "typescript": "5.9.3",
     "vitest": "5.0.3"
+  },
+  "optionalDependencies": {
+    "@next/swc-darwin-arm64": "^16.3.8"
   }
 }

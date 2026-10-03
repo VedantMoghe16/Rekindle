@@ -22,3 +22,22 @@ export async function n8nLaunchCampaign(payload: { campaignId: string; name: str
   if (!response.ok) throw new Error(`n8n webhook returned ${response.status}`);
   return response.json().catch(() => ({})) as Promise<{ postUrls?: Record<string, string> }>;
 }
+
+/** Vyapar AI uses one n8n webhook; the workflow branches on `event`. */
+export function isN8nVyaparConfigured() {
+  return Boolean(process.env.N8N_VYAPAR_WEBHOOK_URL);
+}
+
+export type VyaparEvent = "action.requested" | "campaign.launch" | "message.send";
+
+export async function n8nVyapar(event: VyaparEvent, payload: Record<string, unknown>) {
+  const callbackUrl = `${(process.env.APP_BASE_URL || "http://localhost:3000").replace(/\/$/, "")}/api/vyapar/webhooks/n8n`;
+  const response = await fetch(process.env.N8N_VYAPAR_WEBHOOK_URL!, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-rekindle-secret": process.env.N8N_SHARED_SECRET ?? "" },
+    body: JSON.stringify({ event, ...payload, callbackUrl }),
+    signal: AbortSignal.timeout(15_000),
+  });
+  if (!response.ok) throw new Error(`n8n Vyapar webhook returned ${response.status}`);
+  return response.json().catch(() => ({})) as Promise<{ ref?: string; status?: string }>;
+}

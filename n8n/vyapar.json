@@ -1,0 +1,110 @@
+{
+  "name": "Vyapar AI · Actions & campaigns (Paytm for Business)",
+  "nodes": [
+    {
+      "parameters": { "httpMethod": "POST", "path": "vyapar", "responseMode": "responseNode", "options": {} },
+      "id": "5f1e0c55-2c7a-4d43-9a39-7a1c1f6b0a01",
+      "name": "Vyapar webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 300],
+      "webhookId": "0d9a4c2e-6a55-4f0e-9a31-vyapar0001"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            { "id": "secret-check", "leftValue": "={{ $json.headers['x-rekindle-secret'] }}", "rightValue": "={{ $env.N8N_SHARED_SECRET }}", "operator": { "type": "string", "operation": "equals" } }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "5f1e0c55-2c7a-4d43-9a39-7a1c1f6b0a02",
+      "name": "Secret matches?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [220, 300]
+    },
+    {
+      "parameters": { "respondWith": "json", "responseBody": "={{ { \"error\": \"invalid secret\" } }}", "options": { "responseCode": 401 } },
+      "id": "5f1e0c55-2c7a-4d43-9a39-7a1c1f6b0a03",
+      "name": "Reject (401)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [440, 480]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Turn a Vyapar AI event into one ops task with a human-readable message.\nconst body = $input.first().json.body;\nconst ref = `VY-${Math.floor(2300 + Math.random() * 7000)}`;\nlet text;\nif (body.event === 'action.requested') {\n  const m = body.merchant || {};\n  const titles = { SAMPLE_DISPATCH: '📦 Dispatch free sample', MEETING: '📅 Shop visit booked', PAYMENT_LINK: '💸 Send Paytm payment link', FOLLOW_UP: '⏰ Follow-up reminder' };\n  text = `${titles[body.type] || body.type} · ${m.name} (${m.owner}, ${m.area}) · ₹${body.valueInr}/month\\n${(body.lines || []).join('\\n')}\\nTask ${ref}`;\n} else if (body.event === 'campaign.launch') {\n  text = `📣 Campaign approved: ${body.headline}\\nAudience: ${body.audience} nearby Paytm merchants\\nWhatsApp: ${body.assets?.whatsapp}`;\n} else {\n  text = `Vyapar event ${body.event}`;\n}\nreturn [{ json: { ...body, ref, text } }];"
+      },
+      "id": "5f1e0c55-2c7a-4d43-9a39-7a1c1f6b0a04",
+      "name": "Plan ops task",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.VYAPAR_OPS_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { text: $json.text } }}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "5f1e0c55-2c7a-4d43-9a39-7a1c1f6b0a05",
+      "name": "Notify warehouse / ops (Slack or WhatsApp)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 200],
+      "continueOnFail": true
+    },
+    {
+      "parameters": { "respondWith": "json", "responseBody": "={{ { ref: $('Plan ops task').item.json.ref, status: 'queued' } }}", "options": {} },
+      "id": "5f1e0c55-2c7a-4d43-9a39-7a1c1f6b0a06",
+      "name": "Respond { ref }",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [880, 200]
+    },
+    {
+      "parameters": { "amount": 5, "unit": "seconds" },
+      "id": "5f1e0c55-2c7a-4d43-9a39-7a1c1f6b0a07",
+      "name": "Wait for ops",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1100, 200],
+      "webhookId": "0d9a4c2e-6a55-4f0e-9a31-vyapar0002"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Plan ops task').item.json.callbackUrl }}",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "x-rekindle-secret", "value": "={{ $env.N8N_SHARED_SECRET }}" }] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { event: 'action.completed', ref: $('Plan ops task').item.json.ref, status: $('Plan ops task').item.json.type === 'PAYMENT_LINK' ? 'paid' : 'scheduled', note: 'confirmed by ops' } }}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "5f1e0c55-2c7a-4d43-9a39-7a1c1f6b0a08",
+      "name": "Callback: action.completed",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 200],
+      "continueOnFail": true
+    }
+  ],
+  "connections": {
+    "Vyapar webhook": { "main": [[{ "node": "Secret matches?", "type": "main", "index": 0 }]] },
+    "Secret matches?": { "main": [[{ "node": "Plan ops task", "type": "main", "index": 0 }], [{ "node": "Reject (401)", "type": "main", "index": 0 }]] },
+    "Plan ops task": { "main": [[{ "node": "Notify warehouse / ops (Slack or WhatsApp)", "type": "main", "index": 0 }]] },
+    "Notify warehouse / ops (Slack or WhatsApp)": { "main": [[{ "node": "Respond { ref }", "type": "main", "index": 0 }]] },
+    "Respond { ref }": { "main": [[{ "node": "Wait for ops", "type": "main", "index": 0 }]] },
+    "Wait for ops": { "main": [[{ "node": "Callback: action.completed", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {}
+}
