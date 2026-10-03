@@ -22,3 +22,18 @@ describe("Sarvam Vyapar SDR contract (shared with the vyapar-integration branch)
     expect(webhookUrlFor({ publicBaseUrl: "https://x.example", webhookSecret: "a b" })).toBe("https://x.example/api/vyapar/webhooks/sarvam?secret=a%20b");
   });
 });
+
+describe("call transcript as spoken", () => {
+  it("keeps Analytics content in the spoken language and the English version when given", async () => {
+    const { parseTranscript } = await import("@/lib/providers/sarvam-agent");
+    const turns = parseTranscript({ messages: [
+      { role: "assistant", content: "नमस्ते Sunita जी", language_name: "Hindi" },
+      { role: "user", content: "पर मैं आपसे ही क्यों लूँ?", language_name: "UNKNOWN" },
+    ] });
+    expect(turns).toEqual([
+      { role: "agent", en_text: "नमस्ते Sunita जी", text: "नमस्ते Sunita जी", language: "Hindi" },
+      { role: "user", en_text: "पर मैं आपसे ही क्यों लूँ?", text: "पर मैं आपसे ही क्यों लूँ?" },
+    ]);
+    expect(parseTranscript([{ role: "user", en_text: "Too costly" }])[0]).toMatchObject({ en_text: "Too costly" });
+  });
+});

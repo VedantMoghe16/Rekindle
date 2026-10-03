@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
+import { LanguageButton } from "@/components/paytm/translator";
 
 export function Lockup({ size = "md" }: { size?: "sm" | "md" }) {
   return <span className={`lockup${size === "sm" ? " sm" : ""}`} aria-label="Paytm for Business"><span className="wordmark"><span className="pay">pay</span><span className="tm">tm</span></span><span className="for">for</span><span className="biz">Business</span></span>;
@@ -10,6 +11,7 @@ export function AppBar({ title, sub, back, right }: { title: string; sub?: strin
     {back && <Link className="icon-btn" href={back} aria-label="Back"><ChevronLeft /></Link>}
     <div className="titles"><h1>{title}</h1>{sub && <div className="sub">{sub}</div>}</div>
     {right}
+    <LanguageButton />
   </header>;
 }
 

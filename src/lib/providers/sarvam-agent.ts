@@ -19,10 +19,12 @@ export const SarvamOutboundWebhook = z.object({
   interaction_id: z.string().nullable().optional(),
   failure_reason: z.string().nullable().optional(),
   final_agent_variables: z.record(z.string(), z.unknown()).nullable().optional(),
-  interaction_transcript: z.array(z.object({ role: z.string(), en_text: z.string() })).nullable().optional(),
+  interaction_transcript: z.array(z.object({ role: z.string(), en_text: z.string(), text: z.string().optional(), language: z.string().optional() })).nullable().optional(),
   webhook_config: z.record(z.string(), z.unknown()).nullable().optional(),
 });
 export type SarvamOutboundWebhook = z.infer<typeof SarvamOutboundWebhook>;
+/** One call turn: `text` as spoken (Hindi, Tamil…), `en_text` the English version when Sarvam provides one. */
+export type TranscriptTurn = { role: string; en_text: string; text?: string; language?: string };
 
 /** Opening line sent per call as app_overrides.initial_bot_message (same text as the dashboard default). */
 export function initialBotMessage(v: AgentVariables): string {
@@ -201,8 +203,8 @@ export function mapConnectivityStatus(raw: string | null | undefined): AttemptSt
   return null;
 }
 
-/** Leniently extracts [{role, en_text}] from the (undocumented) transcripts response. */
-export function parseTranscript(raw: unknown): { role: string; en_text: string }[] {
+/** Leniently extracts call turns from the (undocumented) transcripts response. Analytics returns `content` in the spoken language. */
+export function parseTranscript(raw: unknown): TranscriptTurn[] {
   const pickArray = (v: unknown): unknown[] | null => {
     if (Array.isArray(v)) return v;
     if (v && typeof v === "object") {
@@ -218,12 +220,22 @@ export function parseTranscript(raw: unknown): { role: string; en_text: string }
   return arr.flatMap((t) => {
     if (!t || typeof t !== "object") return [];
     const o = t as Record<string, unknown>;
-    const text = [o.en_text, o.text, o.content, o.message, o.transcript].find((x) => typeof x === "string") as string | undefined;
-    if (!text) return [];
+    const str = (x: unknown) => (typeof x === "string" && x.trim() ? x : undefined);
+    const spoken = str(o.content) ?? str(o.text) ?? str(o.message) ?? str(o.transcript);
+    const en = str(o.en_text) ?? spoken;
+    if (!en) return [];
     const roleRaw = String(o.role ?? o.speaker ?? o.sender ?? "").toLowerCase();
     const role = /agent|bot|assistant|ai/.test(roleRaw) ? "agent" : "user";
-    return [{ role, en_text: text }];
+    const language = str(o.language_name) ?? str(o.language);
+    return [{ role, en_text: en, ...(spoken ? { text: spoken } : {}), ...(language && language !== "UNKNOWN" ? { language } : {}) }];
   });
+}
+
+/** The call transcript as spoken (Analytics), used when the webhook only carried the English version. */
+export async function fetchTranscript(interactionId: string, opts: { config?: SarvamConfig; fetchImpl?: Fetch } = {}): Promise<TranscriptTurn[]> {
+  const cfg = opts.config ?? sarvamConfig();
+  const analytics = `${cfg.base}/api/analytics/v1/${encodeURIComponent(cfg.orgId)}/${encodeURIComponent(cfg.workspaceId)}/${encodeURIComponent(cfg.appId)}`;
+  return parseTranscript(await request(`${analytics}/transcripts/${encodeURIComponent(interactionId)}`, { method: "GET" }, cfg, opts.fetchImpl ?? fetch));
 }
 
 export type PollResult = { terminal: boolean; payload: SarvamOutboundWebhook | null; raw: unknown };
@@ -249,10 +261,10 @@ export async function pollAttempt(attemptId: string, opts: { since?: Date; confi
   const status = mapConnectivityStatus(item.connectivity_status as string | null);
   if (!status || (status === "connected" && !item.end_datetime)) return { terminal: false, payload: null, raw: item };
   const interactionId = (item.interaction_id as string | null) ?? null;
-  let transcript: { role: string; en_text: string }[] | null = null;
+  let transcript: TranscriptTurn[] | null = null;
   if (status === "connected" && interactionId) {
     try {
-      transcript = parseTranscript(await request(`${analytics}/transcripts/${encodeURIComponent(interactionId)}`, { method: "GET" }, cfg, fetchImpl));
+      transcript = await fetchTranscript(interactionId, { config: cfg, fetchImpl });
     } catch { transcript = null; }
   }
   const payload: SarvamOutboundWebhook = {

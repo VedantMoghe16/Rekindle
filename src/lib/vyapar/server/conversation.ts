@@ -7,7 +7,8 @@ import { classifyReply, quoteFor, ReplyUnderstanding } from "@/lib/vyapar/replie
 import { OBJECTION_LABELS, STAGE_LABELS, type Stage } from "@/lib/vyapar/taxonomy";
 import { estimateValue, getSeller, liveNow, remember, shortRef, viewMerchant } from "@/lib/vyapar/server/context";
 import { logEvent } from "@/lib/vyapar/server/opportunities";
-import { createOutboundCall, initialBotMessage, normalizePhone, parseFinalVariables, pollAttempt, sarvamConfig, SarvamConfigError, webhookUrlFor, type SarvamOutboundWebhook } from "@/lib/providers/sarvam-agent";
+import { createOutboundCall, fetchTranscript, initialBotMessage, normalizePhone, parseFinalVariables, pollAttempt, sarvamConfig, SarvamConfigError, webhookUrlFor, type SarvamOutboundWebhook, type TranscriptTurn } from "@/lib/providers/sarvam-agent";
+import { z } from "zod";
 import { buildPayload, type Scenario } from "@/lib/vyapar/call-simulation";
 import { demoChatId, isTelegramConfigured, tgSendText, tgSendVoice } from "@/lib/providers/telegram";
 
@@ -163,14 +164,38 @@ export type CallResultInput = { outcome: (typeof CallResult.outcomes)[number]; o
 
 const OBJECTION_MAP: Record<string, string> = { price: "PRICE_TOO_HIGH", moq: "BULK_ONLY_MOQ", quality: "QUALITY_DOUBT", timing: "NOT_NOW", existing_supplier: "HAS_SUPPLIER", other: "OTHER" };
 
+const CallSummary = z.object({ summary: z.string(), nextStep: z.string() });
+const SUMMARY_SYSTEM = `You summarise a sales call between Priya (an AI calling agent for a packaging supplier) and an Indian shop owner, for the supplier.
+Write in plain, simple English that a busy shop owner understands at a glance, whatever language the call was in.
+summary: 2-3 short sentences: what the owner said, their main concern or interest, and what was agreed. No jargon, no invented facts.
+nextStep: one short line on what happens next.`;
+
+/** Plain-language call summary (Gemini), falling back to the agent's structured outcome. */
+async function summariseCall(transcript: TranscriptTurn[], ownerFirst: string, fallback: string) {
+  if (transcript.length < 2) return { summary: fallback, nextStep: "", provider: "rules" };
+  try {
+    const lines = transcript.map((t) => `${t.role === "agent" ? "Priya" : ownerFirst}: ${t.text ?? t.en_text}`).join("\n");
+    const result = await callStructured({ tier: "fast", schema: CallSummary, schemaName: "VyaparCallSummary", system: SUMMARY_SYSTEM, user: `Agent's recorded outcome: ${fallback}\n\nCALL:\n${lines}` });
+    return { ...result.data, provider: result.provenance === "live" ? result.provider : "cached" };
+  } catch (error) {
+    if (!(error instanceof LlmOfflineMiss)) console.warn(`[vyapar] call summary via LLM failed: ${error instanceof Error ? error.message : error}`);
+    return { summary: fallback, nextStep: "", provider: "rules" };
+  }
+}
+
 /** Structured outcome from the Sarvam "Vyapar SDR" voice agent (docs/vyapar/sarvam-agent.md) → memory, stage, follow-up. */
-export async function receiveCallResult(dealId: string, r: CallResultInput, transcript: { role: string; en_text: string }[] = [], simulated = false) {
+export async function receiveCallResult(dealId: string, r: CallResultInput, transcript: TranscriptTurn[] = [], simulated = false, extra: { duration?: number | null } = {}) {
   const deal = await db.vyaparDeal.findUnique({ where: { id: dealId }, include: { merchant: true } });
   if (!deal) throw new Error("Deal not found");
   const seller = await getSeller();
   const at = liveNow();
   const summary = { interested: "Interested on the call", sample_requested: "Agreed to a free sample on the call", objection: "Raised an objection on the call", not_interested: "Not interested (call)", callback: `Asked for a callback${r.callback_time ? `: ${r.callback_time}` : ""}` }[r.outcome];
-  await db.vyaparMessage.create({ data: { dealId, direction: "in", kind: "call", text: `📞 AI call${simulated ? " (simulated)" : " · Sarvam agent"}: ${summary}${r.objection_quote ? `\n"${r.objection_quote}"` : ""}${transcript.length ? `\n\n${transcript.slice(-12).map((t) => `${t.role === "agent" ? "Priya" : deal.merchant.ownerName.split(" ")[0]}: ${t.en_text}`).join("\n")}` : ""}`, author: deal.merchant.ownerName, provider: "sarvam-agent", metaJson: JSON.stringify(r), createdAt: at } });
+  const ownerFirst = deal.merchant.ownerName.split(" ")[0];
+  const outcomeLine = `${summary}${r.objection_quote ? `: "${r.objection_quote}"` : ""}`;
+  const brief = await summariseCall(transcript, ownerFirst, outcomeLine);
+  // The transcript is kept as spoken (Hindi, Tamil, Hinglish…); the summary is what the seller reads first.
+  const turns = transcript.map((t) => ({ who: t.role === "agent" ? "Priya" : ownerFirst, role: t.role, text: t.text ?? t.en_text, en: t.text && t.en_text !== t.text ? t.en_text : null, language: t.language ?? null }));
+  await db.vyaparMessage.create({ data: { dealId, direction: "in", kind: "call", text: brief.summary, author: deal.merchant.ownerName, provider: "sarvam-agent", metaJson: JSON.stringify({ ...r, outcomeLabel: summary, summary: brief.summary, nextStep: brief.nextStep, summaryBy: brief.provider, transcript: turns, simulated, duration: extra.duration ?? null }), createdAt: at } });
   const objection = r.objection_type !== "none" ? OBJECTION_MAP[r.objection_type] : null;
   if (objection || r.outcome === "not_interested") await db.vyaparMemory.create({ data: { dealId, merchantId: deal.merchantId, kind: "OBJECTION", category: r.outcome === "not_interested" ? "NOT_INTERESTED" : objection, summary, quote: r.objection_quote || null, verified: false, createdAt: at } });
   if (r.callback_time) await db.vyaparMemory.create({ data: { dealId, merchantId: deal.merchantId, kind: "TIMING", summary: r.outcome === "sample_requested" ? `Sample delivery: ${r.callback_time}` : `Call back: ${r.callback_time}`, quote: null, createdAt: at } });
@@ -290,7 +315,12 @@ export async function processSarvamWebhook(payload: SarvamOutboundWebhook) {
   }
   const v = parseFinalVariables(payload.final_agent_variables ?? {});
   const outcome = v.outcome ?? (v.objection_type && v.objection_type !== "none" ? "objection" : "callback");
-  const result = await receiveCallResult(action.dealId, { outcome, objection_type: v.objection_type ?? "none", objection_quote: v.objection_quote ?? "", callback_time: v.callback_time ?? "" }, payload.interaction_transcript ?? [], action.provider === "simulated");
+  let transcript: TranscriptTurn[] = payload.interaction_transcript ?? [];
+  // The webhook carries English text; Analytics has the call as spoken. Prefer that for live calls.
+  if (action.provider === "sarvam" && payload.interaction_id && !transcript.some((t) => t.text)) {
+    try { const spoken = await fetchTranscript(payload.interaction_id); if (spoken.length) transcript = spoken; } catch { /* keep the webhook's version */ }
+  }
+  const result = await receiveCallResult(action.dealId, { outcome, objection_type: v.objection_type ?? "none", objection_quote: v.objection_quote ?? "", callback_time: v.callback_time ?? "" }, transcript, action.provider === "simulated", { duration: payload.duration });
   await db.vyaparAction.update({ where: { id: action.id }, data: { status: "completed", summary: `${action.summary} · ${outcome.replace("_", " ")}${payload.duration ? ` · ${Math.round(payload.duration)}s` : ""}` } });
   return { ok: true, status: "connected", outcome, stage: result.stage };
 }

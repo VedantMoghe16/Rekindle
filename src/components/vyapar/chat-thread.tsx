@@ -8,6 +8,8 @@ import { Avatar, ProviderTag } from "@/components/paytm/ui";
 import { toast } from "@/components/paytm/toast";
 import { VoiceNote } from "@/components/vyapar/voice";
 import { CallPanel } from "@/components/vyapar/call-panel";
+import { CallCard } from "@/components/vyapar/call-card";
+import { LanguageButton } from "@/components/paytm/translator";
 import { OBJECTION_LABELS, STAGE_LABELS, type Objection, type Stage } from "@/lib/vyapar/taxonomy";
 
 export type ThreadItem =
@@ -122,12 +124,13 @@ export function ChatThread({ dealId, merchant, stage, autopilot: initialAutopilo
   let lastDay = "";
 
   return <div className="page">
-    <header className="wa-head">
+    <header className="chat-head">
       <Link className="icon-btn" href="/vyapar/deals" aria-label="Back"><ChevronLeft /></Link>
       <Avatar name={merchant.name} round />
       <div className="grow" style={{ minWidth: 0 }}><b>{merchant.name}</b><small>{thinking && pending?.as === "buyer" ? "Vyapar AI is reading…" : "via Vyapar AI · Paytm verified"}</small></div>
       <button className="icon-btn" onClick={() => setCallOpen((o) => !o)} aria-label="AI call"><Phone /></button>
       <Link className="icon-btn" href={`/vyapar/merchants/${merchant.id}`} aria-label="Merchant memory"><Brain /></Link>
+      <LanguageButton />
     </header>
     {callOpen && <CallPanel dealId={dealId} onClose={() => setCallOpen(false)} />}
     {dialing && <div className="call-live"><span className="pulse-dot" /><b className="grow">Priya is on the call with {firstName}…</b><span className="xs muted">result appears here</span></div>}
@@ -145,6 +148,9 @@ export function ChatThread({ dealId, merchant, stage, autopilot: initialAutopilo
         const chip = d !== lastDay ? <span className="daychip" key={`d-${d}`}>{d}</span> : null;
         lastDay = d;
         const cls = fresh.includes(item.id) ? " enter" : "";
+        if (item.type === "message" && item.kind === "call") {
+          return [chip, <div key={item.id} className={`call-wrap${cls}`} style={delay(item.id)}><CallCard text={item.text} meta={item.meta} time={time(item.at)} ownerFirst={firstName} /></div>];
+        }
         if (item.type === "message") {
           const play = typeof item.meta.play === "string" ? item.meta.play : null;
           return [chip,
@@ -153,7 +159,7 @@ export function ChatThread({ dealId, merchant, stage, autopilot: initialAutopilo
               <div><b style={{ color: "var(--pt-navy)" }}>✓ {playLabels[play] ?? play}</b> <span className="muted">· {String(item.meta.winRate ?? "")}% in demo benchmark</span></div>
             </div>,
             <div key={item.id} className={`bubble ${item.direction}${item.kind === "voice" ? " voice-b" : ""}${cls}`} style={delay(item.id)}>
-              {item.kind === "call" && <span className="via" style={{ color: "#6b4eff" }}>Sarvam voice agent</span>}{item.direction === "out" && <span className="via">{item.author}{item.provider && item.provider !== "human" ? ` · ${item.provider === "sarvam-tts" ? "Sarvam voice" : item.provider}` : ""}</span>}
+              {item.direction === "out" && <span className="via">{item.author}{item.provider && item.provider !== "human" ? ` · ${item.provider === "sarvam-tts" ? "Sarvam voice" : item.provider}` : ""}</span>}
               {item.kind === "voice" ? <VoiceNote text={item.text} compact /> : item.text}
               <span className="t">{time(item.at)}{item.direction === "out" && <CheckCheck />}</span>
             </div>];
@@ -182,7 +188,7 @@ export function ChatThread({ dealId, merchant, stage, autopilot: initialAutopilo
       {suggestion && <div className="suggest-card enter">
         <div className="row"><Sparkles size={16} color="var(--pt-cyan-600)" /><b className="grow" style={{ color: "var(--pt-navy)" }}>Suggested reply · {suggestion.label}</b></div>
         <div>{suggestion.text}</div>
-        <div className="row"><button className="btn btn-ghost btn-sm" onClick={() => { setMode("me"); setInput(suggestion.text); setSuggestion(null); }}>Edit</button><button className="btn btn-wa btn-sm grow" onClick={() => approve(suggestion)}><Send />Send</button></div>
+        <div className="row"><button className="btn btn-ghost btn-sm" onClick={() => { setMode("me"); setInput(suggestion.text); setSuggestion(null); }}>Edit</button><button className="btn btn-primary btn-sm grow" onClick={() => approve(suggestion)}><Send />Send</button></div>
       </div>}
       <div ref={end} />
     </div>

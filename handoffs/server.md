@@ -1,5 +1,15 @@
 # Server Agent Handoff
 
+## Latest cycle: Paytm-style chat, call summaries, app-wide translation, voice search
+
+- **Chat UI:** the deal conversation uses Paytm tokens and a white app bar (the WhatsApp colours are gone; the `--wa-*` variables now hold Paytm values).
+- **Calls:** each call shows a `CallCard` with a Gemini plain-English summary, quote and next step. "Read full transcript" opens the exact transcript as spoken; "Show in English" appears when an English version exists.
+  - `receiveCallResult` stores `meta.summary`, `nextStep` and `transcript[{who,role,text,en,language}]`.
+  - Live calls fetch the spoken-language transcript from Sarvam Analytics (`fetchTranscript`; the `content` field is native script).
+  - Simulated calls are Hinglish, each with an English version.
+- **Translation:** the globe button in every app bar opens a picker for the 22 Sarvam languages. `Translator` (in the layout) swaps visible text, placeholders and aria-labels in place, using `/api/vyapar/translate` (Sarvam sarvam-translate:v1, cached in the `Translation` table and in localStorage). `[data-no-translate]` is skipped, and transcripts carry it.
+- **Voice search:** the Find mic records with MediaRecorder and sends it to `/api/vyapar/listen` (ffmpeg converts to 16 kHz WAV, then Sarvam STT in transcribe mode auto-detects the language and translates to English). The search runs right away with the original text plus `english`. The Hinglish/EN/हिं toggle has been removed.
+
 ## Latest cycle: Stop button and contact timing
 
 - **Stop:** `POST /api/vyapar/fleet/[id]/cancel` marks the run CANCELLED. The worker checks before every step and while waiting, so nothing new is sent or dialled. A ringing call finishes and is recorded.

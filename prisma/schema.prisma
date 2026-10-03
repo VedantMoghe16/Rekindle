@@ -648,3 +648,12 @@ model KnowledgeEvent {
   cognee    String   @default("skipped")
   createdAt DateTime
 }
+
+/// Sarvam Translate cache for the app-wide language switch (one row per string per language).
+model Translation {
+  id        String   @id // sha1(lang + source text)
+  lang      String
+  source    String
+  text      String
+  createdAt DateTime @default(now())
+}

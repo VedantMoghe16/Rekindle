@@ -3,6 +3,7 @@ import "../styles/paytm.css";
 import { Lockup, StatusNotch } from "@/components/paytm/ui";
 import { Toaster } from "@/components/paytm/toast";
 import { DemoDrawer } from "@/components/paytm/demo-drawer";
+import { Translator } from "@/components/paytm/translator";
 
 export const metadata: Metadata = { title: "Paytm for Business · Vyapar AI", description: "An AI sales teammate for Paytm merchants: find nearby buyers, pitch in Hinglish, remember objections, close the loop." };
 export const viewport: Viewport = { themeColor: "#002e6e", width: "device-width", initialScale: 1 };
@@ -23,7 +24,7 @@ export default function AppLayout({ children }: Readonly<{ children: React.React
           <ol>
             <li><b>1</b>Sell: find nearby buyers, with reasons</li>
             <li><b>2</b>Buy: post a need, compare 3 real offers</li>
-            <li><b>3</b>Gemini + Sarvam write, speak and call in Hinglish</li>
+            <li><b>3</b>Gemini + Sarvam write, speak, call and translate in 22 Indian languages</li>
             <li><b>4</b>Cognee remembers every vendor, buyer and objection</li>
           </ol>
         </aside>
@@ -31,6 +32,7 @@ export default function AppLayout({ children }: Readonly<{ children: React.React
           <StatusNotch />
           {children}
           <Toaster />
+          <Translator />
         </div>
       </div>
       <DemoDrawer />

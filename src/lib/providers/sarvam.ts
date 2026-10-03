@@ -37,3 +37,16 @@ export async function sarvamTts(text: string, speaker = process.env.SARVAM_TTS_S
   if (!audio) throw new Error("Sarvam text-to-speech returned no audio");
   return Buffer.from(audio, "base64");
 }
+
+/** Sarvam Translate (sarvam-translate:v1, 22 Indian languages). One string per request; callers cache. */
+export async function sarvamTranslate(text: string, target: string, source = "en-IN"): Promise<string> {
+  const response = await fetch("https://api.sarvam.ai/translate", {
+    method: "POST",
+    headers: { "content-type": "application/json", "api-subscription-key": process.env.SARVAM_API_KEY ?? "" },
+    body: JSON.stringify({ input: text.slice(0, 2000), source_language_code: source, target_language_code: target, model: process.env.SARVAM_TRANSLATE_MODEL || "sarvam-translate:v1" }),
+    signal: AbortSignal.timeout(20_000),
+  });
+  if (!response.ok) throw new Error(`Sarvam translate returned ${response.status}: ${(await response.text()).slice(0, 200)}`);
+  const body = await response.json() as { translated_text?: string };
+  return body.translated_text ?? text;
+}

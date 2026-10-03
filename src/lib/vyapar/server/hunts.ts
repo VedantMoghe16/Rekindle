@@ -17,19 +17,20 @@ function parseLeadEvidence(raw: string): StoredLeadEvidence {
   return { reasons: [] };
 }
 
-const PLAN_SYSTEM = `You turn a small Indian merchant's request (English, Hindi or Hinglish) into a search plan over nearby Paytm merchants.
+const PLAN_SYSTEM = `You turn a small Indian merchant's request (English, Hinglish or any Indian language) into a search plan over nearby Paytm merchants.
 categories must be chosen only from: ${CATEGORY_NAMES.join(", ")}.
 radiusKm defaults to 5 when not stated. unitPriceInr is the price the seller mentioned, else null.
 minRating only when the seller asks for a rating floor. onlyWithSignals is true only when they ask for new, newly opened or growing shops.
 language is the language the pitch should use (default hinglish). pitchAngle is one sentence on why these buyers need the product.`;
 
-export async function createHunt(prompt: string) {
+/** `english` is a translation of a prompt spoken in another Indian language (from the mic), used by the rules parser and as a hint. */
+export async function createHunt(prompt: string, english?: string | null) {
   const seller = await getSeller();
   const ctx = { productCategory: seller.productCategory, product: seller.product, unitPriceInr: seller.unitPriceInr };
-  let plan = parsePrompt(prompt, ctx);
+  let plan = parsePrompt(english || prompt, ctx);
   let provenance = "rules";
   try {
-    const result = await callStructured({ tier: "fast", schema: HuntPlan, schemaName: "VyaparHuntPlan", system: PLAN_SYSTEM, user: `Seller: ${seller.merchant.name} (${seller.productCategory}), sells ${seller.product} from ₹${seller.unitPriceInr}.\nRequest: ${prompt}` });
+    const result = await callStructured({ tier: "fast", schema: HuntPlan, schemaName: "VyaparHuntPlan", system: PLAN_SYSTEM, user: `Seller: ${seller.merchant.name} (${seller.productCategory}), sells ${seller.product} from ₹${seller.unitPriceInr}.\nRequest: ${prompt}${english && english !== prompt ? `\n(English translation: ${english})` : ""}` });
     plan = normalisePlan(result.data, ctx);
     provenance = result.provenance === "live" ? (result.provider === "anthropic" ? "claude" : result.provider) : "cached";
   } catch (error) {

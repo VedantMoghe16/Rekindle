@@ -1,3 +1,4 @@
+import { LanguageButton } from "@/components/paytm/translator";
 import Link from "next/link";
 import { Bot, Brain, ShoppingCart, BookOpen, Calculator, CalendarDays, Check, ClipboardList, CreditCard, FileText, Gauge, Handshake, Landmark, Megaphone, Menu, Music, QrCode, ReceiptText, Sparkles, Speaker, Store, ChartColumn } from "lucide-react";
 import { HomeNav, SoonButton, SoonTile } from "@/components/paytm/nav";
@@ -15,6 +16,7 @@ export default async function Home() {
       <SoonButton label="Menu" className="icon-btn" ariaLabel="Menu"><Menu /></SoonButton>
       <Lockup size="sm" />
       <span className="grow" />
+      <LanguageButton />
       <SoonButton label="Announcements" className="icon-btn" ariaLabel="Announcements"><Megaphone /></SoonButton>
     </header>
     <main className="scroll">
