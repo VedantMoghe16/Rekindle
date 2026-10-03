@@ -1,0 +1,1 @@
+export default function AuditPage() { return <div className="content"><div className="eyebrow">P1 · Upcoming</div><h1>Pipeline Audit</h1><p className="subtitle">Upload a CRM export and find recoverable pipeline.</p><div className="placeholder">CSV audit is scheduled after the core revival loop.</div></div>; }

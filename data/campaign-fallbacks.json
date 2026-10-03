@@ -1,0 +1,215 @@
+{
+  "_note": "Deterministic campaign fallbacks used when Claude is offline. Only CloudKavach facts from the seeded SellerProfile: median onboarding 14 days, one-click cloud connectors, ISO 27001 Annex A mappings (changelog 22 Sep 2026). Tokens: {seller} {label} {count} {total} {share} {value} {topQuote}. Bracketed placeholders stay bracketed.",
+  "categories": {
+    "IMPLEMENTATION_EFFORT": [
+      {
+        "campaign_name": "Live in 14 days",
+        "core_message": "Live in 14 days, not 4 months.",
+        "rationale": "{count} of {total} stalled deals ({share} of stalled deals, {value} pipeline) stalled on implementation effort: buyers remember the last rollout, not our product. One put it plainly: “{topQuote}” The message answers that fear with two proof points about time and effort: median onboarding of 14 days and one-click cloud connectors.",
+        "linkedin_post": "Security tools rarely stall on price. They stall on the memory of the last rollout.\n\nWe hear it from engineering leaders every month: the last compliance tool took months to onboard and pulled engineers off the roadmap. So when the next one shows up, the answer is \"not now\".\n\nThat is a fair objection. Here is our answer:\n\n→ Median onboarding time at {seller} is 14 days.\n→ One-click cloud connectors, so your team connects accounts instead of building integrations.\n→ ISO 27001 Annex A mappings are built in.\n\n[customer name] went from kickoff to live in [metric] days.\n\nIf rollout effort is what is holding your compliance plan back, let's look at what 14 days would mean for your team.\n\nLive in 14 days, not 4 months.",
+        "x_thread": [
+          "Security tools rarely stall on price. They stall on the memory of the last rollout: months of onboarding, engineers pulled off the roadmap. A short thread on why that should not be the default.",
+          "\"Not another quarter-long implementation\" is the objection we hear most from engineering leaders. Fair. Here is what onboarding with {seller} looks like instead.",
+          "Median onboarding time: 14 days. One-click cloud connectors instead of integration work. ISO 27001 Annex A mappings built in.",
+          "[customer name] went from kickoff to live in [metric] days, and their platform team kept shipping.",
+          "Live in 14 days, not 4 months. If rollout effort is what is blocking your compliance plan, reply and we will share the 14-day plan."
+        ],
+        "nurture_email": {
+          "subject": "Live in 14 days, not 4 months",
+          "body": "Hi [first name],\n\nWhen we last spoke, the concern was not whether {seller} would help. It was whether your team could absorb another long rollout. That is fair, and we have heard it from several engineering teams this year.\n\nHere is what onboarding looks like now:\n- Median onboarding time is 14 days.\n- One-click cloud connectors for your cloud accounts.\n- ISO 27001 Annex A mappings built in.\n\nI can share a 14-day plan for your stack, including the engineer hours we would need: [hours].\n\nWorth 20 minutes next week?\n\n[your name]"
+        },
+        "landing_hero": {
+          "headline": "Live in 14 days, not 4 months.",
+          "subhead": "Median onboarding time is 14 days. One-click cloud connectors and built-in ISO 27001 Annex A mappings keep your engineers on the roadmap.",
+          "cta": "See the 14-day plan"
+        },
+        "angle_tags": [
+          "Speed",
+          "Proof",
+          "Pain"
+        ]
+      },
+      {
+        "campaign_name": "Onboard in 14 days",
+        "core_message": "Onboard in 14 days. Keep shipping.",
+        "rationale": "{count} of {total} stalled deals ({share}, {value} pipeline) cite implementation effort; the fear is lost engineering time. One buyer said: “{topQuote}” This variant leads with the team's roadmap and backs it with the 14-day median onboarding and one-click cloud connectors.",
+        "linkedin_post": "Your roadmap should not pay for your compliance tool.\n\nThe pattern we see: a team picks a security platform, onboarding drags on, and two engineers quietly disappear from the sprint board for a quarter. Next time, nobody wants to go through it again.\n\nWe built {seller} so onboarding is small:\n\n→ Median onboarding time is 14 days.\n→ One-click cloud connectors.\n→ ISO 27001 Annex A mappings included.\n\n[customer name] kept their release schedule through onboarding: [metric].\n\nOnboard in 14 days. Keep shipping.",
+        "x_thread": [
+          "Your roadmap should not pay for your compliance tool. A thread on onboarding that does not eat a quarter.",
+          "The usual story: onboarding drags, two engineers vanish from the sprint board, and the team swears off the next tool.",
+          "With {seller}: median onboarding time is 14 days, one-click cloud connectors, ISO 27001 Annex A mappings included.",
+          "Onboard in 14 days. Keep shipping. Reply if you want the 14-day plan."
+        ],
+        "nurture_email": {
+          "subject": "Onboarding without losing a sprint",
+          "body": "Hi [first name],\n\nYou mentioned that the last rollout cost your team real engineering time. That is the part we have worked hardest on.\n\n- Median onboarding time is 14 days.\n- One-click cloud connectors.\n- ISO 27001 Annex A mappings included.\n\nHappy to walk through a 14-day plan and the hours it would need from your engineers: [hours].\n\nWould next week work?\n\n[your name]"
+        },
+        "landing_hero": {
+          "headline": "Onboard in 14 days. Keep shipping.",
+          "subhead": "Median onboarding time is 14 days, with one-click cloud connectors and ISO 27001 Annex A mappings included.",
+          "cta": "Get the 14-day plan"
+        },
+        "angle_tags": [
+          "Speed",
+          "Pain"
+        ]
+      }
+    ],
+    "BUDGET": [
+      {
+        "campaign_name": "Prove it in 14 days",
+        "core_message": "Start small. Prove value in 14 days.",
+        "rationale": "{count} of {total} stalled deals ({share}, {value} pipeline) stalled on budget. One buyer said: “{topQuote}” Instead of arguing price, the message lowers the size of the first decision, using the 14-day median onboarding so a buyer can see value inside one budget cycle.",
+        "linkedin_post": "\"No budget right now\" usually means \"not a big, risky commitment right now\".\n\nThat is reasonable. So make the first step small.\n\nWith {seller}:\n→ Median onboarding time is 14 days, so you see results inside the same quarter.\n→ One-click cloud connectors, so the pilot does not need an integration project.\n→ ISO 27001 Annex A mappings built in.\n\n[customer name] started with [scope] and expanded after [metric].\n\nStart small. Prove value in 14 days.",
+        "x_thread": [
+          "\"No budget right now\" usually means \"not a big, risky commitment right now\". Fair. Make the first step smaller.",
+          "With {seller}, median onboarding time is 14 days, so a pilot shows results inside the same quarter.",
+          "One-click cloud connectors. ISO 27001 Annex A mappings built in. Start with [scope], expand when it earns it.",
+          "Start small. Prove value in 14 days."
+        ],
+        "nurture_email": {
+          "subject": "A smaller first step",
+          "body": "Hi [first name],\n\nWhen we spoke, budget was the blocker, and that is completely fair.\n\nOne option: start with [scope] instead of the full rollout. Median onboarding time with {seller} is 14 days, so you would see results inside one quarter, with one-click cloud connectors and ISO 27001 Annex A mappings included.\n\nIf the numbers look different now, I am happy to sketch what a small first phase would cost: [price].\n\n[your name]"
+        },
+        "landing_hero": {
+          "headline": "Start small. Prove value in 14 days.",
+          "subhead": "A focused first phase with median onboarding of 14 days, one-click cloud connectors and ISO 27001 Annex A mappings.",
+          "cta": "Scope a first phase"
+        },
+        "angle_tags": [
+          "Pain",
+          "Speed"
+        ]
+      }
+    ],
+    "NO_OWNER": [
+      {
+        "campaign_name": "Compliance without a security team",
+        "core_message": "No security owner yet? Start anyway.",
+        "rationale": "{count} of {total} stalled deals ({share}, {value} pipeline) stalled because nobody owns security yet. One buyer said: “{topQuote}” The message shows that the first steps are light enough for an engineering lead to own, using one-click cloud connectors and built-in ISO 27001 Annex A mappings.",
+        "linkedin_post": "\"We don't have anyone owning security yet\" is one of the most honest objections we hear.\n\nBut waiting for the hire often means the audit arrives first.\n\nThe first steps with {seller} are light enough for an engineering lead to own:\n→ One-click cloud connectors.\n→ ISO 27001 Annex A mappings built in.\n→ Median onboarding time is 14 days.\n\nWhen your security owner joins, they inherit a working programme instead of a blank page.\n\nNo security owner yet? Start anyway.",
+        "x_thread": [
+          "\"Nobody owns security here yet\" is an honest objection. But waiting for the hire often means the audit shows up first.",
+          "With {seller}: one-click cloud connectors, ISO 27001 Annex A mappings built in, median onboarding time of 14 days.",
+          "Your future security lead inherits a working programme, not a blank page. No security owner yet? Start anyway."
+        ],
+        "nurture_email": {
+          "subject": "Before your security hire starts",
+          "body": "Hi [first name],\n\nYou mentioned there was no one owning security yet. Many teams start before that hire lands, so the new owner inherits a working programme.\n\nWith {seller}, an engineering lead can get going: one-click cloud connectors, ISO 27001 Annex A mappings built in, and a median onboarding time of 14 days.\n\nShall I send a short plan your team could run until the role is filled?\n\n[your name]"
+        },
+        "landing_hero": {
+          "headline": "No security owner yet? Start anyway.",
+          "subhead": "One-click cloud connectors and built-in ISO 27001 Annex A mappings, with median onboarding of 14 days.",
+          "cta": "See the starter plan"
+        },
+        "angle_tags": [
+          "Pain",
+          "Proof"
+        ]
+      }
+    ],
+    "COMPETITOR_LOCKIN": [
+      {
+        "campaign_name": "Plan the switch before renewal",
+        "core_message": "Your renewal is a decision, not a default.",
+        "rationale": "{count} of {total} stalled deals ({share}, {value} pipeline) are locked into an incumbent contract. One buyer said: “{topQuote}” The message reframes the renewal date as a decision point and uses the 14-day median onboarding to show a switch fits inside the renewal window.",
+        "linkedin_post": "Most security contracts are not renewed. They are defaulted into.\n\nIf your renewal is coming up, the question is simple: would you buy the same tool again today?\n\nIf the answer is \"maybe not\", the switch is smaller than it looks:\n→ Median onboarding time with {seller} is 14 days.\n→ One-click cloud connectors.\n→ ISO 27001 Annex A mappings built in.\n\nStart the evaluation [weeks] weeks before renewal and you can switch without a gap.\n\nYour renewal is a decision, not a default.",
+        "x_thread": [
+          "Most security contracts are not renewed. They are defaulted into.",
+          "If your renewal is near, ask: would we buy this tool again today?",
+          "If not, switching is smaller than it looks. Median onboarding with {seller} is 14 days, with one-click cloud connectors and ISO 27001 Annex A mappings.",
+          "Your renewal is a decision, not a default."
+        ],
+        "nurture_email": {
+          "subject": "Before your renewal date",
+          "body": "Hi [first name],\n\nYou mentioned your current contract runs until [renewal date]. Teams that switch well usually start comparing options [weeks] weeks before that.\n\nMedian onboarding time with {seller} is 14 days, with one-click cloud connectors and ISO 27001 Annex A mappings, so a switch fits inside the window.\n\nWant a side-by-side plan you can take into the renewal conversation?\n\n[your name]"
+        },
+        "landing_hero": {
+          "headline": "Your renewal is a decision, not a default.",
+          "subhead": "Switch inside your renewal window: median onboarding of 14 days with one-click cloud connectors.",
+          "cta": "Plan your switch"
+        },
+        "angle_tags": [
+          "Timing",
+          "Proof"
+        ]
+      }
+    ],
+    "MISSING_FEATURE": [
+      {
+        "campaign_name": "ISO 27001 Annex A is live",
+        "core_message": "ISO 27001 Annex A mappings are live.",
+        "rationale": "{count} of {total} stalled deals ({share}, {value} pipeline) stalled on a missing capability. One buyer said: “{topQuote}” The changelog shows ISO 27001 Annex A control mapping shipped on 22 Sep 2026, so the message tells those buyers the gap is closed.",
+        "linkedin_post": "\"Our auditors need ISO 27001, not just one framework\" was a fair objection. It is now answered.\n\nAs of 22 September 2026, {seller} ships ISO 27001 Annex A control mapping.\n\n→ Annex A mappings built in.\n→ One-click cloud connectors.\n→ Median onboarding time of 14 days.\n\nIf ISO 27001 was the reason you paused, it is worth another look.\n\nISO 27001 Annex A mappings are live.",
+        "x_thread": [
+          "Shipped: ISO 27001 Annex A control mapping in {seller} (22 Sep 2026).",
+          "If auditors asked you for ISO 27001 and your tool could not map it, that gap is closed.",
+          "One-click cloud connectors, Annex A mappings built in, median onboarding time of 14 days. Worth another look."
+        ],
+        "nurture_email": {
+          "subject": "The ISO 27001 gap is closed",
+          "body": "Hi [first name],\n\nWhen we last spoke, ISO 27001 Annex A mapping was the missing piece for your auditors. As of 22 September 2026, {seller} ships it.\n\nCombined with one-click cloud connectors and a median onboarding time of 14 days, you could be audit-ready before [deadline].\n\nWant a quick walkthrough of the Annex A mappings?\n\n[your name]"
+        },
+        "landing_hero": {
+          "headline": "ISO 27001 Annex A mappings are live.",
+          "subhead": "Shipped 22 September 2026, with one-click cloud connectors and median onboarding of 14 days.",
+          "cta": "See the mappings"
+        },
+        "angle_tags": [
+          "Proof",
+          "New"
+        ]
+      }
+    ],
+    "TIMING": [
+      {
+        "campaign_name": "When the timing is right",
+        "core_message": "When the time comes, 14 days is all it takes.",
+        "rationale": "{count} of {total} stalled deals ({share}, {value} pipeline) were parked for timing. One buyer said: “{topQuote}” The message keeps the door open without pressure and uses the 14-day median onboarding to show that starting later does not mean finishing late.",
+        "linkedin_post": "\"Let's revisit next quarter\" is rarely a no. It is a calendar problem.\n\nThe risk is that next quarter arrives with an audit attached.\n\nWith {seller}:\n→ Median onboarding time is 14 days.\n→ One-click cloud connectors.\n→ ISO 27001 Annex A mappings built in.\n\nSo when the timing is right, you are not starting a quarter-long project. You are starting a two-week one.\n\nWhen the time comes, 14 days is all it takes.",
+        "x_thread": [
+          "\"Let's revisit next quarter\" is rarely a no. It is a calendar problem.",
+          "With {seller}, median onboarding time is 14 days, with one-click cloud connectors and ISO 27001 Annex A mappings built in.",
+          "When the timing is right, you start a two-week project, not a quarter-long one."
+        ],
+        "nurture_email": {
+          "subject": "Picking this back up",
+          "body": "Hi [first name],\n\nYou suggested we reconnect around [date], so I am keeping my promise.\n\nIf now is a better time, the good news is that starting does not take long: median onboarding time with {seller} is 14 days, with one-click cloud connectors and ISO 27001 Annex A mappings built in.\n\nWould a 20-minute catch-up this month make sense?\n\n[your name]"
+        },
+        "landing_hero": {
+          "headline": "When the time comes, 14 days is enough.",
+          "subhead": "Median onboarding of 14 days, one-click cloud connectors and ISO 27001 Annex A mappings.",
+          "cta": "Book a planning call"
+        },
+        "angle_tags": [
+          "Timing",
+          "Speed"
+        ]
+      }
+    ]
+  },
+  "generic": {
+    "campaign_name": "Compliance in 14 days",
+    "core_message": "Compliance in 14 days, not quarters.",
+    "rationale": "{count} of {total} stalled deals ({share}, {value} pipeline) sit under “{label}”. One buyer said: “{topQuote}” Without a direct proof point for this objection, the message leans on the strongest facts we have: 14-day median onboarding and one-click cloud connectors.",
+    "linkedin_post": "Security and compliance programmes stall for many reasons. Few of them are about the product.\n\nWhat we can promise is that getting started is not the hard part:\n→ Median onboarding time with {seller} is 14 days.\n→ One-click cloud connectors.\n→ ISO 27001 Annex A mappings built in.\n\n[customer name] reached [metric] within [timeframe].\n\nCompliance in 14 days, not quarters.",
+    "x_thread": [
+      "Security programmes stall for many reasons. Getting started should not be one of them.",
+      "With {seller}: median onboarding time of 14 days, one-click cloud connectors, ISO 27001 Annex A mappings built in.",
+      "Compliance in 14 days, not quarters."
+    ],
+    "nurture_email": {
+      "subject": "Checking back in",
+      "body": "Hi [first name],\n\nIt has been a while since we spoke, and I wanted to share what has changed at {seller}: median onboarding time is 14 days, with one-click cloud connectors and ISO 27001 Annex A mappings built in.\n\nIf the reasons we paused have shifted, I would be glad to reconnect for 20 minutes.\n\n[your name]"
+    },
+    "landing_hero": {
+      "headline": "Compliance in 14 days, not quarters.",
+      "subhead": "Median onboarding of 14 days, one-click cloud connectors and ISO 27001 Annex A mappings.",
+      "cta": "Talk to us"
+    },
+    "angle_tags": [
+      "Speed",
+      "Proof"
+    ]
+  }
+}

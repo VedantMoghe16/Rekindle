@@ -1,0 +1,7 @@
+Call notes — Kredo Lending — 2 April 2026
+Ananya: Meera, thanks for taking the time. Where did the team land after the demo?
+Meera Iyer (CTO): Dekho, product accha hai, no doubt. The problem is we don't have anyone owning security right now.
+Meera: Mera infra team already stretched hai, and if we buy a tool with no owner, it'll become shelfware.
+Meera: Once we hire a dedicated security lead, that person should evaluate this. We're hoping to start hiring by Q3.
+Ananya: That makes sense. Should I send over the RBI framework report pack in the meantime?
+Meera: Haan, send it. And keep in touch.

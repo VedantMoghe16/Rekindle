@@ -1,0 +1,16 @@
+From: Arjun Shah <arjun@mediloop.example>
+To: Ananya Rao <ananya@cloudkavach.example>
+Date: 20 Jan 2026
+Subject: Re: CloudKavach proposal
+
+Hi Ananya,
+
+Thanks for the detailed proposal, and the team liked the audit-readiness dashboard.
+
+Unfortunately we signed a one-year contract with SecureGrid in December, and it runs till 15 December 2026. Breaking it isn't an option for us.
+
+Do reach out about two months before the renewal. We'll be reviewing alternatives then, and honestly their reporting has been weak.
+
+Regards,
+Arjun Shah
+Head of IT, MediLoop Health

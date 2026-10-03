@@ -1,4 +1,21 @@
-.ai-state/
-.ai-logs/
+# Dependencies and build output
+node_modules
+.next
+*.tsbuildinfo
+
+# Local databases (app state and caches are recreated by npm run demo:reset)
+prisma/*.db
+prisma/*.db-journal
+
+# Secrets: never commit real environment files, but keep the documented template
 .env
 .env.*
+!.env.example
+
+# Agent orchestration state
+.ai-state/
+.ai-logs/
+
+# Editor and OS
+.DS_Store
+.claude/settings.local.json
