@@ -17,7 +17,7 @@ import { hourLabel, nextSlot, paymentProfile, type TimingStrategy } from "@/lib/
  */
 
 export const DEFAULT_CONTACTS = [
-  { priority: 1, label: "Priority 1", phone: process.env.DEMO_CALL_PHONE || "+919755812313", telegramChatId: process.env.VYAPAR_TELEGRAM_CHAT_ID || "2145717919" },
+  { priority: 1, label: "Priority 1", phone: process.env.DEMO_CALL_PHONE || null, telegramChatId: process.env.VYAPAR_TELEGRAM_CHAT_ID || "2145717919" },
   { priority: 2, label: "Priority 2", phone: null as string | null, telegramChatId: null as string | null },
 ];
 

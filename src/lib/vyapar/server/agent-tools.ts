@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { normalizePhone } from "@/lib/providers/sarvam-agent";
+import { demoPhone } from "@/lib/vyapar/server/demo-phone";
 import { tgSendText, demoChatId, isTelegramConfigured } from "@/lib/providers/telegram";
 import { counterFor, lastBuyerTurn, lessons, offerSheet, parseObjections, parseQty, quote, topPlays } from "@/lib/vyapar/agent-brain";
 import { firstName } from "@/lib/vyapar/pitch";
@@ -30,7 +31,7 @@ export async function resolveDeal(input: ToolInput) {
     const routed = await db.vyaparDeal.findFirst({ where: { demoPhone: { in: [phone, phone.replace(/^\+91/, "")] } }, orderBy: { lastTouchAt: "desc" } });
     if (dialing && (!routed || routed.id === dialing.dealId || !routed.demoPhone)) return db.vyaparDeal.findUnique({ where: { id: dialing.dealId } });
     if (routed) return routed;
-    const demo = normalizePhone(process.env.DEMO_CALL_PHONE || process.env.DEMO_KARAN_PHONE || "");
+    const demo = (await demoPhone()) ?? "";
     if (demo && phone === demo) {
       const lastCall = await db.vyaparAction.findFirst({ where: { type: "AI_CALL" }, orderBy: { createdAt: "desc" } });
       if (lastCall) return db.vyaparDeal.findUnique({ where: { id: lastCall.dealId } });

@@ -9,6 +9,7 @@ import { OBJECTION_LABELS, STAGE_LABELS, type Stage } from "@/lib/vyapar/taxonom
 import { estimateValue, getSeller, liveNow, remember, shortRef, viewMerchant } from "@/lib/vyapar/server/context";
 import { logEvent } from "@/lib/vyapar/server/opportunities";
 import { createOutboundCall, fetchTranscript, initialBotMessage, normalizePhone, parseFinalVariables, pollAttempt, sarvamConfig, sarvamConfigFor, SarvamConfigError, webhookUrlFor, type SarvamOutboundWebhook, type TranscriptTurn } from "@/lib/providers/sarvam-agent";
+import { demoPhone } from "@/lib/vyapar/server/demo-phone";
 import { z } from "zod";
 import { buildPayload, type Scenario } from "@/lib/vyapar/call-simulation";
 import { demoChatId, isTelegramConfigured, tgSendText, tgSendVoice } from "@/lib/providers/telegram";
@@ -236,12 +237,11 @@ export async function agentVariables(dealId: string) {
 
 // ---------- Live calls through the published Sarvam "Vyapar SDR" agent ----------
 
-/** Only the demo buyer can be dialled: fictional merchants have no real numbers (DEMO_KARAN_PHONE = your own phone). */
-function dialPhone(deal: { demoPhone: string | null }): string | null {
+/** Only the demo buyer can be dialled: fictional merchants have no real numbers, so calls ring the visitor's own phone. */
+async function dialPhone(deal: { demoPhone: string | null }): Promise<string | null> {
   // DECISION (demo): fictional merchants have no real numbers. A fleet run routes each target to a demo contact
-  // (deal.demoPhone); otherwise every AI call rings the one demo phone.
-  const demo = (deal.demoPhone || process.env.DEMO_CALL_PHONE || process.env.DEMO_KARAN_PHONE)?.trim();
-  return demo ? normalizePhone(demo) : null;
+  // (deal.demoPhone); otherwise every AI call rings the one demo phone (asked on first visit).
+  return deal.demoPhone?.trim() ? normalizePhone(deal.demoPhone) : demoPhone();
 }
 const mask = (p: string | null) => (p ? `${p.slice(0, 3)}••••••${p.slice(-4)}` : "No phone configured");
 
@@ -249,10 +249,10 @@ export async function previewAgentCall(dealId: string) {
   const vars = await agentVariables(dealId);
   if (!vars) return null;
   const deal = await db.vyaparDeal.findUniqueOrThrow({ where: { id: dealId } });
-  const phone = dialPhone(deal);
+  const phone = await dialPhone(deal);
   const missing: string[] = [];
   try { sarvamConfig(); } catch (error) { if (error instanceof SarvamConfigError) missing.push(...error.missing); else throw error; }
-  if (!phone) missing.push("DEMO_CALL_PHONE (the one demo phone every AI call rings)");
+  if (!phone) missing.push("Your phone number (tap ? on the Vyapar AI home screen)");
   const { persona } = await getSeller();
   let voiceMatches = true;
   try { voiceMatches = sarvamConfigFor(persona.gender).voiceMatches; } catch { /* reported in missing */ }
@@ -278,7 +278,7 @@ export async function startAgentCall(dealId: string, opts: { provider?: "sarvam"
   const deal = await db.vyaparDeal.findUniqueOrThrow({ where: { id: dealId } });
   // The male-voice app for a male seller (Sarvam sets the voice per app); the opening line already agrees in gender.
   const cfg = sarvamConfigFor(preview.agent.gender);
-  const { attemptId } = await createOutboundCall({ phone: dialPhone(deal)!, variables: preview.variables, webhookUrl: webhookUrlFor(cfg), webhookMetadata: { dealId, secret: cfg.webhookSecret }, initialBotMessage: preview.initialBotMessage, initialLanguageName: "Hindi" }, { config: cfg });
+  const { attemptId } = await createOutboundCall({ phone: (await dialPhone(deal))!, variables: preview.variables, webhookUrl: webhookUrlFor(cfg), webhookMetadata: { dealId, secret: cfg.webhookSecret }, initialBotMessage: preview.initialBotMessage, initialLanguageName: "Hindi" }, { config: cfg });
   await db.vyaparAction.create({ data: { dealId, type: "AI_CALL", status: "dialing", summary: `AI call · Sarvam Vyapar SDR · ${preview.phoneMasked}`, payloadJson: JSON.stringify({ lines: [`Calling ${preview.phoneMasked}`, `Opening: ${preview.initialBotMessage}`] }), ref: attemptId, provider: "sarvam", createdAt: liveNow() } });
   return { attemptId, provider, phoneMasked: preview.phoneMasked, result: null };
 }
