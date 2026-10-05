@@ -1,0 +1,17 @@
+node_modules
+.next
+.git
+.env
+.env.*
+!.env.example
+prisma/*.db
+prisma/*.db-journal
+cognee/.venv
+cognee/.data
+cognee/.env
+cognee/__pycache__
+*.log
+*.tsbuildinfo
+*.pdf
+.ai-state
+.ai-logs
